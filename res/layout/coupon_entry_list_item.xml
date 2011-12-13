@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<!-- Layout for individual news entries in a list -->
+<!-- Layout for individual coupon entries in a list -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <!-- Icon shown next to the title/subtitle -->
+    <!-- Icon shown next to the title/text -->
     <ImageView
-        android:id="@+id/news_entry_icon"
+        android:id="@+id/coupon_entry_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:padding="3dp" />
 
-    <!-- Title of the news entry -->
+    <!-- Title of the coupon entry -->
     <TextView
-        android:id="@+id/news_entry_title"
+        android:id="@+id/coupon_entry_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/news_entry_icon"
-        android:layout_alignTop="@id/news_entry_icon"
+        android:layout_toRightOf="@id/coupon_entry_icon"
+        android:layout_alignTop="@id/coupon_entry_icon"
         android:layout_margin="5dp"
         android:textSize="14sp"
         android:textStyle="bold" />
     
-    <!-- Subtitle contains author and date -->
-    <TextView android:id="@+id/news_entry_subtitle"
+    <!-- Text contains coupon description -->
+    <TextView android:id="@+id/coupon_entry_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" 
-        android:layout_alignLeft="@id/news_entry_title" 
-        android:layout_below="@id/news_entry_title" 
+        android:layout_alignLeft="@id/coupon_entry_title" 
+        android:layout_below="@id/coupon_entry_title" 
         android:textSize="12sp" />
 
 </RelativeLayout>

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// NewsEntry
+// Coupon
 //-----------------------------------------------------------------------------
 
 package com.tiktok.consumerapp;
@@ -14,25 +14,26 @@ import java.util.Date;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public final class NewsEntry 
+public final class Coupon 
 {
     
     /**
      * Called when the activity is first created. 
      */
-    public NewsEntry(final String title, final String author, 
-                     final Date postDate, final int icon)
+    public Coupon(final String title, final String text, 
+                  final Date startTime, final Date endTime, final int icon)
     {
-        mTitle    = title;
-        mAuthor   = author;
-        mPostDate = postDate;
-        mIcon     = icon;
+        mTitle     = title;
+        mText      = text;
+        mStartTime = startTime;
+        mEndTime   = endTime;
+        mIcon      = icon;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * @return Title of news entry.
+     * @return Title of coupon.
      */
     public String getTitle()
     {
@@ -42,27 +43,37 @@ public final class NewsEntry
     //-------------------------------------------------------------------------
 
     /**
-     * @return Author of the news.
+     * @return Text description of the coupon.
      */
-    public String getAuthor()
+    public String getText()
     {
-        return mAuthor;
+        return mText;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * @return Post date of the news entry.
+     * @return Starting time coupon is available for use.
      */
-    public Date getPostDate()
+    public Date getStartTime()
     {
-        return mPostDate;
+        return mStartTime;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * @return Icon of this news entry.
+     * @return Ending time coupon is expired.
+     */
+    public Date getEndTime()
+    {
+        return mEndTime;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Icon of this coupon.
      */
     public int getIcon() 
     {
@@ -74,8 +85,9 @@ public final class NewsEntry
     //-------------------------------------------------------------------------
 
     private final String mTitle;
-    private final String mAuthor;
-    private final Date   mPostDate;
+    private final String mText;
+    private final Date   mStartTime;
+    private final Date   mEndTime;
     private final int    mIcon;
 
 }

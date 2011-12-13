@@ -33,12 +33,12 @@ public class TikTokActivity extends Activity
         setContentView(R.layout.main);
 
         // setup the list view
-        final ListView listView        = (ListView)findViewById(R.id.list);
-        final NewsEntryAdapter adapter = new NewsEntryAdapter(this, R.layout.news_entry_list_item);
+        final ListView listView     = (ListView)findViewById(R.id.list);
+        final CouponAdapter adapter = new CouponAdapter(this, R.layout.coupon_entry_list_item);
         listView.setAdapter(adapter);
 
         // populate the list adapter
-        for (final NewsEntry entry : getNewsEntries()) {
+        for (final Coupon entry : getCoupons()) {
             adapter.add(entry);
         }
     }
@@ -103,18 +103,19 @@ public class TikTokActivity extends Activity
     /**
      * 
      */
-    protected List<NewsEntry> getNewsEntries()
+    protected List<Coupon> getCoupons()
     {
         // lets setup some test data
         // normally this wound come from some asynchronous fetch into a data
         // source such as a sqlite db, or an HTPP request
-        final List<NewsEntry> entries = new ArrayList<NewsEntry>();
+        final List<Coupon> entries = new ArrayList<Coupon>();
         for (int i = 0; i < 50; ++i) {
-            int icon = i % 2 == 0 ? R.drawable.news_icon_1 : R.drawable.news_icon_2;
-            NewsEntry entry = new NewsEntry(
-                "Test Entry " + i,
-                "Anonymous Author " + i,
+            int icon = i % 2 == 0 ? R.drawable.coupon_icon_1 : R.drawable.coupon_icon_2;
+            Coupon entry = new Coupon(
+                "Coupon Entry " + i,
+                "Coupon Text " + i,
                 new GregorianCalendar(2011, 11, i).getTime(),
+                new GregorianCalendar(2011, 11, i + 1).getTime(),
                 icon);
             entries.add(entry);
         }
