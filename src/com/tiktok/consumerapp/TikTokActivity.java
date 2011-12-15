@@ -8,13 +8,13 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -42,23 +42,13 @@ public class TikTokActivity extends Activity
         mCursor = mDatabaseAdapter.fetchAllCoupons();
         startManagingCursor(mCursor);
 
-        // if db empty add a bunch of randomly generated coupons
-        if (mCursor.getCount() == 0) {
-            for (final Coupon entry : getCoupons()) {
-                mDatabaseAdapter.createCoupon(entry.getTitle(), entry.getText(), entry.getIcon());
-            }
-            mCursor = mDatabaseAdapter.fetchAllCoupons();
-        }
-
         // setup data/ui mapping
         String[] from = new String[] { 
             CouponTable.sKeyTitle, 
-            CouponTable.sKeyDescription, 
             CouponTable.sKeyIcon 
         };
         int[] to = new int[] { 
             R.id.coupon_entry_title, 
-            R.id.coupon_entry_text, 
             R.id.coupon_entry_icon 
         };
 
@@ -69,6 +59,9 @@ public class TikTokActivity extends Activity
         // update list view to use adapter
         final ListView listView = (ListView)findViewById(R.id.list);
         listView.setAdapter(adapter);
+
+        // run sync coupons task
+        new SyncCouponsTask(adapter, mDatabaseAdapter).execute();
 
         /*
         // setup the list view
@@ -140,31 +133,6 @@ public class TikTokActivity extends Activity
     }
 
     //-------------------------------------------------------------------------
-    
-    /**
-     * 
-     */
-    protected List<Coupon> getCoupons()
-    {
-        // lets setup some test data
-        // normally this wound come from some asynchronous fetch into a data
-        // source such as a sqlite db, or an HTPP request
-        final List<Coupon> entries = new ArrayList<Coupon>();
-        for (int i = 0; i < 50; ++i) {
-            int icon = i % 2 == 0 ? R.drawable.coupon_icon_1 : R.drawable.coupon_icon_2;
-            Coupon entry = new Coupon(
-                "Coupon aa Entry " + i,
-                "Coupon aa Text " + i,
-                new GregorianCalendar(2011, 11, i).getTime(),
-                new GregorianCalendar(2011, 11, i + 1).getTime(),
-                icon);
-            entries.add(entry);
-        }
-
-        return entries;
-    }
-
-    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
     
@@ -172,3 +140,56 @@ public class TikTokActivity extends Activity
     private Cursor                mCursor;
 
 }
+
+//-----------------------------------------------------------------------------
+// SyncCouponsTask
+//-----------------------------------------------------------------------------
+
+class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
+{
+
+    public SyncCouponsTask(SimpleCursorAdapter cursorAdapter, 
+                           TikTokDatabaseAdapter databaseAdapter)
+    {
+        mCursorAdapter   = cursorAdapter;
+        mDatabaseAdapter = databaseAdapter;
+    }
+
+    @Override
+    public void onPreExecute() 
+    {
+    }
+
+    public Cursor doInBackground(Void... params)
+    {
+        // create and instance of the tiktok api and grab the available coupons
+        TikTokApi api     = new TikTokApi();
+        Coupon[] coupons = api.getCoupons();
+
+        // add only new coupons to the database
+        List<Long> currentIds = mDatabaseAdapter.fetchAllCouponIds();
+        for (final Coupon coupon : coupons) {
+            if (!currentIds.contains(coupon.getId())) {
+                mDatabaseAdapter.createCoupon(coupon);
+                Log.w(getClass().getSimpleName(), String.format(
+                    "Added coupon to db: %s", coupon.getTitle()));
+            }
+        }
+
+        // update the cursor in the adapter
+        return mDatabaseAdapter.fetchAllCoupons();
+    }
+
+    @Override
+    public void onPostExecute(Cursor cursor) {
+        mCursorAdapter.changeCursor(cursor);
+    }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+    
+    private SimpleCursorAdapter   mCursorAdapter;
+    private TikTokDatabaseAdapter mDatabaseAdapter;
+}
+

@@ -38,7 +38,7 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     //-------------------------------------------------------------------------
 
     /**
-     * Method is called during upgrade of the database, if the database verison
+     * Method is called during upgrade of the database, if the database version
      * is increased.
      */
     @Override

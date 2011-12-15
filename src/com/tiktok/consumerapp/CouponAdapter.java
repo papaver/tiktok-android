@@ -46,12 +46,9 @@ public final class CouponAdapter extends ArrayAdapter<Coupon>
         viewHolder.titleView.setText(entry.getTitle());
 
         // add formating to subtitle view
-        /*
-        final String formattedSubTitle = String.format("By %s on %s",
-            entry.getAuthor(),
-            DateFormat.getDateInstance(DateFormat.SHORT).format(entry.getPostDate()));
-        */
-        viewHolder.textView.setText(entry.getText());
+        final String formattedText = String.format("Expires on %s",
+            DateFormat.getDateInstance(DateFormat.SHORT).format(entry.getEndTime()));
+        viewHolder.textView.setText(formattedText);
 
         // setting image view is also simple
         viewHolder.imageView.setImageResource(entry.getIcon());

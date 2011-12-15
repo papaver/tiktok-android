@@ -37,7 +37,7 @@ public class CouponTable
         // this is obviously the worst implementation ever
        
         Log.w(CouponTable.class.getName(), String.format(
-            "%s: Upgrading database from version %d to %d " +
+            "Upgrading database from version %d to %d " +
             "which will destroy all data.", oldVersion, newVersion));
 
         // drop the table 
@@ -57,8 +57,11 @@ public class CouponTable
         String createSQL = 
             "create table " + sName + "("                            +
             sKeyRowId       + " integer primary key autoincrement, " +
+            sKeyId          + " integer not null,                  " +
             sKeyTitle       + " text    not null,                  " +
-            sKeyDescription + " text    not null,                  " + 
+            sKeyImageUrl    + " text    not null,                  " +
+            sKeyStartTime   + " integer not null,                  " + 
+            sKeyEndTime     + " integer not null,                  " + 
             sKeyIcon        + " integer not null                   " + ");";
         return createSQL;
     }
@@ -89,11 +92,13 @@ public class CouponTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName           = "Coupon";
-
-    public static String sKeyRowId       = "_id";
-    public static String sKeyTitle       = "title";
-    public static String sKeyDescription = "description";
-    public static String sKeyIcon        = "icon";
+    public static String sName         = "Coupon";
+    public static String sKeyRowId     = "_id";
+    public static String sKeyId        = "coupon_id";
+    public static String sKeyTitle     = "title";
+    public static String sKeyImageUrl  = "image_url";
+    public static String sKeyStartTime = "start_time";
+    public static String sKeyEndTime   = "end_time";
+    public static String sKeyIcon      = "icon";
 
 }

@@ -8,6 +8,9 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -54,9 +57,28 @@ public class TikTokDatabaseAdapter
      * Create a new coupon.
      * @returns The rowId for the new coupon that is created, otherwise a -1.
      */
-    public long createCoupon(String title, String description, int icon)
+    public long createCoupon(Coupon coupon)
     {
-        ContentValues values = createContentValues(title, description, icon);
+        // TODO:: update this so you get the proper icon...
+        int icon = ((int)(coupon.getId()) % 2) == 0 ? R.drawable.coupon_icon_1 : R.drawable.coupon_icon_2;
+
+        ContentValues values = createContentValues(
+            coupon.getId(), coupon.getTitle(), coupon.getImageUrl(), 
+            coupon.getStartTimeRaw(), coupon.getEndTimeRaw(), icon);
+        return mDatabase.insert(CouponTable.sName, null, values);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Create a new coupon.
+     * @returns The rowId for the new coupon that is created, otherwise a -1.
+     */
+    public long createCoupon(long id, String title, String imageUrl, 
+                             long startTime, long endTime, int icon)
+    {
+        ContentValues values = createContentValues(
+            id, title, imageUrl, startTime, endTime, icon);
         return mDatabase.insert(CouponTable.sName, null, values);
     }
 
@@ -66,10 +88,12 @@ public class TikTokDatabaseAdapter
      * Update an existing coupon.
      */
     public boolean updateCoupon(long rowId, 
-                                String title, String description, int icon)
+                                long id, String title, String imageUrl, 
+                                long startTime, long endTime, int icon)
     {
-        ContentValues values = createContentValues(title, description, icon);
-        String equalsSQL     = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
+        ContentValues values = createContentValues(
+            id, title, imageUrl, startTime, endTime, icon);
+        String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
         return mDatabase.update(CouponTable.sName, values, equalsSQL, null) > 0;
     }
 
@@ -80,7 +104,7 @@ public class TikTokDatabaseAdapter
      */
     public boolean deleteCoupon(long rowId) 
     {
-        String equalsSQL     = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
+        String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
         return mDatabase.delete(CouponTable.sName, equalsSQL, null) > 0;
     }
 
@@ -94,11 +118,38 @@ public class TikTokDatabaseAdapter
     {
         String rows[] = new String[] {
             CouponTable.sKeyRowId,
+            CouponTable.sKeyId,
             CouponTable.sKeyTitle,
-            CouponTable.sKeyDescription,
+            CouponTable.sKeyImageUrl,
+            CouponTable.sKeyStartTime,
+            CouponTable.sKeyEndTime,
             CouponTable.sKeyIcon,
         };
         return mDatabase.query(CouponTable.sName, rows, null, null, null, null, null);
+    }
+
+    //-------------------------------------------------------------------------
+    
+    /**
+     * Fetch all the coupons from the database.
+     * @returns Cursor over all the coupons.
+     */
+    public List<Long> fetchAllCouponIds() 
+    {
+        String rows[] = new String[] {
+            CouponTable.sKeyId,
+        };
+        Cursor cursor = mDatabase.query(CouponTable.sName, rows, 
+            null, null, null, null, null);
+        cursor.moveToFirst();
+
+        List<Long> ids = new ArrayList<Long>();
+        while (!cursor.isAfterLast()) {
+            ids.add(cursor.getLong(0));
+            cursor.moveToNext();
+        }
+
+        return ids;
     }
 
     //-------------------------------------------------------------------------
@@ -111,8 +162,11 @@ public class TikTokDatabaseAdapter
     {
         String rows[] = new String[] {
             CouponTable.sKeyRowId,
+            CouponTable.sKeyId,
             CouponTable.sKeyTitle,
-            CouponTable.sKeyDescription,
+            CouponTable.sKeyImageUrl,
+            CouponTable.sKeyStartTime,
+            CouponTable.sKeyEndTime,
             CouponTable.sKeyIcon,
         };
         String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
@@ -125,15 +179,20 @@ public class TikTokDatabaseAdapter
     //-------------------------------------------------------------------------
 
     /**
-     * 
+     * @returns Mapping between database columns and values.
      */
-    private ContentValues createContentValues(String title, String description, 
+    private ContentValues createContentValues(long id, 
+                                              String title, String imageUrl, 
+                                              long startTime, long endTime, 
                                               int icon)
     {
         ContentValues values = new ContentValues();
-        values.put(CouponTable.sKeyTitle, title);
-        values.put(CouponTable.sKeyDescription, description);
-        values.put(CouponTable.sKeyIcon, icon);
+        values.put(CouponTable.sKeyId,        id);
+        values.put(CouponTable.sKeyTitle,     title);
+        values.put(CouponTable.sKeyImageUrl,  imageUrl);
+        values.put(CouponTable.sKeyStartTime, startTime);
+        values.put(CouponTable.sKeyEndTime,   endTime);
+        values.put(CouponTable.sKeyIcon,      icon);
         return values;
     }
 
