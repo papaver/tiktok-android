@@ -139,15 +139,20 @@ public class TikTokDatabaseAdapter
         String rows[] = new String[] {
             CouponTable.sKeyId,
         };
+
+        // grab the data from the database
         Cursor cursor = mDatabase.query(CouponTable.sName, rows, 
             null, null, null, null, null);
         cursor.moveToFirst();
 
+        // create a list of ids
         List<Long> ids = new ArrayList<Long>();
-        while (!cursor.isAfterLast()) {
+        for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
             ids.add(cursor.getLong(0));
-            cursor.moveToNext();
         }
+
+        // cleanup 
+        cursor.close();
 
         return ids;
     }
