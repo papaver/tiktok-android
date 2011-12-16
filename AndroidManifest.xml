@@ -13,6 +13,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
 
+        <!-- External Libraries -->
+        <uses-library android:name="com.google.android.maps" />
+
         <!-- TikTok Main Activity -->
         <activity
             android:label="@string/app_name"
@@ -22,6 +25,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- TikTok Map Activity -->
+        <activity 
+            android:label="@string/app_map_name"
+            android:name=".TikTokMapActivity" />
+
     </application>
 
 </manifest>

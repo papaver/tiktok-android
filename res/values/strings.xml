@@ -3,5 +3,7 @@
 
     <string name="hello">Hello World, TikTokActivity!</string>
     <string name="app_name">TikTok Consumer Mobile Application</string>
+    <string name="app_map_name">TikTok Map</string>
+    <string name="map_button">Map</string>
 
 </resources>
