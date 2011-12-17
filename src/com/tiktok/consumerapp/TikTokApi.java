@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
+import android.provider.Settings.Secure;
 
 import com.google.gson.Gson;
 
@@ -45,10 +46,15 @@ public final class TikTokApi
     /**
      * @return The unique push notification identifier for this device.
      */
-    public static String getDeviceId()
+    public String getDeviceId()
     {
-       String deviceId = "4ebb7e88 4dcccb1c 8e407ae3 eaed0650 8919066d a1b8b6af 62298351 38801311";
-       return deviceId.replaceAll(" ", "%20");
+        //String id 
+            //= Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
+        //Log.w(getClass().getSimpleName(), "Android DeviceId = " + id);
+
+        String deviceId = "4ebb7e88 4dcccb1c 8e407ae3 eaed0650 8919066d a1b8b6af 62298351 38801311";
+        Log.w(getClass().getSimpleName(), "iPhone DeviceId = " + deviceId);
+        return deviceId.replaceAll(" ", "%20");
     }
 
     //-------------------------------------------------------------------------

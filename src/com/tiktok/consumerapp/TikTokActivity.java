@@ -11,6 +11,7 @@ package com.tiktok.consumerapp;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +24,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import android.provider.Settings.Secure;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -71,6 +74,13 @@ public class TikTokActivity extends Activity
 
         // run location services
         setupLocationTracking();
+
+        // run notification services
+        setupNotifications();
+
+        String id 
+            = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        Log.w(getClass().getSimpleName(), "Android DeviceId = " + id);
 
         /*
         // setup the list view
@@ -150,6 +160,19 @@ public class TikTokActivity extends Activity
     {
         Intent mapIntent = new Intent(this, TikTokMapActivity.class);
         startActivity(mapIntent);
+    }
+
+    //-------------------------------------------------------------------------
+    // notification example
+    //-------------------------------------------------------------------------
+        
+    public void setupNotifications()
+    {
+        Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+        registrationIntent.putExtra("app", 
+            PendingIntent.getBroadcast(this, 0, new Intent(), 0));
+        registrationIntent.putExtra("sender", "papaver@gmail.com");
+        startService(registrationIntent);
     }
 
     //-------------------------------------------------------------------------
