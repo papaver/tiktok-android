@@ -20,17 +20,23 @@ public final class Coupon
 {
     
     /**
-     * Called when the activity is first created. 
+     * Called when the coupon is first created.
      */
-    public Coupon(final long id, final String title, final String imageUrl,
-                  final long startTime, final long endTime, final int icon)
+    public Coupon(final long id, final String title, final String details,
+                  final int iconId, final String iconUrl,
+                  final long startTime, final long endTime,
+                  final String barcode, final boolean wasRedeemed)
     {
-        mId        = id;
-        mTitle     = title;
-        mImageUrl  = imageUrl;
-        mStartTime = startTime;
-        mEndTime   = endTime;
-        mIcon      = icon;
+        mId          = id;
+        mTitle       = title;
+        mDetails     = details;
+        mIconId      = iconId;
+        mIconUrl     = iconUrl;
+        mStartTime   = startTime;
+        mEndTime     = endTime;
+        mBarcode     = barcode;
+        mWasRedeemed = wasRedeemed;
+        mIsSoldOut   = false;
     }
 
     //-------------------------------------------------------------------------
@@ -38,7 +44,7 @@ public final class Coupon
     /**
      * @return Unique identifier for the coupon.
      */
-    public long getId()
+    public long id()
     {
         return mId;
     }
@@ -48,7 +54,7 @@ public final class Coupon
     /**
      * @return Title of coupon.
      */
-    public String getTitle()
+    public String title()
     {
         return mTitle;
     }
@@ -56,11 +62,31 @@ public final class Coupon
     //-------------------------------------------------------------------------
 
     /**
-     * @return Url to image icon for coupon.
+     * @return Description of coupon.
      */
-    public String getImageUrl()
+    public String details()
     {
-        return mImageUrl;
+        return mDetails;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Global id of icon.
+     */
+    public int iconId()
+    {
+        return mIconId;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Url of icon.
+     */
+    public String iconUrl()
+    {
+        return mIconUrl;
     }
 
     //-------------------------------------------------------------------------
@@ -68,7 +94,7 @@ public final class Coupon
     /**
      * @return Coupon activation time in seconds since 1970.
      */
-    public long getStartTimeRaw()
+    public long startTimeRaw()
     {
         return mStartTime;
     }
@@ -78,7 +104,7 @@ public final class Coupon
     /**
      * @return Coupon activation time.
      */
-    public Date getStartTime()
+    public Date startTime()
     {
         return new Date(mStartTime);
     }
@@ -88,7 +114,7 @@ public final class Coupon
     /**
      * @return Coupon expiration time in seconds since 1970.
      */
-    public long getEndTimeRaw()
+    public long endTimeRaw()
     {
         return mEndTime;
     }
@@ -98,7 +124,7 @@ public final class Coupon
     /**
      * @return Coupon expiration time in seconds since 1970.
      */
-    public Date getEndTime()
+    public Date endTime()
     {
         return new Date(mEndTime);
     }
@@ -106,11 +132,75 @@ public final class Coupon
     //-------------------------------------------------------------------------
 
     /**
-     * @return Icon of this coupon.
+     * @return Barcode for coupon.
      */
-    public int getIcon() 
+    public String barcode()
     {
-        return mIcon;
+        return mBarcode;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns weather or not coupon was redeemed.
+     */
+    public boolean wasRedeemed()
+    {
+        return mWasRedeemed;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Redeems the coupon.
+     */
+    public void redeem()
+    {
+        mWasRedeemed = true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns weather or not coupon was redeemed.
+     */
+    public boolean isSoldOut()
+    {
+        return mIsSoldOut;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Sell out coupon.
+     */
+    public void sellOut()
+    {
+        mIsSoldOut = true;
+    }
+
+    //-------------------------------------------------------------------------
+    // methods
+    //-------------------------------------------------------------------------
+
+    @Override
+    public String toString()
+    {
+        String newLine = System.getProperty("line.separator");
+        String string  =
+            "Coupon {"      + newLine +
+            "  id: "        + Long.toString(id()) + newLine +
+            "  title: "     + title() + newLine +
+            "  details: "   + details() + newLine +
+            "  iconId: "    + Integer.toString(iconId()) + newLine +
+            "  iconUrl: "   + iconUrl() + newLine +
+            "  startTime: " + startTime().toString() + newLine +
+            "  endTime: "   + endTime().toString() + newLine +
+            "  barcode: "   + barcode() + newLine +
+            "  redeemed: "  + Boolean.toString(wasRedeemed()) + newLine +
+            "  isSoldOut: " + Boolean.toString(isSoldOut()) + newLine +
+            "}";
+        return string;
     }
 
     //-------------------------------------------------------------------------
@@ -120,11 +210,17 @@ public final class Coupon
     @SerializedName("id")
     private final long mId;
 
-    @SerializedName("description")
+    @SerializedName("headline")
     private final String mTitle;
 
-    @SerializedName("image_url")
-    private final String mImageUrl;
+    @SerializedName("description")
+    private final String mDetails;
+
+    @SerializedName("icon_uid")
+    private final int mIconId;
+
+    @SerializedName("icon_url")
+    private final String mIconUrl;
 
     @SerializedName("enable_time_in_tvsec")
     private final long mStartTime;
@@ -132,5 +228,11 @@ public final class Coupon
     @SerializedName("expiry_time_in_tvsec")
     private final long mEndTime;
 
-    private final int mIcon;
+    @SerializedName("barcode_number")
+    private final String mBarcode;
+
+    @SerializedName("redeemed")
+    private boolean mWasRedeemed;
+
+    private boolean mIsSoldOut;
 }

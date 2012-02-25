@@ -22,13 +22,21 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
-import android.provider.Settings.Secure;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
+
+/**
+ * [moiz] need to have all the networking and json parsing happening in the 
+ *      background
+ *
+ */
 
 public final class TikTokApi 
 {
@@ -38,23 +46,40 @@ public final class TikTokApi
      */
     public static String getApiUrl()
     {
-        return "http://electric-dusk-7349.herokuapp.com";
+        // [moiz] implement some sort of debugging options
+        boolean TIKTOKAPI_STAGING = true;
+
+        if (TIKTOKAPI_STAGING) {
+            return "https://furious-window-5155.herokuapp.com";
+        } else {
+            return "https://www.tiktok.com";
+        }
     }
 
     //-------------------------------------------------------------------------
     
     /**
-     * @return The unique push notification identifier for this device.
+     * @return Return a Guid that represents this device.
      */
     public String getDeviceId()
     {
-        //String id 
-            //= Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
-        //Log.w(getClass().getSimpleName(), "Android DeviceId = " + id);
+        // [moiz] temp:: generate a uuid and print it out, use this static id
+        //   until we can figure out a place to store the id that is similar
+        //   to the keychain store on the iphone
+        //String deviceId = Device.generateGUID();
+        String deviceId = "838320de-f612-4358-9c8d-da2b81eeeec7";
+        return deviceId;
+    }
 
-        String deviceId = "4ebb7e88 4dcccb1c 8e407ae3 eaed0650 8919066d a1b8b6af 62298351 38801311";
-        Log.w(getClass().getSimpleName(), "iPhone DeviceId = " + deviceId);
-        return deviceId.replaceAll(" ", "%20");
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns the consumer id regsitered with this device.
+     */
+    public long getConsumerId()
+    {
+        // [moiz] temp:: need to figure out where to store temp adata
+        return 2;
     }
 
     //-------------------------------------------------------------------------
@@ -65,7 +90,7 @@ public final class TikTokApi
     public boolean registerDevice()
     {
         // get route to register device with server
-        String url = String.format("%s/register?token=%s", 
+        String url = String.format("%s/register?uuid=%s",
             getApiUrl(), getDeviceId());
 
         // process request
@@ -76,13 +101,38 @@ public final class TikTokApi
     //-------------------------------------------------------------------------
 
     /**
+     * Check if the device is registered with the server.
+     */
+    public boolean validateRegistration()
+    {
+        // get route to register device with server
+        String url = String.format("%s/consumers/%d/registered?uuid=%s",
+            getApiUrl(), getConsumerId(), getDeviceId());
+
+        // process request
+        InputStream stream = postHttpRequest(url);
+        return stream != null;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Register the notification token with the server.
+     */
+    public void registerNotificationToken(String token)
+    {
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Get the list of available coupons.
      */
-    public Coupon[] getCoupons()
+    public Coupon[] syncActiveCoupons()
     {
         // get the route to the list of coupons
-        String url = String.format("%s/coupons?token=%s", 
-            getApiUrl(), getDeviceId());
+        String url = String.format("%s/consumers/%s/coupons",
+            getApiUrl(), getConsumerId());
 
         // get the json content from the url
         InputStream stream = getHttpRequest(url);
@@ -90,7 +140,16 @@ public final class TikTokApi
         // set the json parser
         Gson gson        = new Gson();
         Reader reader    = new InputStreamReader(stream);
-        Coupon[] coupons = gson.fromJson(reader, Coupon[].class);
+
+        // [moiz] temp to test out coupon parsing... probably better to the
+        // Jackson Json parser as the elements can be bound dynamically
+        JsonElement element   = gson.fromJson(reader, JsonElement.class);
+        JsonObject results    = element.getAsJsonObject().getAsJsonObject("results");
+        JsonArray couponArray = results.getAsJsonArray("coupons");
+
+        // reparse the coupons
+        Coupon[] coupons = new Gson().fromJson(couponArray.toString(), Coupon[].class);
+
         return coupons;
     }
 

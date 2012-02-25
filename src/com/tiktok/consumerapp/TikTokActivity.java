@@ -54,7 +54,7 @@ public class TikTokActivity extends Activity
         // setup data/ui mapping
         String[] from = new String[] { 
             CouponTable.sKeyTitle, 
-            CouponTable.sKeyIcon 
+            CouponTable.sKeyIconId
         };
         int[] to = new int[] { 
             R.id.coupon_entry_title, 
@@ -104,6 +104,12 @@ public class TikTokActivity extends Activity
     protected void onStart() 
     {
         super.onStart();
+
+        // [moiz] check that deviceid and generate guid work as expected
+        String guid     = Device.generateGUID();
+        String deviceId = Device.deviceId(getBaseContext());
+        Log.w(getClass().getSimpleName(), "Android DeviceId = " + deviceId);
+        Log.w(getClass().getSimpleName(), "Android GUID = " + guid);
     }
 
     //-------------------------------------------------------------------------
@@ -326,15 +332,16 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
     {
         // create and instance of the tiktok api and grab the available coupons
         TikTokApi api     = new TikTokApi();
-        Coupon[] coupons = api.getCoupons();
+        Coupon[] coupons = api.syncActiveCoupons();
 
         // add only new coupons to the database
         List<Long> currentIds = mDatabaseAdapter.fetchAllCouponIds();
         for (final Coupon coupon : coupons) {
-            if (!currentIds.contains(coupon.getId())) {
+            Log.w(getClass().getSimpleName(), coupon.toString());
+            if (!currentIds.contains(coupon.id())) {
                 mDatabaseAdapter.createCoupon(coupon);
                 Log.w(getClass().getSimpleName(), String.format(
-                    "Added coupon to db: %s", coupon.getTitle()));
+                    "Added coupon to db: %s", coupon.title()));
             }
         }
 

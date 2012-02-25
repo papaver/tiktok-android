@@ -55,14 +55,18 @@ public class CouponTable
     private static String getCreateSQL()
     {
         String createSQL = 
-            "create table " + sName + "("                            +
-            sKeyRowId       + " integer primary key autoincrement, " +
-            sKeyId          + " integer not null,                  " +
-            sKeyTitle       + " text    not null,                  " +
-            sKeyImageUrl    + " text    not null,                  " +
-            sKeyStartTime   + " integer not null,                  " + 
-            sKeyEndTime     + " integer not null,                  " + 
-            sKeyIcon        + " integer not null                   " + ");";
+            "create table "  + sName + "("                            +
+            sKeyRowId        + " integer primary key autoincrement, " +
+            sKeyId           + " integer not null,                  " +
+            sKeyTitle        + " text    not null,                  " +
+            sKeyDetails      + " text    not null,                  " +
+            sKeyIconId       + " integer not null,                  " +
+            sKeyIconUrl      + " text    not null,                  " +
+            sKeyStartTime    + " integer not null,                  " +
+            sKeyEndTime      + " integer not null,                  " +
+            sKeyBarcode      + " text    not null,                  " +
+            sKeyWasRedeemed  + " integer not null,                  " +
+            sKeyIsSoldOut    + " integer not null                   " + ");";
         return createSQL;
     }
 
@@ -92,13 +96,17 @@ public class CouponTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName         = "Coupon";
-    public static String sKeyRowId     = "_id";
-    public static String sKeyId        = "coupon_id";
-    public static String sKeyTitle     = "title";
-    public static String sKeyImageUrl  = "image_url";
-    public static String sKeyStartTime = "start_time";
-    public static String sKeyEndTime   = "end_time";
-    public static String sKeyIcon      = "icon";
+    public static String sName           = "Coupon";
+    public static String sKeyRowId       = "_id";
+    public static String sKeyId          = "coupon_id";
+    public static String sKeyTitle       = "title";
+    public static String sKeyDetails     = "details";
+    public static String sKeyIconId      = "icon_id";
+    public static String sKeyIconUrl     = "icon_url";
+    public static String sKeyStartTime   = "start_time";
+    public static String sKeyEndTime     = "end_time";
+    public static String sKeyBarcode     = "barcode";
+    public static String sKeyWasRedeemed = "was_redeemed";
+    public static String sKeyIsSoldOut   = "is_sold_out";
 
 }
