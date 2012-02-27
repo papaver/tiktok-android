@@ -32,6 +32,7 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase database)
     {
+        MerchantTable.onCreate(database);
         CouponTable.onCreate(database);
     }
 
@@ -45,6 +46,7 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     public void onUpgrade(SQLiteDatabase database, 
                           int oldVersion, int newVersion)
     {
+        MerchantTable.onUpgrade(database, oldVersion, newVersion);
         CouponTable.onUpgrade(database, oldVersion, newVersion);
     }
 

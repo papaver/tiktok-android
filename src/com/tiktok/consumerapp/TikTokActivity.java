@@ -335,10 +335,18 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
         Coupon[] coupons = api.syncActiveCoupons();
 
         // add only new coupons to the database
-        List<Long> currentIds = mDatabaseAdapter.fetchAllCouponIds();
+        List<Long> couponIds       = mDatabaseAdapter.fetchAllCouponIds();
+        List<String> merchantNames = mDatabaseAdapter.fetchAllMerchantNames();
         for (final Coupon coupon : coupons) {
             Log.w(getClass().getSimpleName(), coupon.toString());
-            if (!currentIds.contains(coupon.id())) {
+
+            if (!merchantNames.contains(coupon.merchant().name())) {
+                mDatabaseAdapter.createMerchant(coupon.merchant());
+                Log.w(getClass().getSimpleName(), String.format(
+                    "Added merchant to db: %s", coupon.merchant().name()));
+            }
+
+            if (!couponIds.contains(coupon.id())) {
                 mDatabaseAdapter.createCoupon(coupon);
                 Log.w(getClass().getSimpleName(), String.format(
                     "Added coupon to db: %s", coupon.title()));

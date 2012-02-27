@@ -25,7 +25,8 @@ public final class Coupon
     public Coupon(final long id, final String title, final String details,
                   final int iconId, final String iconUrl,
                   final long startTime, final long endTime,
-                  final String barcode, final boolean wasRedeemed)
+                  final String barcode, final boolean wasRedeemed,
+                  final Merchant merchant)
     {
         mId          = id;
         mTitle       = title;
@@ -37,6 +38,7 @@ public final class Coupon
         mBarcode     = barcode;
         mWasRedeemed = wasRedeemed;
         mIsSoldOut   = false;
+        mMerchant    = merchant;
     }
 
     //-------------------------------------------------------------------------
@@ -180,6 +182,16 @@ public final class Coupon
     }
 
     //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns merchant who owns this coupon.
+     */
+    public Merchant merchant()
+    {
+        return mMerchant;
+    }
+
+    //-------------------------------------------------------------------------
     // methods
     //-------------------------------------------------------------------------
 
@@ -199,6 +211,7 @@ public final class Coupon
             "  barcode: "   + barcode() + newLine +
             "  redeemed: "  + Boolean.toString(wasRedeemed()) + newLine +
             "  isSoldOut: " + Boolean.toString(isSoldOut()) + newLine +
+            "  merchant: "  + merchant().toString() + newLine +
             "}";
         return string;
     }
@@ -235,4 +248,7 @@ public final class Coupon
     private boolean mWasRedeemed;
 
     private boolean mIsSoldOut;
+
+    @SerializedName("merchant")
+    private Merchant mMerchant;
 }
