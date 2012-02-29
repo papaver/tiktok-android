@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// StartupActivity
+// CouponMapActivity
 //-----------------------------------------------------------------------------
 
 package com.tiktok.consumerapp;
@@ -9,16 +9,15 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 //import android.util.Log;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class StartupActivity extends Activity
+public class CouponMapActivity extends Activity
 {
 
     /**
@@ -28,51 +27,10 @@ public class StartupActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.startup);
 
-        // [moiz] example of grabbing image container
-        //ImageView imageView = (ImageView)findViewById(R.id.background);
-        //imageView.setImageResource();
-
-        // [moiz] add the startup process here once the final json package
-        //   that will be used is integrated into the sytem
-        //    1) startup location services
-        //    2) register notifications with server
-        //    3) validate guid with server, assign a consumer id to the device
-        //    4) sync coupons? or let the deals activity automatically do that?
-
-        // setup a thread to wait a few minutes and then start the next
-        // main deals activity
-        final Context context = this;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-
-                    // just wait for a while
-                    int waited = 50;
-                    while (waited > 0) {
-                        sleep(100);
-                        --waited;
-                    }
-
-                } catch (InterruptedException e) {
-                    // nothing to see here
-
-                } finally {
-
-                    // close this activity, will remove it from the stack
-                    finish();
-
-                    // create an intent to start the main deals activity
-                    Intent dealsActivity = new Intent(context, MainTabActivity.class);
-                    startActivity(dealsActivity);
-                }
-            };
-        };
-
-        // start the thread
-        thread.start();
+        TextView textView = new TextView(this);
+        textView.setText("This is the Deals Map Tab.");
+        setContentView(textView);
     }
 
     //-------------------------------------------------------------------------

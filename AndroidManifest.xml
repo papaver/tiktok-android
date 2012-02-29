@@ -24,25 +24,53 @@
         <!-- TikTok Startup Activity -->
         <activity
             android:label="@string/app_name"
-            android:name=".StartupActivity" >
+            android:name=".StartupActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- TikTok Deals Activity -->
-        <activity 
-            android:label="@string/app_name"
+        <!-- TikTok Test List Activity -->
+        <activity
+            android:label="@string/test_app_name"
             android:name=".TikTokActivity" />
 
-        <!-- TikTok Map Activity -->
-        <activity 
-            android:label="@string/app_map_name"
+        <!-- TikTok Test Map Activity -->
+        <activity
+            android:label="@string/test_app_map_name"
             android:name=".TikTokMapActivity" />
 
+
+        <!-- Main Tab Activity -->
+        <activity
+            android:name=".MainTabActivity"
+            android:label="@string/tabs_name"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <!-- Coupons List Activity -->
+        <activity
+            android:label="@string/tab_list"
+            android:name=".CouponListActivity" />
+
+        <!-- Coupons Map Activity -->
+        <activity
+            android:label="@string/tab_map"
+            android:name=".CouponMapActivity" />
+
+        <!-- Karma Activity -->
+        <activity
+            android:label="@string/tab_karma"
+            android:name=".KarmaActivity" />
+
+        <!-- Settings Activity -->
+        <activity
+            android:label="@string/tab_settings"
+            android:name=".SettingsActivity" />
+
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->
-        <receiver android:name=".C2DMReceiver" 
+        <receiver android:name=".C2DMReceiver"
                   android:permission="com.google.android.c2dm.permission.SEND" >
 
             <!-- receive the message -->

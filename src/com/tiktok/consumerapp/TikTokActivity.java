@@ -43,6 +43,7 @@ public class TikTokActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        /*
         // open up the database 
         mDatabaseAdapter = new TikTokDatabaseAdapter(this);
         mDatabaseAdapter.open();
@@ -81,6 +82,7 @@ public class TikTokActivity extends Activity
         String id 
             = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
         Log.w(getClass().getSimpleName(), "Android DeviceId = " + id);
+        */
 
         /*
         // setup the list view

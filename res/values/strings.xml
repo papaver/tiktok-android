@@ -2,8 +2,16 @@
 <resources>
 
     <string name="hello">Hello World, TikTokActivity!</string>
-    <string name="app_name">TikTok Consumer Mobile Application</string>
-    <string name="app_map_name">TikTok Map</string>
+    <string name="test_app_name">TikTok Consumer Mobile Application</string>
+    <string name="test_app_map_name">TikTok Map</string>
     <string name="map_button">Map</string>
+
+    <string name="app_name">TikTok</string>
+
+    <string name="tabs_name">TikTok</string>
+    <string name="tab_list">Deals List</string>
+    <string name="tab_map">Deals Map</string>
+    <string name="tab_karma">Karma</string>
+    <string name="tab_settings">Settings</string>
 
 </resources>
