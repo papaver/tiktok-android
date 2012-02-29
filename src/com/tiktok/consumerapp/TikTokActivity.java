@@ -8,24 +8,16 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-
-import android.provider.Settings.Secure;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -43,58 +35,11 @@ public class TikTokActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        /*
-        // open up the database 
-        mDatabaseAdapter = new TikTokDatabaseAdapter(this);
-        mDatabaseAdapter.open();
-
-        // fill the listview with data
-        mCursor = mDatabaseAdapter.fetchAllCoupons();
-        startManagingCursor(mCursor);
-
-        // setup data/ui mapping
-        String[] from = new String[] { 
-            CouponTable.sKeyTitle, 
-            CouponTable.sKeyIconId
-        };
-        int[] to = new int[] { 
-            R.id.coupon_entry_title, 
-            R.id.coupon_entry_icon 
-        };
-
-        // create a new array adapter and set it to display the row
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-            R.layout.coupon_entry_list_item, mCursor, from, to);
-
-        // update list view to use adapter
-        final ListView listView = (ListView)findViewById(R.id.list);
-        listView.setAdapter(adapter);
-
-        // run sync coupons task
-        new SyncCouponsTask(adapter, mDatabaseAdapter).execute();
-
         // run location services
         setupLocationTracking();
 
         // run notification services
         setupNotifications();
-
-        String id 
-            = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
-        Log.w(getClass().getSimpleName(), "Android DeviceId = " + id);
-        */
-
-        /*
-        // setup the list view
-        final ListView listView     = (ListView)findViewById(R.id.list);
-        final CouponAdapter adapter = new CouponAdapter(this, R.layout.coupon_entry_list_item);
-        listView.setAdapter(adapter);
-
-        // populate the list adapter
-        for (final Coupon entry : getCoupons()) {
-            adapter.add(entry);
-        }
-        */
     }
 
     //-------------------------------------------------------------------------
@@ -156,8 +101,6 @@ public class TikTokActivity extends Activity
     protected void onDestroy() 
     {
         super.onDestroy();
-        if (mDatabaseAdapter != null) mDatabaseAdapter.close();
-        if (mCursor != null) mCursor.close();
     }
 
     //-------------------------------------------------------------------------
@@ -305,70 +248,8 @@ public class TikTokActivity extends Activity
     // fields
     //-------------------------------------------------------------------------
     
-    private TikTokDatabaseAdapter mDatabaseAdapter;
-    private Cursor                mCursor;
     private Location              mLastKnownLocation;
 
 }
 
-//-----------------------------------------------------------------------------
-// SyncCouponsTask
-//-----------------------------------------------------------------------------
-
-class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
-{
-
-    public SyncCouponsTask(SimpleCursorAdapter cursorAdapter, 
-                           TikTokDatabaseAdapter databaseAdapter)
-    {
-        mCursorAdapter   = cursorAdapter;
-        mDatabaseAdapter = databaseAdapter;
-    }
-
-    @Override
-    public void onPreExecute() 
-    {
-    }
-
-    public Cursor doInBackground(Void... params)
-    {
-        // create and instance of the tiktok api and grab the available coupons
-        TikTokApi api     = new TikTokApi();
-        Coupon[] coupons = api.syncActiveCoupons();
-
-        // add only new coupons to the database
-        List<Long> couponIds       = mDatabaseAdapter.fetchAllCouponIds();
-        List<String> merchantNames = mDatabaseAdapter.fetchAllMerchantNames();
-        for (final Coupon coupon : coupons) {
-            Log.w(getClass().getSimpleName(), coupon.toString());
-
-            if (!merchantNames.contains(coupon.merchant().name())) {
-                mDatabaseAdapter.createMerchant(coupon.merchant());
-                Log.w(getClass().getSimpleName(), String.format(
-                    "Added merchant to db: %s", coupon.merchant().name()));
-            }
-
-            if (!couponIds.contains(coupon.id())) {
-                mDatabaseAdapter.createCoupon(coupon);
-                Log.w(getClass().getSimpleName(), String.format(
-                    "Added coupon to db: %s", coupon.title()));
-            }
-        }
-
-        // update the cursor in the adapter
-        return mDatabaseAdapter.fetchAllCoupons();
-    }
-
-    @Override
-    public void onPostExecute(Cursor cursor) {
-        mCursorAdapter.changeCursor(cursor);
-    }
-
-    //-------------------------------------------------------------------------
-    // fields
-    //-------------------------------------------------------------------------
-    
-    private SimpleCursorAdapter   mCursorAdapter;
-    private TikTokDatabaseAdapter mDatabaseAdapter;
-}
 
