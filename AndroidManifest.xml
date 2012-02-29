@@ -21,15 +21,20 @@
         <!-- External Libraries -->
         <uses-library android:name="com.google.android.maps" />
 
-        <!-- TikTok Main Activity -->
+        <!-- TikTok Startup Activity -->
         <activity
             android:label="@string/app_name"
-            android:name=".TikTokActivity" >
+            android:name=".StartupActivity" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- TikTok Deals Activity -->
+        <activity 
+            android:label="@string/app_name"
+            android:name=".TikTokActivity" />
 
         <!-- TikTok Map Activity -->
         <activity 

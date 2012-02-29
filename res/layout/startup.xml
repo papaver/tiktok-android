@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dip"
+    android:layout_height="480dip"
+    android:gravity="top" >
+
+    <ImageView
+        android:id="@+id/background"
+        android:src="@drawable/initalloadingsplash"
+        android:scaleType="fitXY"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="bottom"
+        android:orientation="vertical" >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/tik"
+                android:src="@drawable/tik"
+                android:scaleType="fitCenter"
+                android:layout_width="111dip"
+                android:layout_height="102dip" />
+
+            <ImageView
+                android:id="@+id/tok"
+                android:src="@drawable/tok"
+                android:scaleType="fitCenter"
+                android:layout_width="111dip"
+                android:layout_height="102dip" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/bar"
+            android:src="@drawable/splashprogressbar"
+            android:scaleType="fitCenter"
+            android:layout_width="fill_parent"
+            android:layout_height="50dip" />
+
+    </LinearLayout>
+
+</FrameLayout>
