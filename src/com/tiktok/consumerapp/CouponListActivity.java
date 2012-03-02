@@ -151,12 +151,9 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
 
     public Cursor doInBackground(Void... params)
     {
+        /*
         // create and instance of the tiktok api and grab the available coupons
-        TikTokApi api     = new TikTokApi();
-
-        // [moiz] testing get rid of me soon!
-        api.consumerid = 5;
-
+        TikTokApi api    = new TikTokApi(getContext());
         Coupon[] coupons = api.syncActiveCoupons();
 
         // add only new coupons to the database
@@ -177,6 +174,7 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
                     "Added coupon to db: %s", coupon.title()));
             }
         }
+        */
 
         // update the cursor in the adapter
         return mDatabaseAdapter.fetchAllCoupons();

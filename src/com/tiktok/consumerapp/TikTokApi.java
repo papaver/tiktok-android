@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
@@ -76,6 +77,15 @@ public final class TikTokApi
     }
 
     //-------------------------------------------------------------------------
+    // constructor
+    //-------------------------------------------------------------------------
+
+    public TikTokApi(Context context)
+    {
+        mContext = context.getApplicationContext();
+    }
+
+    //-------------------------------------------------------------------------
     // api
     //-------------------------------------------------------------------------
 
@@ -93,35 +103,6 @@ public final class TikTokApi
             return "https://www.tiktok.com";
         }
     }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Return a Guid that represents this device.
-     */
-    public String getDeviceId()
-    {
-        // [moiz] temp:: generate a uuid and print it out, use this static id
-        //   until we can figure out a place to store the id that is similar
-        //   to the keychain store on the iphone
-        //String deviceId = Device.generateGUID();
-        //String deviceId = "838320de-f612-4358-9c8d-da2b81eeeec7";
-        return deviceId;
-    }
-    public String deviceId;
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Returns the consumer id regsitered with this device.
-     */
-    public long getConsumerId()
-    {
-        // [moiz] temp:: need to figure out where to store temp data
-        return consumerid;
-    }
-
-    public long consumerid;
 
     //-------------------------------------------------------------------------
 
@@ -169,7 +150,7 @@ public final class TikTokApi
     {
         // get route to register device with server
         String url = String.format("%s/consumers/%d/registered?uuid=%s",
-            getApiUrl(), getConsumerId(), getDeviceId());
+            getApiUrl(), utilities().getConsumerId(), utilities().getDeviceId());
 
         // process request
         HttpGet request    = new HttpGet(url);
@@ -218,7 +199,7 @@ public final class TikTokApi
     {
         // get the route to the list of coupons
         String url = String.format("%s/consumers/%s/coupons",
-            getApiUrl(), getConsumerId());
+            getApiUrl(), utilities().getConsumerId());
 
         // get the json content from the url
         HttpGet request    = new HttpGet(url);
@@ -279,7 +260,8 @@ public final class TikTokApi
     public void updateSettings(Map<String, String> settings)
     {
         // construct route to update coupon attribute
-        String url = String.format("%s/consumers/%s", getApiUrl(), getConsumerId());
+        String url = String.format("%s/consumers/%s",
+            getApiUrl(), utilities().getConsumerId());
 
         // setup put request for desired attribute
         HttpPut request = new HttpPut(url);
@@ -355,7 +337,7 @@ public final class TikTokApi
     {
         // construct route to update coupon attribute
         String url = String.format("%s/consumers/%s/coupons/%d",
-            getApiUrl(), getConsumerId(), couponId);
+            getApiUrl(), utilities().getConsumerId(), couponId);
 
         // setup put request for desired attribute
         HttpPut request = new HttpPut(url);
@@ -399,7 +381,7 @@ public final class TikTokApi
     {
         // construct route to retrieve karma points
         String url = String.format("%s/consumers/%s/loyalty_points",
-            getApiUrl(), getConsumerId());
+            getApiUrl(), utilities().getConsumerId());
 
         // pull data from the server
         HttpGet request    = new HttpGet(url);
@@ -466,7 +448,22 @@ public final class TikTokApi
     }
 
     //-------------------------------------------------------------------------
+    // methods
+    //-------------------------------------------------------------------------
+
+    private Utilities utilities()
+    {
+        if (mUtilities == null) {
+            mUtilities = new Utilities(mContext);
+        }
+        return mUtilities;
+    }
+
+    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
+
+    private Context   mContext;
+    private Utilities mUtilities;
 
 }

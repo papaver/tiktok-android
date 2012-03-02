@@ -45,7 +45,8 @@ public final class Settings
 
     public Settings(Context context)
     {
-        mPreferences = context.getSharedPreferences(kDomain, Activity.MODE_PRIVATE);
+        Context globalContext = context.getApplicationContext();
+        mPreferences = globalContext.getSharedPreferences(kDomain, Activity.MODE_PRIVATE);
         mEditor      = mPreferences.edit();
     }
 
