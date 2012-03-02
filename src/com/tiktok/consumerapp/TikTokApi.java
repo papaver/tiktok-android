@@ -109,7 +109,7 @@ public final class TikTokApi
     /**
      * Register the device with the server.
      */
-    public long registerDevice(String deviceId)
+    public String registerDevice(String deviceId)
     {
         // get route to register device with server
         String url = String.format("%s/register?uuid=%s", getApiUrl(), deviceId);
@@ -130,7 +130,7 @@ public final class TikTokApi
                 Map<String, Integer> results = mapper.convertValue(
                     response.getResults(),
                     new TypeReference<Map<String, Integer>>() {});
-                return results.get("id").intValue();
+                return results.get("id").toString();
             }
 
         } catch (Exception e) {
@@ -138,7 +138,7 @@ public final class TikTokApi
                 "exception: %s", e.toString()));
         }
 
-        return -1;
+        return null;
     }
 
     //-------------------------------------------------------------------------
@@ -184,10 +184,14 @@ public final class TikTokApi
     /**
      * Register the notification token with the server.
      */
-    public void registerNotificationToken(String token)
+    public TikTokApiResponse registerNotificationToken(String token)
     {
-        // [moiz] need to wait for the server to implement this before this
-        // can be worked on
+        // add to hash
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("token", token);
+
+        // update server
+        return updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -236,7 +240,7 @@ public final class TikTokApi
      * @return Updates server with consumers current location, currently
      *   ignores the response from the server.
      */
-    public void updateCurrentLocation(Location location)
+    public TikTokApiResponse updateCurrentLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -248,7 +252,7 @@ public final class TikTokApi
         settings.put("longitude", longitude);
 
         // update server
-        updateSettings(settings);
+        return updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -257,7 +261,7 @@ public final class TikTokApi
      * @return Updates server with consumer settings, currently ignores the
      *   response from the server.
      */
-    public void updateSettings(Map<String, String> settings)
+    public TikTokApiResponse updateSettings(Map<String, String> settings)
     {
         // construct route to update coupon attribute
         String url = String.format("%s/consumers/%s",
@@ -278,12 +282,23 @@ public final class TikTokApi
             request.setEntity(new UrlEncodedFormEntity(pairs));
 
             // process request
-            processRequest(request);
+            InputStream stream = processRequest(request);
+
+            // nothing to do if response did not go through
+            if (stream == null) return null;
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiResponse response =
+                mapper.readValue(stream, TikTokApiResponse.class);
+            return response;
 
         } catch (Exception e) {
             Log.w(getClass().getSimpleName(), String.format(
                 "exception: %s", e.toString()));
         }
+
+        return null;
     }
 
     //-------------------------------------------------------------------------
@@ -292,7 +307,7 @@ public final class TikTokApi
      * @return Updates server with consumers home location, currently
      *   ignores the response from the server.
      */
-    public void updateHomeLocation(Location location)
+    public TikTokApiResponse updateHomeLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -304,7 +319,7 @@ public final class TikTokApi
         settings.put("home_longitude", longitude);
 
         // update server
-        updateSettings(settings);
+        return updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -313,7 +328,7 @@ public final class TikTokApi
      * @return Updates server with consumers work location, currently
      *   ignores the response from the server.
      */
-    public void updateWorkLocation(Location location)
+    public TikTokApiResponse updateWorkLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -325,7 +340,7 @@ public final class TikTokApi
         settings.put("work_longitude", longitude);
 
         // update server
-        updateSettings(settings);
+        return updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------

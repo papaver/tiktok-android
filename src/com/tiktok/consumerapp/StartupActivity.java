@@ -9,10 +9,11 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-//import android.util.Log;
+import android.util.Log;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -29,6 +30,19 @@ public class StartupActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startup);
+
+        // [moiz] this should be split up into verify and register like
+        //   the ios app, should be fine for now...
+        //   this needs to be threaded as well and should happen on startup
+        //   probably not on create...
+
+        // register device id with the server
+        registerDevice();
+
+        // register notifications with C2DM server
+        registerNotifications();
+
+
 
         // [moiz] example of grabbing image container
         //ImageView imageView = (ImageView)findViewById(R.id.background);
@@ -128,6 +142,62 @@ public class StartupActivity extends Activity
     protected void onDestroy()
     {
         super.onDestroy();
+    }
+
+    //-------------------------------------------------------------------------
+    // methods
+    //-------------------------------------------------------------------------
+
+    private void registerDevice()
+    {
+        Log.w(getClass().getSimpleName(), "registering device id...");
+
+        // [moiz] clean this logic up so it works correctly!
+
+        TikTokApi api       = new TikTokApi(getApplicationContext());
+        Utilities utilities = new Utilities(getApplicationContext());
+
+        // check if this is a new device
+        String consumerId = utilities.getConsumerId();
+        if (consumerId == null) {
+
+            // generate a new device id
+            String deviceId = Device.generateGUID();
+
+            // register device id with server
+            consumerId = api.registerDevice(deviceId);
+            if (consumerId != null) {
+                utilities.cacheConsumerId(consumerId);
+
+            // failed to regsiter with server ask user to try again
+            } else {
+            }
+
+        // check if the registration is valid
+        } else {
+
+            boolean isValid = api.validateRegistration();
+            if (!isValid) {
+                utilities.clearDeviceId();
+                utilities.clearConsumerId();
+
+                // try to register the device again
+                registerDevice();
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void registerNotifications()
+    {
+        Log.w(getClass().getSimpleName(), "registering with notification server...");
+
+        Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
+        registrationIntent.putExtra("app",
+            PendingIntent.getBroadcast(this, 0, new Intent(), 0));
+        registrationIntent.putExtra("sender", Constants.kPushNotificationAccount);
+        startService(registrationIntent);
     }
 }
 

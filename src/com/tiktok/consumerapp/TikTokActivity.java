@@ -9,7 +9,6 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -37,9 +36,6 @@ public class TikTokActivity extends Activity
 
         // run location services
         setupLocationTracking();
-
-        // run notification services
-        setupNotifications();
     }
 
     //-------------------------------------------------------------------------
@@ -111,19 +107,6 @@ public class TikTokActivity extends Activity
     {
         Intent mapIntent = new Intent(this, TikTokMapActivity.class);
         startActivity(mapIntent);
-    }
-
-    //-------------------------------------------------------------------------
-    // notification example
-    //-------------------------------------------------------------------------
-        
-    public void setupNotifications()
-    {
-        Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
-        registrationIntent.putExtra("app", 
-            PendingIntent.getBroadcast(this, 0, new Intent(), 0));
-        registrationIntent.putExtra("sender", "papaver@gmail.com");
-        startService(registrationIntent);
     }
 
     //-------------------------------------------------------------------------
