@@ -8,23 +8,33 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import com.google.gson.annotations.SerializedName;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Merchant
 {
 
     /**
-     * Called when the merchant is first created.
+     * Called when the merchant is created through json parsing.
      */
-    public Merchant(final String name, final String address,
-                    final double latitude, final double longitude,
-                    final String phone, final String category,
-                    final String details, final int iconId, final String iconUrl,
-                    final String websiteUrl)
+    @JsonCreator
+    public Merchant(
+        @JsonProperty("name")         final String name,
+        @JsonProperty("full_address") final String address,
+        @JsonProperty("latitude")     final double latitude,
+        @JsonProperty("longitude")    final double longitude,
+        @JsonProperty("phone_number") final String phone,
+        @JsonProperty("category")     final String category,
+        @JsonProperty("description")  final String details,
+        @JsonProperty("icon_uid")     final int iconId,
+        @JsonProperty("icon_url")     final String iconUrl,
+        @JsonProperty("web_url")      final String websiteUrl)
     {
         mName       = name;
         mAddress    = address;
@@ -166,33 +176,14 @@ public final class Merchant
     // fields
     //-------------------------------------------------------------------------
 
-    @SerializedName("name")
     private final String mName;
-
-    @SerializedName("full_address")
     private final String mAddress;
-
-    @SerializedName("latitude")
     private final double mLatitude;
-
-    @SerializedName("longitude")
     private final double mLongitude;
-
-    @SerializedName("phone_number")
     private final String mPhone;
-
-    @SerializedName("category")
     private final String mCategory;
-
-    @SerializedName("description")
     private final String mDetails;
-
-    @SerializedName("icon_uid")
-    private final int mIconId;
-
-    @SerializedName("icon_url")
+    private final int    mIconId;
     private final String mIconUrl;
-
-    @SerializedName("web_url")
     private final String mWebsiteUrl;
 }

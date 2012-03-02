@@ -10,37 +10,75 @@ package com.tiktok.consumerapp;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
+import android.location.Location;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonArray;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
 /**
- * [moiz] need to have all the networking and json parsing happening in the 
+ * [moiz] need to have all the networking and json parsing happening in the
  *      background
  *
  */
 
-public final class TikTokApi 
+public final class TikTokApi
 {
-    
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    public static final String kTikTokApiKeyStatus  = "status";
+    public static final String kTikTokApiKeyError   = "error";
+    public static final String kTikTokApiKeyResults = "results";
+
+    public static final String kTikTokApiStatusOkay      = "OK";
+    public static final String kTikTokApiStatusInvalid   = "INVALID REQUEST";
+    public static final String kTikTokApiStatusForbidden = "FORBIDDEN";
+    public static final String kTikTokApiStatusNotFound  = "NOT FOUND";
+
+    //-------------------------------------------------------------------------
+    // enums
+    //-------------------------------------------------------------------------
+
+    public enum CouponAttribute
+    {
+        kRedeem     ("redeem"),
+        kFacebook   ("fb"),
+        kTwitter    ("tw"),
+        kGooglePlus ("gplus"),
+        kSMS        ("sms"),
+        kEmail      ("email");
+
+        CouponAttribute(String key) { mKey = key; }
+        public String key() { return mKey; }
+        private final String mKey;
+    }
+
+    //-------------------------------------------------------------------------
+    // api
+    //-------------------------------------------------------------------------
+
     /**
      * @return Url to TikTok website.
      */
@@ -57,7 +95,7 @@ public final class TikTokApi
     }
 
     //-------------------------------------------------------------------------
-    
+
     /**
      * @return Return a Guid that represents this device.
      */
@@ -67,9 +105,10 @@ public final class TikTokApi
         //   until we can figure out a place to store the id that is similar
         //   to the keychain store on the iphone
         //String deviceId = Device.generateGUID();
-        String deviceId = "838320de-f612-4358-9c8d-da2b81eeeec7";
+        //String deviceId = "838320de-f612-4358-9c8d-da2b81eeeec7";
         return deviceId;
     }
+    public String deviceId;
 
     //-------------------------------------------------------------------------
 
@@ -78,24 +117,47 @@ public final class TikTokApi
      */
     public long getConsumerId()
     {
-        // [moiz] temp:: need to figure out where to store temp adata
-        return 2;
+        // [moiz] temp:: need to figure out where to store temp data
+        return consumerid;
     }
+
+    public long consumerid;
 
     //-------------------------------------------------------------------------
 
     /**
      * Register the device with the server.
      */
-    public boolean registerDevice()
+    public long registerDevice(String deviceId)
     {
         // get route to register device with server
-        String url = String.format("%s/register?uuid=%s",
-            getApiUrl(), getDeviceId());
+        String url = String.format("%s/register?uuid=%s", getApiUrl(), deviceId);
 
         // process request
-        InputStream stream = postHttpRequest(url);
-        return stream != null;
+        HttpGet request    = new HttpGet(url);
+        InputStream stream = processRequest(request);
+
+        try {
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiResponse response =
+                mapper.readValue(stream, TikTokApiResponse.class);
+
+            // parse the results if the query was a success
+            if (response.isOkay()) {
+                Map<String, Integer> results = mapper.convertValue(
+                    response.getResults(),
+                    new TypeReference<Map<String, Integer>>() {});
+                return results.get("id").intValue();
+            }
+
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format(
+                "exception: %s", e.toString()));
+        }
+
+        return -1;
     }
 
     //-------------------------------------------------------------------------
@@ -110,8 +172,30 @@ public final class TikTokApi
             getApiUrl(), getConsumerId(), getDeviceId());
 
         // process request
-        InputStream stream = postHttpRequest(url);
-        return stream != null;
+        HttpGet request    = new HttpGet(url);
+        InputStream stream = processRequest(request);
+
+        try {
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiResponse response =
+                mapper.readValue(stream, TikTokApiResponse.class);
+
+            // parse the results if the query was a success
+            if (response.isOkay()) {
+                Map<String, Boolean> results = mapper.convertValue(
+                    response.getResults(),
+                    new TypeReference<Map<String, Boolean>>() {});
+                return results.get("registered").booleanValue();
+            }
+
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format(
+                "exception: %s", e.toString()));
+        }
+
+        return false;
     }
 
     //-------------------------------------------------------------------------
@@ -121,6 +205,8 @@ public final class TikTokApi
      */
     public void registerNotificationToken(String token)
     {
+        // [moiz] need to wait for the server to implement this before this
+        // can be worked on
     }
 
     //-------------------------------------------------------------------------
@@ -135,44 +221,215 @@ public final class TikTokApi
             getApiUrl(), getConsumerId());
 
         // get the json content from the url
-        InputStream stream = getHttpRequest(url);
+        HttpGet request    = new HttpGet(url);
+        InputStream stream = processRequest(request);
 
-        // set the json parser
-        Gson gson        = new Gson();
-        Reader reader    = new InputStreamReader(stream);
+        try {
 
-        // [moiz] temp to test out coupon parsing... probably better to the
-        // Jackson Json parser as the elements can be bound dynamically
-        JsonElement element   = gson.fromJson(reader, JsonElement.class);
-        JsonObject results    = element.getAsJsonObject().getAsJsonObject("results");
-        JsonArray couponArray = results.getAsJsonArray("coupons");
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiResponse response = mapper.readValue(stream, TikTokApiResponse.class);
+            if (response.isOkay()) {
 
-        // reparse the coupons
-        Coupon[] coupons = new Gson().fromJson(couponArray.toString(), Coupon[].class);
+                // convert the top level results structure
+                Map<String, Object> results = mapper.convertValue(
+                    response.getResults(), new TypeReference<Map<String, Object>>() {});
 
-        return coupons;
+                // process the new coupons
+                Coupon[] coupons  = mapper.convertValue(results.get("coupons"), Coupon[].class);
+                Integer[] killed  = mapper.convertValue(results.get("killed"), Integer[].class);
+                Integer[] soldOut = mapper.convertValue(results.get("sold_out"), Integer[].class);
+
+                return coupons;
+            }
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format("exception: %s", e.toString()));
+        }
+
+        return null;
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * @return Content from the get request.
+     * @return Updates server with consumers current location, currently
+     *   ignores the response from the server.
      */
-    public InputStream postHttpRequest(String url)
+    public void updateCurrentLocation(Location location)
     {
-        HttpPost request = new HttpPost(url);
-        return processRequest(request);
+        // convert location into string
+        String latitude  = String.format("%f", location.getLatitude());
+        String longitude = String.format("%f", location.getLongitude());
+
+        // add to hash
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("latitude", latitude);
+        settings.put("longitude", longitude);
+
+        // update server
+        updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
 
     /**
-     * @return Content from the post request.
+     * @return Updates server with consumer settings, currently ignores the
+     *   response from the server.
      */
-    public InputStream getHttpRequest(String url)
+    public void updateSettings(Map<String, String> settings)
     {
-        HttpGet request = new HttpGet(url);
-        return processRequest(request);
+        // construct route to update coupon attribute
+        String url = String.format("%s/consumers/%s", getApiUrl(), getConsumerId());
+
+        // setup put request for desired attribute
+        HttpPut request = new HttpPut(url);
+
+        // parse the json data
+        try {
+
+            // add settings to request
+            List<NameValuePair> pairs =
+                new ArrayList<NameValuePair>(settings.size());
+            for (Map.Entry<String, String> entry : settings.entrySet()) {
+                pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+            }
+            request.setEntity(new UrlEncodedFormEntity(pairs));
+
+            // process request
+            processRequest(request);
+
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format(
+                "exception: %s", e.toString()));
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Updates server with consumers home location, currently
+     *   ignores the response from the server.
+     */
+    public void updateHomeLocation(Location location)
+    {
+        // convert location into string
+        String latitude  = String.format("%f", location.getLatitude());
+        String longitude = String.format("%f", location.getLongitude());
+
+        // add to hash
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("home_latitude", latitude);
+        settings.put("home_longitude", longitude);
+
+        // update server
+        updateSettings(settings);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Updates server with consumers work location, currently
+     *   ignores the response from the server.
+     */
+    public void updateWorkLocation(Location location)
+    {
+        // convert location into string
+        String latitude  = String.format("%f", location.getLatitude());
+        String longitude = String.format("%f", location.getLongitude());
+
+        // add to hash
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("work_latitude", latitude);
+        settings.put("work_longitude", longitude);
+
+        // update server
+        updateSettings(settings);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Update coupon attribute.
+     */
+    public TikTokApiResponse updateCoupon(long couponId, CouponAttribute attribute)
+    {
+        // construct route to update coupon attribute
+        String url = String.format("%s/consumers/%s/coupons/%d",
+            getApiUrl(), getConsumerId(), couponId);
+
+        // setup put request for desired attribute
+        HttpPut request = new HttpPut(url);
+
+        // parse the json data
+        try {
+
+            // add attribute to request
+            List<NameValuePair> pairs = new ArrayList<NameValuePair>(1);
+            pairs.add(new BasicNameValuePair(attribute.key(), "1"));
+            request.setEntity(new UrlEncodedFormEntity(pairs));
+
+            // process request
+            InputStream stream = processRequest(request);
+
+            // nothing to do if response did not go through
+            if (stream == null) return null;
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiMultiResponse response =
+                mapper.readValue(stream, TikTokApiMultiResponse.class);
+
+            // return the response for the attribute that was updated
+            return response.getResponse(attribute.key());
+
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format(
+                "exception: %s", e.toString()));
+        }
+
+        return null;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Syncs the most current karma points stats from the server.
+     */
+    public Map<String, Integer> syncKarmaPoints()
+    {
+        // construct route to retrieve karma points
+        String url = String.format("%s/consumers/%s/loyalty_points",
+            getApiUrl(), getConsumerId());
+
+        // pull data from the server
+        HttpGet request    = new HttpGet(url);
+        InputStream stream = processRequest(request);
+
+        // nothing to do if response did not go through
+        if (stream == null) return null;
+
+        // parse the json data
+        try {
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            TikTokApiResponse response =
+                mapper.readValue(stream, TikTokApiResponse.class);
+
+            // parse the results if the query was a success
+            if (response.isOkay()) {
+                Map<String, Integer> results = mapper.convertValue(
+                    response.getResults(),
+                    new TypeReference<Map<String, Integer>>() {});
+                return results;
+            }
+
+        } catch (Exception e) {
+            Log.w(getClass().getSimpleName(), String.format(
+                "exception: %s", e.toString()));
+        }
+
+        return null;
     }
 
     //-------------------------------------------------------------------------
@@ -180,7 +437,7 @@ public final class TikTokApi
     /**
      * @return Content from the uri request.
      */
-    public InputStream processRequest(HttpUriRequest request)
+    private InputStream processRequest(HttpUriRequest request)
     {
         try {
 

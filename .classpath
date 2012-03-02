@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" path="lib/gson-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/c2dm.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.9.5.jar"/>

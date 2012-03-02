@@ -10,23 +10,33 @@ package com.tiktok.consumerapp;
 
 import java.util.Date;
 
-import com.google.gson.annotations.SerializedName;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public final class Coupon 
+@JsonIgnoreProperties(ignoreUnknown = true)
+public final class Coupon
 {
-    
+
     /**
-     * Called when the coupon is first created.
+     * Called when the coupon is created through json parsing.
      */
-    public Coupon(final long id, final String title, final String details,
-                  final int iconId, final String iconUrl,
-                  final long startTime, final long endTime,
-                  final String barcode, final boolean wasRedeemed,
-                  final Merchant merchant)
+    @JsonCreator
+    public Coupon(
+        @JsonProperty("id")                   final long id,
+        @JsonProperty("headline")             final String title,
+        @JsonProperty("description")          final String details,
+        @JsonProperty("icon_uid")             final int iconId,
+        @JsonProperty("icon_url")             final String iconUrl,
+        @JsonProperty("enable_time_in_tvsec") final long startTime,
+        @JsonProperty("expiry_time_in_tvsec") final long endTime,
+        @JsonProperty("barcode_number")       final String barcode,
+        @JsonProperty("redeemed")             final boolean wasRedeemed,
+        @JsonProperty("merchant")             final Merchant merchant)
     {
         mId          = id;
         mTitle       = title;
@@ -219,36 +229,17 @@ public final class Coupon
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
-    
-    @SerializedName("id")
-    private final long mId;
 
-    @SerializedName("headline")
-    private final String mTitle;
+    private final long     mId;
+    private final String   mTitle;
+    private final String   mDetails;
+    private final int      mIconId;
+    private final String   mIconUrl;
+    private final long     mStartTime;
+    private final long     mEndTime;
+    private final String   mBarcode;
+    private       boolean  mWasRedeemed;
+    private       boolean  mIsSoldOut;
+    private final Merchant mMerchant;
 
-    @SerializedName("description")
-    private final String mDetails;
-
-    @SerializedName("icon_uid")
-    private final int mIconId;
-
-    @SerializedName("icon_url")
-    private final String mIconUrl;
-
-    @SerializedName("enable_time_in_tvsec")
-    private final long mStartTime;
-
-    @SerializedName("expiry_time_in_tvsec")
-    private final long mEndTime;
-
-    @SerializedName("barcode_number")
-    private final String mBarcode;
-
-    @SerializedName("redeemed")
-    private boolean mWasRedeemed;
-
-    private boolean mIsSoldOut;
-
-    @SerializedName("merchant")
-    private Merchant mMerchant;
 }

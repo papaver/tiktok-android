@@ -45,11 +45,11 @@ public class CouponListActivity extends Activity
         // setup data/ui mapping
         String[] from = new String[] {
             CouponTable.sKeyTitle,
-            CouponTable.sKeyIconId
+            //CouponTable.sKeyIconId
         };
         int[] to = new int[] {
             R.id.coupon_entry_title,
-            R.id.coupon_entry_icon
+            //R.id.coupon_entry_icon
         };
 
         // create a new array adapter and set it to display the row
@@ -153,13 +153,16 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
     {
         // create and instance of the tiktok api and grab the available coupons
         TikTokApi api     = new TikTokApi();
+
+        // [moiz] testing get rid of me soon!
+        api.consumerid = 5;
+
         Coupon[] coupons = api.syncActiveCoupons();
 
         // add only new coupons to the database
         List<Long> couponIds       = mDatabaseAdapter.fetchAllCouponIds();
         List<String> merchantNames = mDatabaseAdapter.fetchAllMerchantNames();
         for (final Coupon coupon : coupons) {
-            Log.w(getClass().getSimpleName(), coupon.toString());
 
             if (!merchantNames.contains(coupon.merchant().name())) {
                 mDatabaseAdapter.createMerchant(coupon.merchant());
@@ -168,6 +171,7 @@ class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
             }
 
             if (!couponIds.contains(coupon.id())) {
+                Log.w(getClass().getSimpleName(), coupon.toString());
                 mDatabaseAdapter.createCoupon(coupon);
                 Log.w(getClass().getSimpleName(), String.format(
                     "Added coupon to db: %s", coupon.title()));
