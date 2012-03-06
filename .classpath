@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/c2dm.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.9.5.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.9.5.jar"/>
+	<classpathentry kind="lib" path="lib/FlurryAgent.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
