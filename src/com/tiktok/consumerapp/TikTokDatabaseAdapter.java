@@ -97,13 +97,13 @@ public class TikTokDatabaseAdapter
      * Create a new merchant.
      * @returns The rowId for the new merchant that is created, otherwise a -1.
      */
-    public long createMerchant(String name, String address,
+    public long createMerchant(long id, String name, String address,
                                double latitude, double longitude,
                                String phone, String category, String details,
                                int iconId, String iconUrl,
                                String webUrl)
     {
-        Merchant merchant = new Merchant(name, address, latitude, longitude, phone,
+        Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
             category, details, iconId, iconUrl, webUrl);
         return createMerchant(merchant);
     }
@@ -132,13 +132,13 @@ public class TikTokDatabaseAdapter
      * Updates an existing merchant.
      */
     public boolean updateMerchant(long rowId,
-                                  String name, String address,
+                                  long id, String name, String address,
                                   double latitude, double longitude,
                                   String phone, String category, String details,
                                   int iconId, String iconUrl,
                                   String webUrl)
     {
-        Merchant merchant = new Merchant(name, address, latitude, longitude, phone,
+        Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
             category, details, iconId, iconUrl, webUrl);
         ContentValues values = createContentValues(merchant);
         String equalsSQL = String.format("%s = %s", MerchantTable.sKeyRowId, rowId);
@@ -202,6 +202,7 @@ public class TikTokDatabaseAdapter
     {
         String rows[] = new String[] {
             MerchantTable.sKeyRowId,
+            MerchantTable.sKeyId,
             MerchantTable.sKeyName,
             MerchantTable.sKeyAddress,
             MerchantTable.sKeyLatitude,
@@ -251,10 +252,10 @@ public class TikTokDatabaseAdapter
      * Fetch all the merchants from the database.
      * @returns Cursor over all the coupons.
      */
-    public List<String> fetchAllMerchantNames()
+    public List<Long> fetchAllMerchantIds()
     {
         String rows[] = new String[] {
-            MerchantTable.sKeyName,
+            MerchantTable.sKeyId,
         };
 
         // grab the data from the database
@@ -263,15 +264,15 @@ public class TikTokDatabaseAdapter
         cursor.moveToFirst();
 
         // create a list of ids
-        List<String> names = new ArrayList<String>();
+        List<Long> ids = new ArrayList<Long>();
         for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
-            names.add(cursor.getString(0));
+            ids.add(cursor.getLong(0));
         }
 
         // cleanup
         cursor.close();
 
-        return names;
+        return ids;
     }
 
     //-------------------------------------------------------------------------
@@ -309,10 +310,11 @@ public class TikTokDatabaseAdapter
      * Fetch merchant from the database.
      * @returns Cursor positioned at the requested coupon.
      */
-    public Cursor fetchMerchant(String name) throws SQLException
+    public Cursor fetchMerchant(long id) throws SQLException
     {
         String rows[] = new String[] {
             MerchantTable.sKeyRowId,
+            MerchantTable.sKeyId,
             MerchantTable.sKeyName,
             MerchantTable.sKeyAddress,
             MerchantTable.sKeyLatitude,
@@ -324,7 +326,7 @@ public class TikTokDatabaseAdapter
             MerchantTable.sKeyIconUrl,
             MerchantTable.sKeyWebsiteUrl
         };
-        String equalsSQL = String.format("%s = '%s'", MerchantTable.sKeyName, name);
+        String equalsSQL = String.format("%s = '%s'", MerchantTable.sKeyId, id);
         Cursor cursor    = mDatabase.query(true, MerchantTable.sName, rows, equalsSQL,
             null, null, null, null, null);
         if (cursor != null) cursor.moveToFirst();
@@ -349,11 +351,7 @@ public class TikTokDatabaseAdapter
         values.put(CouponTable.sKeyBarcode,     coupon.barcode());
         values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
         values.put(CouponTable.sKeyIsSoldOut,   coupon.isSoldOut());
-
-        // fetch merchant id
-        Cursor cursor = fetchMerchant(coupon.merchant().name());
-        values.put(CouponTable.sMerchant, cursor.getLong(0));
-        cursor.close();
+        values.put(CouponTable.sMerchant,       coupon.merchant().id());
 
         return values;
     }
@@ -366,6 +364,7 @@ public class TikTokDatabaseAdapter
     private ContentValues createContentValues(Merchant merchant)
     {
         ContentValues values = new ContentValues();
+        values.put(MerchantTable.sKeyId,         merchant.id());
         values.put(MerchantTable.sKeyName,       merchant.name());
         values.put(MerchantTable.sKeyAddress,    merchant.address());
         values.put(MerchantTable.sKeyLatitude,   merchant.latitude());

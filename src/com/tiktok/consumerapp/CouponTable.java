@@ -68,7 +68,7 @@ public class CouponTable
             sKeyWasRedeemed  + " integer not null,                  " +
             sKeyIsSoldOut    + " integer not null default 0,        " +
             sMerchant        + " integer not null                   "
-                             + String.format(" references %s(%s)", MerchantTable.sName, MerchantTable.sKeyRowId)
+                             + String.format(" references %s(%s)", MerchantTable.sName, MerchantTable.sKeyId)
                              + " on delete cascade                  " + ");";
         return createSQL;
     }

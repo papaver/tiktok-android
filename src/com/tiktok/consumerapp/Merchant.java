@@ -25,6 +25,7 @@ public final class Merchant
      */
     @JsonCreator
     public Merchant(
+        @JsonProperty("id")           final long id,
         @JsonProperty("name")         final String name,
         @JsonProperty("full_address") final String address,
         @JsonProperty("latitude")     final double latitude,
@@ -36,6 +37,7 @@ public final class Merchant
         @JsonProperty("icon_url")     final String iconUrl,
         @JsonProperty("web_url")      final String websiteUrl)
     {
+        mId         = id;
         mName       = name;
         mAddress    = address;
         mLatitude   = latitude;
@@ -46,6 +48,16 @@ public final class Merchant
         mIconId     = iconId;
         mIconUrl    = iconUrl;
         mWebsiteUrl = websiteUrl;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Unique identifier for the merchant.
+     */
+    public long id()
+    {
+        return mId;
     }
 
     //-------------------------------------------------------------------------
@@ -158,6 +170,7 @@ public final class Merchant
         String newLine = System.getProperty("line.separator");
         String string  =
             "Merchant {"     + newLine +
+            "  id: "         + Long.toString(id()) + newLine +
             "  name: "       + name() + newLine +
             "  address: "    + address() + newLine +
             "  latitude: "   + Double.toString(latitude()) + newLine +
@@ -176,6 +189,7 @@ public final class Merchant
     // fields
     //-------------------------------------------------------------------------
 
+    private final long   mId;
     private final String mName;
     private final String mAddress;
     private final double mLatitude;

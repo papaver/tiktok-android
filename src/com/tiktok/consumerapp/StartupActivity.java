@@ -43,7 +43,6 @@ public class StartupActivity extends Activity
         registerNotifications();
 
 
-
         // [moiz] example of grabbing image container
         //ImageView imageView = (ImageView)findViewById(R.id.background);
         //imageView.setImageResource();

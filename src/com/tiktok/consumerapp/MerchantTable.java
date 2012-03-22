@@ -59,6 +59,7 @@ public class MerchantTable
         String createSQL =
             "create table " + sName + "("                            +
             sKeyRowId       + " integer primary key autoincrement, " +
+            sKeyId          + " integer not null,                  " +
             sKeyName        + " text    not null,                  " +
             sKeyAddress     + " text    not null,                  " +
             sKeyLatitude    + " real    not null,                  " +
@@ -100,6 +101,7 @@ public class MerchantTable
 
     public static String sName          = "Merchant";
     public static String sKeyRowId      = "_id";
+    public static String sKeyId         = "merchant_id";
     public static String sKeyName       = "name";
     public static String sKeyAddress    = "address";
     public static String sKeyLatitude   = "latitude";

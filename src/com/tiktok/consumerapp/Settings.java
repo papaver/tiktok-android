@@ -23,6 +23,12 @@ import android.location.Location;
 public final class Settings
 {
 
+    /**
+     * [moiz] use apply instead of commit where possible, this runs the save
+     *   process asycnronously instead of commit which runs it syncronously,
+     *   can't use for remove
+     */
+
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
