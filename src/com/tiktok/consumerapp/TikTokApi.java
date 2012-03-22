@@ -94,10 +94,7 @@ public final class TikTokApi
      */
     public static String getApiUrl()
     {
-        // [moiz] implement some sort of debugging options
-        boolean TIKTOKAPI_STAGING = true;
-
-        if (TIKTOKAPI_STAGING) {
+        if (Debug.kTikTokApiStaging) {
             return "https://furious-window-5155.herokuapp.com";
         } else {
             return "https://www.tiktok.com";
@@ -149,7 +146,7 @@ public final class TikTokApi
     public boolean validateRegistration()
     {
         // get route to register device with server
-        String url = String.format("%s/consumers/%d/registered?uuid=%s",
+        String url = String.format("%s/consumers/%s/registered?uuid=%s",
             getApiUrl(), utilities().getConsumerId(), utilities().getDeviceId());
 
         // process request
