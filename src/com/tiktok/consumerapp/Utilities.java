@@ -9,7 +9,9 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
@@ -28,6 +30,23 @@ public final class Utilities
     private static final String kKeyDeviceId          = "TTDeviceKey";
     private static final String kKeyConsumerId        = "TTCustomerKey";
     private static final String kKeyNotificationToken = "TTNotificationKey";
+
+    //-------------------------------------------------------------------------
+    // static methods
+    //-------------------------------------------------------------------------
+
+    public static void displaySimpleAlert(Context context, String title, String message)
+    {
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // nothing to see here
+            }
+        });
+        alertDialog.show();
+    }
 
     //-------------------------------------------------------------------------
     // constructor
