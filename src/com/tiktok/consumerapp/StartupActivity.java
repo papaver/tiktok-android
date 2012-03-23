@@ -21,6 +21,15 @@ import android.util.Log;
 
 public class StartupActivity extends Activity
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    private static final String kLogTag = "StartupActivity";
+
+    //-------------------------------------------------------------------------
+    // activity
+    //-------------------------------------------------------------------------
 
     /**
      * Called when the activity is first created.
@@ -31,18 +40,7 @@ public class StartupActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startup);
 
-        // [moiz] this should be split up into verify and register like
-        //   the ios app, should be fine for now...
-        //   this needs to be threaded as well and should happen on startup
-        //   probably not on create...
-
-        // register device id with the server
-        registerDevice();
-
-        // register notifications with C2DM server
-        registerNotifications();
-
-
+        /*
         // [moiz] example of grabbing image container
         //ImageView imageView = (ImageView)findViewById(R.id.background);
         //imageView.setImageResource();
@@ -54,8 +52,6 @@ public class StartupActivity extends Activity
         //    3) validate guid with server, assign a consumer id to the device
         //    4) sync coupons? or let the deals activity automatically do that?
 
-        // setup a thread to wait a few minutes and then start the next
-        // main deals activity
         final Context context = this;
         Thread thread = new Thread() {
             @Override
@@ -86,6 +82,7 @@ public class StartupActivity extends Activity
 
         // start the thread
         thread.start();
+        */
     }
 
     //-------------------------------------------------------------------------
@@ -108,6 +105,18 @@ public class StartupActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+
+        //Analytics.passCheckpoint("Startup");
+
+        // register device with the server if no consumer id found
+        Utilities utilities = new Utilities(getApplicationContext());
+        String consumerId = utilities.getConsumerId();
+        if (consumerId == null) {
+            purgeData();
+            registerDevice();
+        } else {
+            validateRegistration();
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -147,42 +156,92 @@ public class StartupActivity extends Activity
     // methods
     //-------------------------------------------------------------------------
 
+    private void purgeData()
+    {
+        // purge the database
+        TikTokDatabaseHelper.purgeDatabase(getApplicationContext());
+
+        // purge the icon directory
+
+        // purge settings
+        Settings settings = new Settings(getApplicationContext());
+        settings.clearAllSettings();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void runStartupProcess()
+    {
+        // set user id for analytics
+        //Utilities utilities = new Utilities(getApplicationContext());
+        //Analytics.setUserId(utilities.getDeviceId());
+
+        // kick off registration for notifications
+        registerNotifications();
+
+        // add location tracking operation
+        setupLocationTracking();
+
+        // sync coupons
+        syncCoupons();
+    }
+
+    //-------------------------------------------------------------------------
+
     private void registerDevice()
     {
-        Log.w(getClass().getSimpleName(), "registering device id...");
-
-        // [moiz] clean this logic up so it works correctly!
+        Log.i(kLogTag, "registering device id...");
 
         TikTokApi api       = new TikTokApi(getApplicationContext());
         Utilities utilities = new Utilities(getApplicationContext());
 
-        // check if this is a new device
-        String consumerId = utilities.getConsumerId();
-        if (consumerId == null) {
+        // generate a new device id
+        String deviceId = utilities.getDeviceId();
+        if (deviceId == null) {
+            deviceId = Device.generateGUID();
+        }
 
-            // generate a new device id
-            String deviceId = Device.generateGUID();
+        // attempt to register the device
+        String consumerId = api.registerDevice(deviceId);
+        if (consumerId != null) {
+            utilities.cacheDeviceId(deviceId);
+            utilities.cacheConsumerId(consumerId);
+            runStartupProcess();
 
-            // register device id with server
-            consumerId = api.registerDevice(deviceId);
-            if (consumerId != null) {
-                utilities.cacheConsumerId(consumerId);
+        // something went horribly wrong
+        } else {
+            Log.e(kLogTag, "registration failed...");
+            String title   = "Registration Error";
+            String message = "Failed to register with the server. Please " +
+                             "try again later.";
+            Utilities.displaySimpleAlert(this, title, message);
+        }
+    }
 
-            // failed to regsiter with server ask user to try again
-            } else {
-            }
+    //-------------------------------------------------------------------------
 
-        // check if the registration is valid
+    private void validateRegistration()
+    {
+        Log.i(kLogTag, "validating registration with server...");
+
+        TikTokApi api       = new TikTokApi(getApplicationContext());
+        Utilities utilities = new Utilities(getApplicationContext());
+
+        // allow the startup process to continue
+        boolean isRegistered = api.validateRegistration();
+        if (isRegistered) {
+            runStartupProcess();
+
+        // re-run the registration process if server no longer registered
         } else {
 
-            boolean isValid = api.validateRegistration();
-            if (!isValid) {
-                utilities.clearDeviceId();
-                utilities.clearConsumerId();
+            // clean up the existing cached data
+            utilities.clearConsumerId();
+            utilities.clearDeviceId();
 
-                // try to register the device again
-                registerDevice();
-            }
+            // re-register with the server
+            purgeData();
+            registerDevice();
         }
     }
 
@@ -190,13 +249,32 @@ public class StartupActivity extends Activity
 
     private void registerNotifications()
     {
-        Log.w(getClass().getSimpleName(), "registering with notification server...");
+        Log.i(kLogTag, "registering with notification server...");
 
         Intent registrationIntent = new Intent("com.google.android.c2dm.intent.REGISTER");
         registrationIntent.putExtra("app",
             PendingIntent.getBroadcast(this, 0, new Intent(), 0));
         registrationIntent.putExtra("sender", Constants.kPushNotificationAccount);
         startService(registrationIntent);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void setupLocationTracking()
+    {
+        Log.i(kLogTag, "setting up location tracking...");
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void syncCoupons()
+    {
+        // close this activity, will remove it from the stack
+        finish();
+
+        // create an intent to start the main deals activity
+        Intent dealsActivity = new Intent(getApplicationContext(), MainTabActivity.class);
+        startActivity(dealsActivity);
     }
 }
 
