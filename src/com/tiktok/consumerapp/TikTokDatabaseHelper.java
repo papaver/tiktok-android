@@ -18,12 +18,29 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class TikTokDatabaseHelper extends SQLiteOpenHelper
 {
+    //-------------------------------------------------------------------------
+    // static methods
+    //-------------------------------------------------------------------------
+
+    /**
+     * Delete database from the filesystem.
+     */
+    public static void purgeDatabase(Context context)
+    {
+        context.deleteDatabase(sDatabaseName);
+    }
+
+    //-------------------------------------------------------------------------
+    // constructor
+    //-------------------------------------------------------------------------
     
     public TikTokDatabaseHelper(Context context)
     {
         super(context, sDatabaseName, null, sDatabaseVersion);
     }
 
+    //-------------------------------------------------------------------------
+    // methods
     //-------------------------------------------------------------------------
 
     /**
