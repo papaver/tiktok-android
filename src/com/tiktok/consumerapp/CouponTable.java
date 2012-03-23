@@ -41,7 +41,7 @@ public class CouponTable
             "which will destroy all data.", oldVersion, newVersion));
 
         // drop the table 
-        dropTable(database, sName);
+        dropTable(database);
 
         // create the new table
         onCreate(database);
@@ -78,9 +78,9 @@ public class CouponTable
     /**
      * Drop the given table from the database.
      */
-    public static void dropTable(SQLiteDatabase database, String tableName)
+    public static void dropTable(SQLiteDatabase database)
     {
-        database.execSQL(getTableDropSQL(tableName));
+        database.execSQL(getTableDropSQL(sName));
     }
 
     //-------------------------------------------------------------------------
