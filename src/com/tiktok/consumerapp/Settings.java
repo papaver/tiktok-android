@@ -101,6 +101,9 @@ public final class Settings
     {
          mEditor.putString(kTagGender, gender);
          mEditor.commit();
+
+         // update analytics
+         Analytics.setUserGender(gender);
     }
 
     //-------------------------------------------------------------------------
@@ -117,6 +120,9 @@ public final class Settings
     {
          mEditor.putLong(kTagBirthday, birthday.getTime());
          mEditor.commit();
+
+         // update analytics
+         Analytics.setUserAge(birthday);
     }
 
     //-------------------------------------------------------------------------

@@ -10,7 +10,6 @@ package com.tiktok.consumerapp;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -94,6 +93,7 @@ public class StartupActivity extends Activity
     protected void onStart()
     {
         super.onStart();
+        Analytics.startSession(this);
     }
 
     //-------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public class StartupActivity extends Activity
     {
         super.onResume();
 
-        //Analytics.passCheckpoint("Startup");
+        Analytics.passCheckpoint("Startup");
 
         // register device with the server if no consumer id found
         Utilities utilities = new Utilities(getApplicationContext());
@@ -139,6 +139,7 @@ public class StartupActivity extends Activity
     protected void onStop()
     {
         super.onStop();
+        Analytics.endSession(this);
     }
 
     //-------------------------------------------------------------------------
@@ -173,8 +174,8 @@ public class StartupActivity extends Activity
     private void runStartupProcess()
     {
         // set user id for analytics
-        //Utilities utilities = new Utilities(getApplicationContext());
-        //Analytics.setUserId(utilities.getDeviceId());
+        Utilities utilities = new Utilities(getApplicationContext());
+        Analytics.setUserId(utilities.getDeviceId());
 
         // kick off registration for notifications
         registerNotifications();
