@@ -8,7 +8,11 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -51,8 +55,8 @@ public final class Settings
 
     public Settings(Context context)
     {
-        Context globalContext = context.getApplicationContext();
-        mPreferences = globalContext.getSharedPreferences(kDomain, Activity.MODE_PRIVATE);
+        mContext     = context.getApplicationContext();
+        mPreferences = mContext.getSharedPreferences(kDomain, Activity.MODE_PRIVATE);
         mEditor      = mPreferences.edit();
     }
 
@@ -69,8 +73,14 @@ public final class Settings
 
     public void setName(String name)
     {
-         mEditor.putString(kTagName, name);
-         mEditor.commit();
+        mEditor.putString(kTagName, name);
+        mEditor.commit();
+
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("name", name);
+        api.updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -84,8 +94,14 @@ public final class Settings
 
     public void setEmail(String email)
     {
-         mEditor.putString(kTagEmail, email);
-         mEditor.commit();
+        mEditor.putString(kTagEmail, email);
+        mEditor.commit();
+
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("email", email);
+        api.updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -99,11 +115,17 @@ public final class Settings
 
     public void setGender(String gender)
     {
-         mEditor.putString(kTagGender, gender);
-         mEditor.commit();
+        mEditor.putString(kTagGender, gender);
+        mEditor.commit();
 
-         // update analytics
-         Analytics.setUserGender(gender);
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("sex", gender.toLowerCase().substring(0, 1));
+        api.updateSettings(settings);
+
+        // update analytics
+        Analytics.setUserGender(gender);
     }
 
     //-------------------------------------------------------------------------
@@ -116,13 +138,29 @@ public final class Settings
 
     //-------------------------------------------------------------------------
 
+    public String birthdayStr()
+    {
+        // format date into string
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, y", Locale.US);
+        String birthday             = dateFormat.format(birthday());
+        return birthday;
+    }
+
+    //-------------------------------------------------------------------------
+
     public void setBirthday(Date birthday)
     {
-         mEditor.putLong(kTagBirthday, birthday.getTime());
-         mEditor.commit();
+        mEditor.putLong(kTagBirthday, birthday.getTime());
+        mEditor.commit();
 
-         // update analytics
-         Analytics.setUserAge(birthday);
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("birthday", birthdayStr());
+        api.updateSettings(settings);
+
+        // update analytics
+        Analytics.setUserAge(birthday);
     }
 
     //-------------------------------------------------------------------------
@@ -137,6 +175,10 @@ public final class Settings
     public void setHome(Location home)
     {
         setLocation(kTagHome, home);
+
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        api.updateHomeLocation(home);
     }
 
     //-------------------------------------------------------------------------
@@ -166,6 +208,10 @@ public final class Settings
     public void setWork(Location work)
     {
         setLocation(kTagWork, work);
+
+        // push update to server
+        TikTokApi api = new TikTokApi(mContext);
+        api.updateWorkLocation(work);
     }
 
     //-------------------------------------------------------------------------
@@ -248,6 +294,7 @@ public final class Settings
     // fields
     //-------------------------------------------------------------------------
 
+    private Context           mContext;
     private SharedPreferences mPreferences;
     private Editor            mEditor;
 

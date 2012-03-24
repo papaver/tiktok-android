@@ -23,6 +23,13 @@ import android.util.Log;
 
 public class C2DMReceiver extends BroadcastReceiver
 {
+
+    //-------------------------------------------------------------------------
+
+    static final String kLogTag = "NotificationReciever";
+
+    //-------------------------------------------------------------------------
+
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -37,16 +44,29 @@ public class C2DMReceiver extends BroadcastReceiver
 
     private void handleRegistration(Context context, Intent intent)
     {
-        String registration = intent.getStringExtra("registration_id");
-        String error        = intent.getStringExtra("error");
+        String token        = intent.getStringExtra("registration_id");
         String unregistered = intent.getStringExtra("registered");
+        String error        = intent.getStringExtra("error");
 
         if (error != null) {
-            Log.w(getClass().getSimpleName(), "Registration failed: " + error);
+            Log.e(kLogTag, "Registration failed: " + error);
         } else if (unregistered != null) {
-            Log.w(getClass().getSimpleName(), "Unregistered: " + unregistered);
-        } else if (registration != null) {
-            Log.w(getClass().getSimpleName(), "Registered: " + registration);
+            Log.i(kLogTag, "Unregistered: " + unregistered);
+            Utilities utilities = new Utilities(context);
+            utilities.clearNotificationToken();
+        } else if (token != null) {
+            Log.i(kLogTag, "Registered: " + token);
+
+            // [moiz] this needs to be implemented on the server side and tested
+            Utilities utilities = new Utilities(context);
+            String oldToken     = utilities.getNotificationToken();
+            if (!token.equals(oldToken)) {
+                TikTokApi api = new TikTokApi(context);
+                if (api.registerNotificationToken(token) != null) {
+                    Log.i(kLogTag, String.format("Cached new token: %s", token));
+                    utilities.cacheNotificationToken(token);
+                }
+            }
         }
     }
 
@@ -55,7 +75,7 @@ public class C2DMReceiver extends BroadcastReceiver
     private void handleMessage(Context context, Intent intent)
     {
         String message = intent.getStringExtra("message");
-        Log.w(getClass().getSimpleName(), "Message: " + message);
+        Log.i(kLogTag, "Message: " + message);
     }
 }
 
