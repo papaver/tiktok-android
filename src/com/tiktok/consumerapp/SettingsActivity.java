@@ -8,17 +8,32 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.widget.TextView;
-//import android.util.Log;
+import android.preference.PreferenceActivity;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.util.Log;
+
+import org.bostonandroid.datepreference.DatePreference;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class SettingsActivity extends Activity
+public class SettingsActivity extends    PreferenceActivity
+                              implements OnSharedPreferenceChangeListener
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    static final String kLogTag = "SettingsActivity";
+
+    //-------------------------------------------------------------------------
+    // activity
+    //-------------------------------------------------------------------------
 
     /**
      * Called when the activity is first created.
@@ -27,10 +42,31 @@ public class SettingsActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
 
-        TextView textView = new TextView(this);
-        textView.setText("This is the Settings Tab.");
-        setContentView(textView);
+        // update the summaries
+        mSettings = new Settings(this);
+
+        // name
+        if (!mSettings.name().equals("")) {
+            EditTextPreference textPreference =
+                (EditTextPreference)getPreferenceScreen().findPreference(Settings.kTagName);
+            textPreference.setSummary(mSettings.name());
+        }
+
+        // email
+        if (!mSettings.email().equals("")) {
+            EditTextPreference textPreference =
+                (EditTextPreference)getPreferenceScreen().findPreference(Settings.kTagEmail);
+            textPreference.setSummary(mSettings.email());
+        }
+
+        // gender
+        if (!mSettings.gender().equals("")) {
+            ListPreference textPreference =
+                (ListPreference)getPreferenceScreen().findPreference(Settings.kTagGender);
+            textPreference.setSummary(mSettings.gender());
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -53,6 +89,10 @@ public class SettingsActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+
+        // set up a listener whenever a key changes
+        SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
+        preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     //-------------------------------------------------------------------------
@@ -64,6 +104,10 @@ public class SettingsActivity extends Activity
     protected void onPause()
     {
         super.onPause();
+
+        // unregister the listener whenever a key changes
+        SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     //-------------------------------------------------------------------------
@@ -87,5 +131,35 @@ public class SettingsActivity extends Activity
     {
         super.onDestroy();
     }
+
+    //-------------------------------------------------------------------------
+    // shared preferences listener
+    //-------------------------------------------------------------------------
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key)
+    {
+        Log.i(kLogTag, String.format("Updated setting %s", key));
+
+        // update summary for text fields
+        if (key.equals(Settings.kTagName) || key.equals(Settings.kTagEmail)) {
+            EditTextPreference textPreference =
+                (EditTextPreference)getPreferenceScreen().findPreference(key);
+            textPreference.setSummary(sharedPreferences.getString(key, ""));
+        }
+
+        // update summary for list fields
+        if (key.equals(Settings.kTagGender)) {
+            ListPreference listPreference =
+                (ListPreference)getPreferenceScreen().findPreference(key);
+            listPreference.setSummary(sharedPreferences.getString(key, ""));
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+
+    private Settings mSettings;
 }
 

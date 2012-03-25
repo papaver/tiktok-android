@@ -8,7 +8,9 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -18,18 +20,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public final class Settings
+public final class Settings implements OnSharedPreferenceChangeListener
 {
 
     /**
      * [moiz] use apply instead of commit where possible, this runs the save
-     *   process asycnronously instead of commit which runs it syncronously,
+     *   process asychronously instead of commit which runs it synchronously,
      *   can't use for remove
      */
 
@@ -37,17 +42,17 @@ public final class Settings
     // statics
     //-------------------------------------------------------------------------
 
-    private static final String kDomain           = "com.tiktok.comsumerapp.preferences";
-    private static final String kTagName          = "TTS_name";
-    private static final String kTagEmail         = "TTS_email";
-    private static final String kTagGender        = "TTS_gender";
-    private static final String kTagBirthday      = "TTS_birthday";
-    private static final String kTagHome          = "TTS_home";
-    private static final String kTagHomeLocality  = "TTS_homeLocality";
-    private static final String kTagWork          = "TTS_work";
-    private static final String kTagWorkLocality  = "TTS_workLocality";
-    private static final String kTagLastUpdate    = "TTS_lastUpdate";
-    //private static final String kTagTutorialIndex = "TTS_tutorial";
+    public static final String kDomain           = "com.tiktok.comsumerapp.preferences";
+    public static final String kTagName          = "TTS_name";
+    public static final String kTagEmail         = "TTS_email";
+    public static final String kTagGender        = "TTS_gender";
+    public static final String kTagBirthday      = "TTS_birthday";
+    public static final String kTagHome          = "TTS_home";
+    public static final String kTagHomeLocality  = "TTS_homeLocality";
+    public static final String kTagWork          = "TTS_work";
+    public static final String kTagWorkLocality  = "TTS_workLocality";
+    public static final String kTagLastUpdate    = "TTS_lastUpdate";
+    //public static final String kTagTutorialIndex = "TTS_tutorial";
 
     //-------------------------------------------------------------------------
     // constructor
@@ -56,8 +61,10 @@ public final class Settings
     public Settings(Context context)
     {
         mContext     = context.getApplicationContext();
-        mPreferences = mContext.getSharedPreferences(kDomain, Activity.MODE_PRIVATE);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mEditor      = mPreferences.edit();
+
+        mPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     //-------------------------------------------------------------------------
@@ -75,11 +82,15 @@ public final class Settings
     {
         mEditor.putString(kTagName, name);
         mEditor.commit();
+    }
 
-        // push update to server
+    //-------------------------------------------------------------------------
+
+    public void syncName()
+    {
         TikTokApi api = new TikTokApi(mContext);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("name", name);
+        settings.put("name", name());
         api.updateSettings(settings);
     }
 
@@ -96,11 +107,15 @@ public final class Settings
     {
         mEditor.putString(kTagEmail, email);
         mEditor.commit();
+    }
 
-        // push update to server
+    //-------------------------------------------------------------------------
+
+    public void syncEmail()
+    {
         TikTokApi api = new TikTokApi(mContext);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("email", email);
+        settings.put("email", email());
         api.updateSettings(settings);
     }
 
@@ -117,23 +132,33 @@ public final class Settings
     {
         mEditor.putString(kTagGender, gender);
         mEditor.commit();
+    }
 
+    //-------------------------------------------------------------------------
+
+    public void syncGender()
+    {
         // push update to server
         TikTokApi api = new TikTokApi(mContext);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("sex", gender.toLowerCase().substring(0, 1));
+        settings.put("sex", gender().toLowerCase().substring(0, 1));
         api.updateSettings(settings);
 
         // update analytics
-        Analytics.setUserGender(gender);
+        Analytics.setUserGender(gender());
     }
 
     //-------------------------------------------------------------------------
 
     public Date birthday()
     {
-        long birthday = mPreferences.getLong(kTagBirthday, 0);
-        return new Date(birthday);
+        String birthday = mPreferences.getString(kTagBirthday, null);
+        try {
+            return birthday == null ? null :
+                new SimpleDateFormat("yyyy.MM.dd", Locale.US).parse(birthday);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -141,18 +166,23 @@ public final class Settings
     public String birthdayStr()
     {
         // format date into string
+        Date birthday               = birthday();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, y", Locale.US);
-        String birthday             = dateFormat.format(birthday());
-        return birthday;
+        return birthday == null ? "" : dateFormat.format(birthday());
     }
 
     //-------------------------------------------------------------------------
 
     public void setBirthday(Date birthday)
     {
-        mEditor.putLong(kTagBirthday, birthday.getTime());
+        mEditor.putString(kTagBirthday, DateFormat.getDateInstance().format(birthday));
         mEditor.commit();
+    }
 
+    //-------------------------------------------------------------------------
+
+    public void syncBirthday()
+    {
         // push update to server
         TikTokApi api = new TikTokApi(mContext);
         Map<String, String> settings = new HashMap<String, String>();
@@ -160,7 +190,7 @@ public final class Settings
         api.updateSettings(settings);
 
         // update analytics
-        Analytics.setUserAge(birthday);
+        Analytics.setUserAge(birthday());
     }
 
     //-------------------------------------------------------------------------
@@ -175,10 +205,14 @@ public final class Settings
     public void setHome(Location home)
     {
         setLocation(kTagHome, home);
+    }
 
-        // push update to server
+    //-------------------------------------------------------------------------
+
+    public void syncHome()
+    {
         TikTokApi api = new TikTokApi(mContext);
-        api.updateHomeLocation(home);
+        api.updateHomeLocation(home());
     }
 
     //-------------------------------------------------------------------------
@@ -208,10 +242,14 @@ public final class Settings
     public void setWork(Location work)
     {
         setLocation(kTagWork, work);
+    }
 
-        // push update to server
+    //-------------------------------------------------------------------------
+
+    public void syncWork()
+    {
         TikTokApi api = new TikTokApi(mContext);
-        api.updateWorkLocation(work);
+        api.updateWorkLocation(work());
     }
 
     //-------------------------------------------------------------------------
@@ -288,6 +326,26 @@ public final class Settings
         mEditor.putFloat(latKey, (float)value.getLatitude());
         mEditor.putFloat(lngKey, (float)value.getLongitude());
         mEditor.commit();
+    }
+
+    //-------------------------------------------------------------------------
+    // shared preferences listener
+    //-------------------------------------------------------------------------
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key)
+    {
+        Log.i("Settings", String.format("Syncing setting %s", key));
+
+        if (key.equals(kTagName)) {
+            syncName();
+        } else if (key.equals(kTagEmail)) {
+            syncEmail();
+        } else if (key.equals(kTagGender)) {
+            syncGender();
+        } else if (key.equals(kTagBirthday)) {
+            syncBirthday();
+        }
     }
 
     //-------------------------------------------------------------------------
