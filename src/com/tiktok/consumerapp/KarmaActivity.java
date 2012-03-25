@@ -8,6 +8,9 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Map;
+import java.util.Iterator;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -27,10 +30,7 @@ public class KarmaActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        TextView textView = new TextView(this);
-        textView.setText("This is the Karma Tab.");
-        setContentView(textView);
+        setContentView(R.layout.karma);
     }
 
     //-------------------------------------------------------------------------
@@ -53,6 +53,25 @@ public class KarmaActivity extends Activity
     protected void onResume()
     {
         super.onResume();
+
+        // grab the point count from the server
+        TikTokApi api               = new TikTokApi(this);
+        Map<String, Integer> points = api.syncKarmaPoints();
+
+        // update the points
+        Iterator<Map.Entry<String, Integer>> iterator = points.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Integer> pair = iterator.next();
+
+            // find the id of the text view
+            String name = String.format("%s_points", pair.getKey());
+            int id = getResources().getIdentifier(name, "id", getPackageName());
+            if (id == 0) continue;
+
+            // update the text view
+            final TextView textView = (TextView)findViewById(id);
+            textView.setText(pair.getValue().toString());
+        }
     }
 
     //-------------------------------------------------------------------------
