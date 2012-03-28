@@ -1,106 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:stretchColumns="1">
+    android:layout_height="fill_parent">
 
-    <TableRow>
-        <ImageView
-            android:id="@+id/fb_icon"
-            android:layout_width="25dip"
-            android:layout_height="25dip"
-            android:padding="1dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_facebook" />
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dip"
+        android:paddingLeft="5dip"
+        android:paddingRight="5dip"
+        android:stretchColumns="1">
 
-        <TextView
-            android:layout_gravity="center_vertical"
-            android:text="Facebook"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-        <TextView
-            android:id="@+id/fb_points"
-            android:layout_gravity="center_vertical"
-            android:text="-"
-            android:gravity="right"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-    </TableRow>
+        <TableRow
+            android:paddingTop="1dip"
+            android:paddingBottom="1dip" >
 
-    <TableRow>
-        <ImageView
-            android:id="@+id/tw_icon"
-            android:layout_width="25dip"
-            android:layout_height="25dip"
-            android:padding="1dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_twitterbird" />
+            <ImageView
+                android:id="@+id/fb_icon"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:padding="1dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_facebook" />
 
-        <TextView
-            android:layout_gravity="center_vertical"
-            android:text="Twitter"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-        <TextView
-            android:id="@+id/tw_points"
-            android:layout_gravity="center_vertical"
-            android:text="-"
-            android:gravity="right"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-    </TableRow>
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:text="Facebook"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/fb_points"
+                android:layout_gravity="center_vertical"
+                android:text="-"
+                android:gravity="right"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+        </TableRow>
 
-    <TableRow>
-        <ImageView
-            android:id="@+id/email_icon"
-            android:layout_width="25dip"
-            android:layout_height="25dip"
-            android:padding="1dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_envelope" />
+        <TableRow
+            android:paddingTop="1dip"
+            android:paddingBottom="1dip" >
 
-        <TextView
-            android:layout_gravity="center_vertical"
-            android:text="Email"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-        <TextView
-            android:id="@+id/email_points"
-            android:layout_gravity="center_vertical"
-            android:text="-"
-            android:gravity="right"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-    </TableRow>
+            <ImageView
+                android:id="@+id/tw_icon"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:padding="1dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_twitterbird" />
 
-    <TableRow>
-        <ImageView
-            android:id="@+id/sms_icon"
-            android:layout_width="25dip"
-            android:layout_height="25dip"
-            android:padding="1dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_speechbubble" />
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:text="Twitter"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/tw_points"
+                android:layout_gravity="center_vertical"
+                android:text="-"
+                android:gravity="right"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+        </TableRow>
 
-        <TextView
-            android:layout_gravity="center_vertical"
-            android:text="SMS"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-        <TextView
-            android:id="@+id/sms_points"
-            android:layout_gravity="center_vertical"
-            android:text="-"
-            android:gravity="right"
-            android:paddingLeft="3dip"
-            android:paddingRight="3dip"
-            android:textSize="17sp" />
-    </TableRow>
-</TableLayout>
+        <TableRow
+            android:paddingTop="1dip"
+            android:paddingBottom="1dip" >
+
+            <ImageView
+                android:id="@+id/email_icon"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:padding="1dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_envelope" />
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:text="Email"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/email_points"
+                android:layout_gravity="center_vertical"
+                android:text="-"
+                android:gravity="right"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+        </TableRow>
+
+        <TableRow
+            android:paddingTop="1dip"
+            android:paddingBottom="1dip" >
+
+            <ImageView
+                android:id="@+id/sms_icon"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:padding="1dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_speechbubble" />
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:text="SMS"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/sms_points"
+                android:layout_gravity="center_vertical"
+                android:text="-"
+                android:gravity="right"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+        </TableRow>
+
+        <TableRow
+            android:paddingTop="1dip"
+            android:paddingBottom="1dip" >
+
+            <ImageView
+                android:id="@+id/referral_icon"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:padding="1dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_badge" />
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:text="Referrals"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/referral_points"
+                android:layout_gravity="center_vertical"
+                android:text="-"
+                android:gravity="right"
+                android:paddingLeft="3dip"
+                android:paddingRight="3dip"
+                android:textSize="17sp" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/karma_copy"
+        android:text="@string/karma_copy"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="10dip"
+        android:paddingLeft="45dip"
+        android:paddingRight="45dip"
+        android:paddingBottom="10dip"
+        android:textSize="17sp" 
+        android:onClick="onClickCopy"                
+        android:clickable="true" />
+
+    <ImageView
+        android:id="@+id/tok"
+        android:src="@drawable/tok_karma"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:layout_width="75dip"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

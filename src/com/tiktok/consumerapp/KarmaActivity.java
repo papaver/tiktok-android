@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Iterator;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 //import android.util.Log;
 
@@ -105,6 +108,16 @@ public class KarmaActivity extends Activity
     protected void onDestroy()
     {
         super.onDestroy();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void onClickCopy(View view)
+    {
+        String url    = "http://www.tiktok.com/karma_details";
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 }
 
