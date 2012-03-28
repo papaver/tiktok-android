@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class TikTokDatabaseAdapter 
 {
-    
+
     public TikTokDatabaseAdapter(Context context)
     {
         mContext = context;
@@ -113,16 +113,25 @@ public class TikTokDatabaseAdapter
     /**
      * Update an existing coupon.
      */
-    public boolean updateCoupon(long rowId,
-                                long id, String title, String details,
+    public boolean updateCoupon(long id, String title, String details,
                                 int iconId, String iconUrl,
                                 long startTime, long endTime, String barcode,
                                 boolean wasRedeemed, Merchant merchant)
     {
         Coupon coupon = new Coupon(id, title, details, iconId, iconUrl,
             startTime, endTime, barcode, wasRedeemed, merchant);
+        return updateCoupon(coupon);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Update an existing coupon.
+     */
+    public boolean updateCoupon(Coupon coupon)
+    {
         ContentValues values = createContentValues(coupon);
-        String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
+        String equalsSQL = String.format("%s = %d", CouponTable.sKeyId, coupon.id());
         return mDatabase.update(CouponTable.sName, values, equalsSQL, null) > 0;
     }
 
@@ -131,8 +140,7 @@ public class TikTokDatabaseAdapter
     /**
      * Updates an existing merchant.
      */
-    public boolean updateMerchant(long rowId,
-                                  long id, String name, String address,
+    public boolean updateMerchant(long id, String name, String address,
                                   double latitude, double longitude,
                                   String phone, String category, String details,
                                   int iconId, String iconUrl,
@@ -140,19 +148,28 @@ public class TikTokDatabaseAdapter
     {
         Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
             category, details, iconId, iconUrl, webUrl);
-        ContentValues values = createContentValues(merchant);
-        String equalsSQL = String.format("%s = %s", MerchantTable.sKeyRowId, rowId);
-        return mDatabase.update(MerchantTable.sName, values, equalsSQL, null) > 0;
+        return updateMerchant(merchant);
     }
 
     //-------------------------------------------------------------------------
 
     /**
+     * Updates an existing merchant.
+     */
+    public boolean updateMerchant(Merchant merchant)
+    {
+        ContentValues values = createContentValues(merchant);
+        String equalsSQL = String.format("%s = %d", MerchantTable.sKeyId, merchant.id());
+        return mDatabase.update(MerchantTable.sName, values, equalsSQL, null) > 0;
+    }
+
+    //-------------------------------------------------------------------------
+    /**
      * Delete an existing coupon.
      */
-    public boolean deleteCoupon(long rowId) 
+    public boolean deleteCoupon(long id)
     {
-        String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
+        String equalsSQL = String.format("%s = %d", CouponTable.sKeyId, id);
         return mDatabase.delete(CouponTable.sName, equalsSQL, null) > 0;
     }
 
@@ -161,9 +178,9 @@ public class TikTokDatabaseAdapter
     /**
      * Delete an existing coupon.
      */
-    public boolean deleteMerchant(long rowId) 
+    public boolean deleteMerchant(long id)
     {
-        String equalsSQL = String.format("%s = %s", MerchantTable.sKeyRowId, rowId);
+        String equalsSQL = String.format("%s = %d", MerchantTable.sKeyId, id);
         return mDatabase.delete(MerchantTable.sName, equalsSQL, null) > 0;
     }
 
@@ -281,27 +298,9 @@ public class TikTokDatabaseAdapter
      * Fetch coupon from the database.
      * @returns Cursor positioned at the requested coupon.
      */
-    public Cursor fetchCoupon(long rowId) throws SQLException
+    public Coupon fetchCoupon(long id) throws SQLException
     {
-        String rows[] = new String[] {
-            CouponTable.sKeyRowId,
-            CouponTable.sKeyId,
-            CouponTable.sKeyTitle,
-            CouponTable.sKeyDetails,
-            CouponTable.sKeyIconId,
-            CouponTable.sKeyIconUrl,
-            CouponTable.sKeyStartTime,
-            CouponTable.sKeyEndTime,
-            CouponTable.sKeyBarcode,
-            CouponTable.sKeyWasRedeemed,
-            CouponTable.sKeyIsSoldOut,
-            CouponTable.sMerchant,
-        };
-        String equalsSQL = String.format("%s = %s", CouponTable.sKeyRowId, rowId);
-        Cursor cursor    = mDatabase.query(true, CouponTable.sName, rows, equalsSQL,
-            null, null, null, null, null);
-        if (cursor != null) cursor.moveToFirst();
-        return cursor;
+        return CouponTable.fetch(mDatabase, id);
     }
 
     //-------------------------------------------------------------------------
@@ -310,27 +309,9 @@ public class TikTokDatabaseAdapter
      * Fetch merchant from the database.
      * @returns Cursor positioned at the requested coupon.
      */
-    public Cursor fetchMerchant(long id) throws SQLException
+    public Merchant fetchMerchant(long id) throws SQLException
     {
-        String rows[] = new String[] {
-            MerchantTable.sKeyRowId,
-            MerchantTable.sKeyId,
-            MerchantTable.sKeyName,
-            MerchantTable.sKeyAddress,
-            MerchantTable.sKeyLatitude,
-            MerchantTable.sKeyLongitude,
-            MerchantTable.sKeyPhone,
-            MerchantTable.sKeyCategory,
-            MerchantTable.sKeyDetails,
-            MerchantTable.sKeyIconId,
-            MerchantTable.sKeyIconUrl,
-            MerchantTable.sKeyWebsiteUrl
-        };
-        String equalsSQL = String.format("%s = '%s'", MerchantTable.sKeyId, id);
-        Cursor cursor    = mDatabase.query(true, MerchantTable.sName, rows, equalsSQL,
-            null, null, null, null, null);
-        if (cursor != null) cursor.moveToFirst();
-        return cursor;
+        return MerchantTable.fetch(mDatabase, id);
     }
 
     //-------------------------------------------------------------------------

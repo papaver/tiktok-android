@@ -8,6 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -93,6 +95,56 @@ public class MerchantTable
         String tableDropSQL =
             String.format("drop table if exists %s", tableName);
         return tableDropSQL;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Fetch merchant from the database.
+     * @returns Cursor positioned at the requested coupon.
+     */
+    public static Merchant fetch(SQLiteDatabase database, long id) throws SQLException
+    {
+        String rows[] = new String[] {
+            sKeyRowId,
+            sKeyId,
+            sKeyName,
+            sKeyAddress,
+            sKeyLatitude,
+            sKeyLongitude,
+            sKeyPhone,
+            sKeyCategory,
+            sKeyDetails,
+            sKeyIconId,
+            sKeyIconUrl,
+            sKeyWebsiteUrl
+        };
+
+        String equalsSQL = String.format("%s = '%d'", sKeyId, id);
+        Cursor cursor    = database.query(true, sName, rows, equalsSQL,
+            null, null, null, null, null);
+
+        // create a merchant from the cursor
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            Merchant merchant = new Merchant(
+                cursor.getLong(cursor.getColumnIndex(sKeyId)),
+                cursor.getString(cursor.getColumnIndex(sKeyName)),
+                cursor.getString(cursor.getColumnIndex(sKeyAddress)),
+                cursor.getDouble(cursor.getColumnIndex(sKeyLatitude)),
+                cursor.getDouble(cursor.getColumnIndex(sKeyLongitude)),
+                cursor.getString(cursor.getColumnIndex(sKeyPhone)),
+                cursor.getString(cursor.getColumnIndex(sKeyCategory)),
+                cursor.getString(cursor.getColumnIndex(sKeyDetails)),
+                cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
+                cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
+                cursor.getString(cursor.getColumnIndex(sKeyWebsiteUrl))
+            );
+            return merchant;
+        }
+
+        return null;
     }
 
     //-------------------------------------------------------------------------

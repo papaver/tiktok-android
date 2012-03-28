@@ -8,6 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -17,7 +19,7 @@ import android.util.Log;
 
 public class CouponTable
 {
-    
+
     /**
      * Runs if table needs to be created.
      */
@@ -35,7 +37,7 @@ public class CouponTable
                                  int oldVersion, int newVersion)
     {
         // this is obviously the worst implementation ever
-       
+
         Log.w(CouponTable.class.getName(), String.format(
             "Upgrading database from version %d to %d " +
             "which will destroy all data.", oldVersion, newVersion));
@@ -93,6 +95,63 @@ public class CouponTable
         String tableDropSQL = 
             String.format("drop table if exists %s", tableName); 
         return tableDropSQL;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Fetch coupon from the database.
+     * @returns Cursor positioned at the requested coupon.
+     */
+    public static Coupon fetch(SQLiteDatabase database, long id) throws SQLException
+    {
+        String rows[] = new String[] {
+            sKeyRowId,
+            sKeyId,
+            sKeyTitle,
+            sKeyDetails,
+            sKeyIconId,
+            sKeyIconUrl,
+            sKeyStartTime,
+            sKeyEndTime,
+            sKeyBarcode,
+            sKeyWasRedeemed,
+            sKeyIsSoldOut,
+            sMerchant,
+        };
+
+        String equalsSQL = String.format("%s = %d", sKeyId, id);
+        Cursor cursor    = database.query(true, sName, rows, equalsSQL,
+            null, null, null, null, null);
+
+        // create a coupon from the cursor
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            // grab merchant
+            long merchantId   = cursor.getLong(cursor.getColumnIndex(sMerchant));
+            Merchant merchant = MerchantTable.fetch(database, merchantId);
+
+            // can't have coupons without merchants!
+            if (merchant != null) {
+                Coupon coupon = new Coupon(
+                    cursor.getLong(cursor.getColumnIndex(sKeyId)),
+                    cursor.getString(cursor.getColumnIndex(sKeyTitle)),
+                    cursor.getString(cursor.getColumnIndex(sKeyDetails)),
+                    cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
+                    cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
+                    cursor.getLong(cursor.getColumnIndex(sKeyStartTime)),
+                    cursor.getLong(cursor.getColumnIndex(sKeyEndTime)),
+                    cursor.getString(cursor.getColumnIndex(sKeyBarcode)),
+                    cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
+                    cursor.getInt(cursor.getColumnIndex(sKeyIsSoldOut)) == 1,
+                    merchant
+                );
+                return coupon;
+            }
+        }
+
+        return null;
     }
 
     //-------------------------------------------------------------------------

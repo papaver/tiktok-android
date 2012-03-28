@@ -76,6 +76,17 @@ public final class TikTokApi
         private final String mKey;
     }
 
+    public enum CouponKey
+    {
+        kCoupons ("coupons"),
+        kKilled ("killed"),
+        kSoldOut  ("sold_out");
+
+        CouponKey(String key) { mKey = key; }
+        public String key() { return mKey; }
+        private final String mKey;
+    }
+
     //-------------------------------------------------------------------------
     // constructor
     //-------------------------------------------------------------------------
@@ -196,7 +207,7 @@ public final class TikTokApi
     /**
      * @return Get the list of available coupons.
      */
-    public Coupon[] syncActiveCoupons()
+    public Map<CouponKey, Object> syncActiveCoupons()
     {
         // get the route to the list of coupons
         String url = String.format("%s/consumers/%s/coupons",
@@ -218,11 +229,20 @@ public final class TikTokApi
                     response.getResults(), new TypeReference<Map<String, Object>>() {});
 
                 // process the new coupons
-                Coupon[] coupons  = mapper.convertValue(results.get("coupons"), Coupon[].class);
-                Integer[] killed  = mapper.convertValue(results.get("killed"), Integer[].class);
-                Integer[] soldOut = mapper.convertValue(results.get("sold_out"), Integer[].class);
+                Coupon[] coupons  = mapper.convertValue(
+                    results.get(CouponKey.kCoupons.key()), Coupon[].class);
+                Long[] killed  = mapper.convertValue(
+                    results.get(CouponKey.kKilled.key()), Long[].class);
+                Long[] soldOut = mapper.convertValue(
+                    results.get(CouponKey.kSoldOut.key()), Long[].class);
 
-                return coupons;
+                // pack into map
+                Map<CouponKey, Object> data = new HashMap<CouponKey, Object>();
+                data.put(CouponKey.kCoupons, coupons);
+                data.put(CouponKey.kKilled, killed);
+                data.put(CouponKey.kSoldOut, soldOut);
+
+                return data;
             }
         } catch (Exception e) {
             Log.w(getClass().getSimpleName(), String.format("exception: %s", e.toString()));

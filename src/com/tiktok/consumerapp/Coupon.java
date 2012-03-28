@@ -53,6 +53,35 @@ public final class Coupon
 
     //-------------------------------------------------------------------------
 
+    public Coupon(
+        long id,
+        String title,
+        String details,
+        int iconId,
+        String iconUrl,
+        long startTime,
+        long endTime,
+        String barcode,
+        boolean isSoldOut,
+        boolean wasRedeemed,
+        Merchant merchant)
+    {
+        mId          = id;
+        mTitle       = title;
+        mDetails     = details;
+        mIconId      = iconId;
+        mIconUrl     = iconUrl;
+        mStartTime   = startTime;
+        mEndTime     = endTime;
+        mBarcode     = barcode;
+        mIsSoldOut   = isSoldOut;
+        mWasRedeemed = wasRedeemed;
+        mIsSoldOut   = isSoldOut;
+        mMerchant    = merchant;
+    }
+
+    //-------------------------------------------------------------------------
+
     /**
      * @return Unique identifier for the coupon.
      */
