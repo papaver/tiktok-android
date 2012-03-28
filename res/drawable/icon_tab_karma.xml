@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- When selected, use grey -->
-    <item android:drawable="@drawable/tab_icon_bar_chart_gray"
+    <item android:drawable="@drawable/tab_icon_crown_gray"
           android:state_selected="true" />
     <!-- When not selected, use white-->
-    <item android:drawable="@drawable/tab_icon_bar_chart_white" />
+    <item android:drawable="@drawable/tab_icon_crown_white" />
 </selector>
 
