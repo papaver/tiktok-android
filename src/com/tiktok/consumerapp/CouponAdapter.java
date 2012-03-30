@@ -9,12 +9,14 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import java.text.DateFormat;
+import java.util.Date;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,60 +24,64 @@ import android.widget.TextView;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public final class CouponAdapter extends ArrayAdapter<Coupon>
+public final class CouponAdapter extends CursorAdapter
 {
-    
-    public CouponAdapter(final Context context, final int couponLayoutResource) 
+
+    public CouponAdapter(final Context context, final Cursor cursor)
     {
-        super(context, 0);
-        mCouponLayoutResource = couponLayoutResource;
+        super(context, cursor);
     }
 
     //-------------------------------------------------------------------------
 
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent)
+    public void bindView(View view, Context context, Cursor cursor)
     {
-        // we need to get the best view (reuse if possible) and then retrieve
-        // its corresponding ViewHolder, which optimizes lookup efficiency
-        final View view             = getWorkingView(convertView);
+        // retrieve corresponding ViewHolder, which optimizes lookup efficiency
         final ViewHolder viewHolder = getViewHolder(view);
-        final Coupon entry          = getItem(position);
+
+        // retrieve merchant
+        TikTokDatabaseAdapter adapter = null;
+        try {
+            adapter = new TikTokDatabaseAdapter(context);
+            adapter.open();
+        } catch (Exception e) {
+        }
+
+        // grab data from the cursor
+        long merchantId     = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
+        String title        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
+        long endTimeSeconds = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
+        Date endTime        = new Date(endTimeSeconds * 1000);
+
+        // query merchant from cursor
+        Merchant merchant = adapter.fetchMerchant(merchantId);
 
         // setting the title view is strait forward
-        viewHolder.titleView.setText(entry.title());
+        viewHolder.merchant.setText(merchant.name().toUpperCase());
+        viewHolder.title.setText(capitalize(title));
+        viewHolder.expiresTime.setText(getExpirationTime(endTime));
 
         // add formating to subtitle view
-        final String formattedText = String.format("Expires on %s",
-            DateFormat.getDateInstance(DateFormat.SHORT).format(entry.endTime()));
-        viewHolder.textView.setText(formattedText);
+        final String formattedText = String.format("Offer expires at %s",
+            DateFormat.getTimeInstance(DateFormat.SHORT).format(endTime));
+        viewHolder.expiresAt.setText(formattedText);
 
         // setting image view is also simple
-        viewHolder.imageView.setImageResource(0);
+        //viewHolder.icon.setImageResource(0);
 
-        return view;
+        // cleanup
+        adapter.close();
     }
 
     //-------------------------------------------------------------------------
 
-    /**
-     * The working view is just the convertView re-used if possible or 
-     * inflated new if not possible
-     */
-    private View getWorkingView(final View convertView)
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent)
     {
-        View workingView = null;
-        if (convertView == null) {
-            final Context context         = getContext();
-            final LayoutInflater inflater = (LayoutInflater)
-                context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            workingView = inflater.inflate(mCouponLayoutResource, null);
-        } else {
-            workingView = convertView;
-        }
-
-        return workingView;
+        LayoutInflater inflater = LayoutInflater.from(context);
+        final View view = inflater.inflate(R.layout.coupon_entry_list_item, parent, false);
+        return view;
     }
 
     //-------------------------------------------------------------------------
@@ -84,23 +90,21 @@ public final class CouponAdapter extends ArrayAdapter<Coupon>
      * The viewHolder allows us to re-looking up view references;
      * since views are recycled, these references will never change
      */
-    private ViewHolder getViewHolder(final View couponView)
+    private ViewHolder getViewHolder(final View view)
     {
-        final Object tag      = couponView.getTag();
-        ViewHolder viewHolder = null;
-
+        // create a new holder if the tag is empty
+        final Object tag = view.getTag();
         if ((tag == null) || !(tag instanceof ViewHolder)) {
-            viewHolder           = new ViewHolder();
-            viewHolder.titleView = (TextView)couponView.findViewById(R.id.coupon_entry_title);
-            viewHolder.textView  = (TextView)couponView.findViewById(R.id.coupon_entry_text);
-            viewHolder.imageView = (ImageView)couponView.findViewById(R.id.coupon_entry_icon);
-
-            couponView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder)tag;
+            ViewHolder holder  = new ViewHolder();
+            holder.merchant    = (TextView)view.findViewById(R.id.coupon_merchant);
+            holder.title       = (TextView)view.findViewById(R.id.coupon_title);
+            holder.expiresAt   = (TextView)view.findViewById(R.id.coupon_expires_at);
+            holder.expiresTime = (TextView)view.findViewById(R.id.coupon_expire);
+            holder.icon        = (ImageView)view.findViewById(R.id.coupon_icon);
+            view.setTag(holder);
         }
 
-        return viewHolder;
+        return (ViewHolder)view.getTag();
     }
 
     //-------------------------------------------------------------------------
@@ -111,15 +115,55 @@ public final class CouponAdapter extends ArrayAdapter<Coupon>
      */
     private static class ViewHolder
     {
-        public TextView  titleView;
-        public TextView  textView;
-        public ImageView imageView;
+        public TextView  merchant;
+        public TextView  title;
+        public TextView  expiresAt;
+        public TextView  expiresTime;
+        public ImageView icon;
+    }
+
+    //-------------------------------------------------------------------------
+
+    private String capitalize(String text)
+    {
+        final StringBuilder result = new StringBuilder(text.length());
+
+        String[] words = text.split("\\s");
+        for(int index = 0; index < words.length; ++index) {
+            if (index > 0) result.append(" ");
+            result.append(Character.toUpperCase(words[index].charAt(0)))
+                  .append(words[index].substring(1).toLowerCase());
+        }
+
+        return result.toString();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public boolean isExpired(Date time)
+    {
+        return time.before(new Date());
+    }
+
+    //-------------------------------------------------------------------------
+
+    public String getExpirationTime(Date time)
+    {
+        // return the default color if expired
+        if (isExpired(time)) return "00:00:00";
+
+        // calculate interval value
+        long secondsLeft  = (time.getTime() - new Date().getTime()) / 1000;
+        float minutesLeft = (float)secondsLeft / 60.0f;
+
+        // update the coupon expire timer
+        String timer = String.format("%02d:%02d:%02d",
+            (int)minutesLeft / 60, (int)minutesLeft % 60, (int)secondsLeft % 60);
+        return timer;
     }
 
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
-
-    private final int mCouponLayoutResource;
 
 }

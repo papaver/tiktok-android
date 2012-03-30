@@ -204,7 +204,7 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyBarcode,
             CouponTable.sKeyWasRedeemed,
             CouponTable.sKeyIsSoldOut,
-            CouponTable.sMerchant,
+            CouponTable.sKeyMerchant,
         };
         return mDatabase.query(CouponTable.sName, rows, null, null, null, null, null);
     }
@@ -332,7 +332,7 @@ public class TikTokDatabaseAdapter
         values.put(CouponTable.sKeyBarcode,     coupon.barcode());
         values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
         values.put(CouponTable.sKeyIsSoldOut,   coupon.isSoldOut());
-        values.put(CouponTable.sMerchant,       coupon.merchant().id());
+        values.put(CouponTable.sKeyMerchant,    coupon.merchant().id());
 
         return values;
     }

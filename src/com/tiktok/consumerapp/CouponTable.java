@@ -69,7 +69,7 @@ public class CouponTable
             sKeyBarcode      + " text    not null,                  " +
             sKeyWasRedeemed  + " integer not null,                  " +
             sKeyIsSoldOut    + " integer not null default 0,        " +
-            sMerchant        + " integer not null                   "
+            sKeyMerchant     + " integer not null                   "
                              + String.format(" references %s(%s)", MerchantTable.sName, MerchantTable.sKeyId)
                              + " on delete cascade                  " + ");";
         return createSQL;
@@ -117,7 +117,7 @@ public class CouponTable
             sKeyBarcode,
             sKeyWasRedeemed,
             sKeyIsSoldOut,
-            sMerchant,
+            sKeyMerchant,
         };
 
         String equalsSQL = String.format("%s = %d", sKeyId, id);
@@ -129,7 +129,7 @@ public class CouponTable
             cursor.moveToFirst();
 
             // grab merchant
-            long merchantId   = cursor.getLong(cursor.getColumnIndex(sMerchant));
+            long merchantId   = cursor.getLong(cursor.getColumnIndex(sKeyMerchant));
             Merchant merchant = MerchantTable.fetch(database, merchantId);
 
             // can't have coupons without merchants!
@@ -170,6 +170,6 @@ public class CouponTable
     public static String sKeyBarcode     = "barcode";
     public static String sKeyWasRedeemed = "was_redeemed";
     public static String sKeyIsSoldOut   = "is_sold_out";
-    public static String sMerchant       = "merchant";
+    public static String sKeyMerchant    = "merchant";
 
 }

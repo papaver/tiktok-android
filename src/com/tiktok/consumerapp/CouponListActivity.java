@@ -51,19 +51,8 @@ public class CouponListActivity extends Activity
         mCursor = mDatabaseAdapter.fetchAllCoupons();
         startManagingCursor(mCursor);
 
-        // setup data/ui mapping
-        String[] from = new String[] {
-            CouponTable.sKeyTitle,
-            //CouponTable.sKeyIconId
-        };
-        int[] to = new int[] {
-            R.id.coupon_entry_title,
-            //R.id.coupon_entry_icon
-        };
-
         // create a new array adapter and set it to display the row
-        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-            R.layout.coupon_entry_list_item, mCursor, from, to);
+        final CouponAdapter adapter = new CouponAdapter(this, mCursor);
 
         // update list view to use adapter
         final ListView listView = (ListView)findViewById(R.id.list);

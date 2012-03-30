@@ -1,37 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <!-- Layout for individual coupon entries in a list -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    <!-- android:background="@drawable/cellbackground" > -->
 
-    <!-- Icon shown next to the title/text -->
-    <ImageView
-        android:id="@+id/coupon_entry_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:padding="3dp" />
+    <FrameLayout
+        android:layout_width="106dip"
+        android:layout_height="106dip"
+        android:padding="5dip" >
 
-    <!-- Title of the coupon entry -->
-    <TextView
-        android:id="@+id/coupon_entry_title"
+        <LinearLayout
+            android:layout_width="96dip"
+            android:layout_height="96dip"
+            android:background="@drawable/coupon_icon"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="5dip" >
+
+            <!-- Icon shown next to the title/text -->
+            <ImageView
+                android:id="@+id/coupon_icon"
+                android:src="@drawable/icon03"
+                android:layout_width="64dip"
+                android:layout_height="64dip" />
+
+            <!-- Coupon Expire Time -->
+            <TextView
+                android:id="@+id/coupon_expire"
+                android:text="00:00:00"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:textColor="#FFFFFF"
+                android:paddingBottom="2dip" />
+        </LinearLayout>
+    </FrameLayout>>
+
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/coupon_entry_icon"
-        android:layout_alignTop="@id/coupon_entry_icon"
-        android:layout_margin="5dp"
-        android:textSize="14sp"
-        android:textStyle="bold" />
-    
-    <!-- Text contains coupon description -->
-    <TextView android:id="@+id/coupon_entry_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
-        android:layout_alignLeft="@id/coupon_entry_title" 
-        android:layout_below="@id/coupon_entry_title" 
-        android:textSize="12sp" />
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:padding="5dip"
+        android:orientation="vertical" >
 
-</RelativeLayout>
+        <!-- Merchant Name -->
+        <TextView
+            android:id="@+id/coupon_merchant"
+            android:text="MERCHANT NAME"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingTop="1dip" />
+
+        <!-- Coupon Title -->
+        <TextView android:id="@+id/coupon_title"
+            android:text="Buy an Offer, Get Another One Free!"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:textSize="15sp"
+            android:lines="3"
+            android:paddingTop="1dip" />
+
+        <!-- Coupon Expires At -->
+        <TextView android:id="@+id/coupon_expires_at"
+            android:text="Offer expires at 7:00pm!"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingTop="1dip" />
+
+    </LinearLayout>
+
+</LinearLayout>
