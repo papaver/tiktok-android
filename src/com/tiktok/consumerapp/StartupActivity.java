@@ -163,6 +163,8 @@ public class StartupActivity extends Activity
         TikTokDatabaseHelper.purgeDatabase(getApplicationContext());
 
         // purge the icon directory
+        IconManager iconManager = new IconManager(getApplicationContext());
+        iconManager.deleteAllImages();
 
         // purge settings
         Settings settings = new Settings(getApplicationContext());

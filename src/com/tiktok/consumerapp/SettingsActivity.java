@@ -16,8 +16,6 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.util.Log;
 
-import org.bostonandroid.datepreference.DatePreference;
-
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------

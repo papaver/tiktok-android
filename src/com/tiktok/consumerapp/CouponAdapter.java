@@ -13,12 +13,18 @@ import java.util.Date;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.util.Log;
+
+import com.tiktok.consumerapp.drawable.BitmapDrawable;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -26,12 +32,24 @@ import android.widget.TextView;
 
 public final class CouponAdapter extends CursorAdapter
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    private static final String kLogTag = "CouponAdapter";
+
+    //-------------------------------------------------------------------------
+    // constructor
+    //-------------------------------------------------------------------------
 
     public CouponAdapter(final Context context, final Cursor cursor)
     {
         super(context, cursor);
+        mIconManager = new IconManager(context);
     }
 
+    //-------------------------------------------------------------------------
+    // cursoradapter overrides
     //-------------------------------------------------------------------------
 
     @Override
@@ -49,13 +67,15 @@ public final class CouponAdapter extends CursorAdapter
         }
 
         // grab data from the cursor
-        long merchantId     = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
-        String title        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
-        long endTimeSeconds = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
-        Date endTime        = new Date(endTimeSeconds * 1000);
+        final long merchantId     = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
+        final String title        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
+        final long endTimeSeconds = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
+        final Date endTime        = new Date(endTimeSeconds * 1000);
+        final int iconId          = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIconId));
+        final String iconUrl      = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
 
         // query merchant from cursor
-        Merchant merchant = adapter.fetchMerchant(merchantId);
+        final Merchant merchant = adapter.fetchMerchant(merchantId);
 
         // setting the title view is strait forward
         viewHolder.merchant.setText(merchant.name().toUpperCase());
@@ -67,8 +87,51 @@ public final class CouponAdapter extends CursorAdapter
             DateFormat.getTimeInstance(DateFormat.SHORT).format(endTime));
         viewHolder.expiresAt.setText(formattedText);
 
-        // setting image view is also simple
-        //viewHolder.icon.setImageResource(0);
+        // set icon image
+        IconManager.IconData iconData = mIconManager.new IconData(iconId, iconUrl);
+        BitmapDrawable icon = mIconManager.getImage(iconData);
+        if (icon != null) {
+            viewHolder.icon.setImageBitmap(icon.getBitmap());
+
+        // use activity indicator and load image from server
+        } else {
+
+            // set activity indicator
+            viewHolder.icon.setImageResource(R.drawable.activity_indicator);
+
+            RotateAnimation rotation = new RotateAnimation(
+                0.0f,
+                360.0f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f);
+            rotation.setDuration(360 * 4);
+            rotation.setInterpolator(new LinearInterpolator());
+            rotation.setRepeatMode(Animation.RESTART);
+            rotation.setRepeatCount(Animation.INFINITE);
+
+            // and apply it to your imageview
+            viewHolder.icon.startAnimation(rotation);
+
+            // download icon from server
+            mIconManager.requestImage(iconData, new IconManager.CompletionHandler() {
+
+                public void onSuccess(final BitmapDrawable drawable) {
+                    Log.i(kLogTag, String.format("Downloaded icon: %s", iconUrl));
+                    viewHolder.icon.post(new Runnable() {
+                        public void run() {
+                            viewHolder.icon.setImageBitmap(drawable.getBitmap());
+                            viewHolder.icon.clearAnimation();
+                        }
+                    });
+                }
+
+                public void onFailure() {
+                    Log.e(kLogTag, String.format("Failed to download icon: %s", iconUrl));
+                }
+            });
+        }
 
         // cleanup
         adapter.close();
@@ -84,6 +147,8 @@ public final class CouponAdapter extends CursorAdapter
         return view;
     }
 
+    //-------------------------------------------------------------------------
+    // helper methods
     //-------------------------------------------------------------------------
 
     /**
@@ -166,4 +231,5 @@ public final class CouponAdapter extends CursorAdapter
     // fields
     //-------------------------------------------------------------------------
 
+    private IconManager mIconManager;
 }

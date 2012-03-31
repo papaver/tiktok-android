@@ -13,14 +13,11 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 //-----------------------------------------------------------------------------
 // class implementation
