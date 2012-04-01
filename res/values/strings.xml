@@ -13,8 +13,11 @@
     <string name="tab_map">Deals Map</string>
     <string name="tab_karma">Karma</string>
     <string name="tab_settings">Settings</string>
+    <string name="coupon_view">Deal</string>
+    <string name="merchant_view">Merchant</string>
 
     <string name="settings_birthday">Date of Birth</string>
+
 
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
 

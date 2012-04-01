@@ -69,6 +69,16 @@
             android:label="@string/tab_settings"
             android:name=".SettingsActivity" />
 
+        <!-- Coupon Activity -->
+        <activity
+            android:label="@string/coupon_view"
+            android:name=".CouponActivity" />
+
+        <!-- Merchant Activity -->
+        <activity
+            android:label="@string/merchant_view"
+            android:name=".MerchantActivity" />
+
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->
         <receiver android:name=".C2DMReceiver"
                   android:permission="com.google.android.c2dm.permission.SEND" >

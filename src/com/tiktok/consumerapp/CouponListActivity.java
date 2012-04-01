@@ -11,19 +11,21 @@ package com.tiktok.consumerapp;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class CouponListActivity extends Activity
+public class CouponListActivity extends ListActivity
 {
     static final String kLogTag = "CouponListActivity";
 
@@ -52,7 +54,7 @@ public class CouponListActivity extends Activity
         final CouponAdapter adapter = new CouponAdapter(this, mCursor);
 
         // update list view to use adapter
-        final ListView listView = (ListView)findViewById(R.id.list);
+        final ListView listView = getListView();
         listView.setAdapter(adapter);
 
         // run sync coupons task
@@ -122,6 +124,27 @@ public class CouponListActivity extends Activity
         super.onDestroy();
         if (mDatabaseAdapter != null) mDatabaseAdapter.close();
         if (mCursor != null) mCursor.close();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    protected void onListItemClick(ListView listView, View view, int position, long id)
+    {
+        super.onListItemClick(listView, view, position, id);
+        Intent intent = new Intent(this, CouponActivity.class);
+        intent.putExtra(CouponTable.sKeyId, id);
+        startActivityForResult(intent, 0);
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        Log.i(kLogTag, String.format("Result of intent: %d", resultCode));
     }
 
     //-------------------------------------------------------------------------
