@@ -13,6 +13,8 @@ import java.util.Date;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -20,11 +22,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
+import com.tiktok.consumerapp.utilities.UIDefaults;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -67,12 +71,14 @@ public final class CouponAdapter extends CursorAdapter
         }
 
         // grab data from the cursor
-        final long merchantId     = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
-        final String title        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
-        final long endTimeSeconds = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
-        final Date endTime        = new Date(endTimeSeconds * 1000);
-        final int iconId          = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIconId));
-        final String iconUrl      = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
+        final long merchantId       = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
+        final String title          = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
+        final long endTimeSeconds   = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
+        final long startTimeSeconds = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyStartTime));
+        final Date endTime          = new Date(endTimeSeconds * 1000);
+        final Date startTime        = new Date(startTimeSeconds * 1000);
+        final int iconId            = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIconId));
+        final String iconUrl        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
 
         // query merchant from cursor
         final Merchant merchant = adapter.fetchMerchant(merchantId);
@@ -86,6 +92,10 @@ public final class CouponAdapter extends CursorAdapter
         final String formattedText = String.format("Offer expires at %s",
             DateFormat.getTimeInstance(DateFormat.SHORT).format(endTime));
         viewHolder.expiresAt.setText(formattedText);
+
+        // update color
+        GradientDrawable background = (GradientDrawable)viewHolder.linearLayout.getBackground();
+        background.setColor(getColor(endTime, startTime));
 
         // set icon image
         IconManager.IconData iconData = mIconManager.new IconData(iconId, iconUrl);
@@ -165,6 +175,7 @@ public final class CouponAdapter extends CursorAdapter
             holder.title       = (TextView)view.findViewById(R.id.coupon_title);
             holder.expiresAt   = (TextView)view.findViewById(R.id.coupon_expires_at);
             holder.expiresTime = (TextView)view.findViewById(R.id.coupon_expire);
+            holder.linearLayout    = (LinearLayout)view.findViewById(R.id.coupon_gradient);
             holder.icon        = (ImageView)view.findViewById(R.id.coupon_icon);
             view.setTag(holder);
         }
@@ -180,11 +191,12 @@ public final class CouponAdapter extends CursorAdapter
      */
     private static class ViewHolder
     {
-        public TextView  merchant;
-        public TextView  title;
-        public TextView  expiresAt;
-        public TextView  expiresTime;
-        public ImageView icon;
+        public TextView     merchant;
+        public TextView     title;
+        public TextView     expiresAt;
+        public TextView     expiresTime;
+        public LinearLayout linearLayout;
+        public ImageView    icon;
     }
 
     //-------------------------------------------------------------------------
@@ -225,6 +237,107 @@ public final class CouponAdapter extends CursorAdapter
         String timer = String.format("%02d:%02d:%02d",
             (int)minutesLeft / 60, (int)minutesLeft % 60, (int)secondsLeft % 60);
         return timer;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public int getColor(Date endTime, Date startTime)
+    {
+        final int sixty_minutes  = 60 * 60;
+        final int thirty_minutes = 30 * 60;
+        final int five_minutes   =  5 * 60;
+
+        // return the default color if expired
+        if (isExpired(endTime)) return UIDefaults.getTokColor();
+
+        // calculate interp value
+        long secondsLeft  = endTime.getTime() - new Date().getTime();
+        long totalSeconds = endTime.getTime() - startTime.getTime();
+
+        // green  should be solid until 60 minutes
+        // yellow should be solid at 30 minutes
+        // orange should be solid at  5 minutes
+        float t = 0.0f;
+        if (secondsLeft > sixty_minutes) {
+            t = 0.0f;
+        } else if (secondsLeft > thirty_minutes) {
+            t = (secondsLeft - thirty_minutes) / thirty_minutes;
+            t = 0.00f + (1.0f - t) * 0.33f;
+        } else if (secondsLeft > five_minutes) {
+            t = (secondsLeft - five_minutes) / (thirty_minutes - five_minutes);
+            t = 0.33f + (1.0f - t) * 0.33f;
+        } else {
+            t = (secondsLeft / five_minutes);
+            t = 0.66f + (1.0f - t) * 0.33f;
+        }
+
+        // colors to transition between
+        final int tik    = UIDefaults.getTikColor();
+        final int yellow = Color.YELLOW;
+        final int orange = Color.argb(255, 255, 127, 0);
+        final int tok    = UIDefaults.getTokColor();
+
+        // class to make computations cleaner
+        class ColorTable
+        {
+            public ColorTable(float t, float offset, int start, int end)
+            {
+                this.t      = t;
+                this.offset = offset;
+                this.start  = start;
+                this.end    = end;
+            }
+
+            public float t, offset;
+            public int start, end;
+        }
+
+        ColorTable sColorTable[] = {
+            new ColorTable(0.33f, 0.00f, tik,    yellow),
+            new ColorTable(0.66f, 0.33f, yellow, orange),
+            new ColorTable(1.00f, 0.66f, orange, tok   )
+        };
+
+        // return the interpolated color
+        int index = 0;
+        for (; index < sColorTable.length; ++index) {
+            if (t > sColorTable[index].t) continue;
+
+            int start  = sColorTable[index].start;
+            int end    = sColorTable[index].end;
+            float newT = (t - sColorTable[index].offset) / 0.33f;
+            return colorByInterpolatingToColor(start, end, newT);
+        }
+
+        // in case something went wrong...
+        return Color.BLACK;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public int colorByInterpolatingToColor(int colorA, int colorB, float fraction)
+    {
+        int redA   = Color.red(colorA);
+        int greenA = Color.green(colorA);
+        int blueA  = Color.blue(colorA);
+        int alphaA = Color.alpha(colorA);
+
+        int redB   = Color.red(colorB);
+        int greenB = Color.green(colorB);
+        int blueB  = Color.blue(colorB);
+        int alphaB = Color.alpha(colorB);
+
+        int red   = redA   + (int)(fraction * (float)(redB - redA));
+        int green = greenA + (int)(fraction * (float)(greenB - greenA));
+        int blue  = blueA  + (int)(fraction * (float)(blueB - blueA));
+        int alpha = alphaA + (int)(fraction * (float)(alphaB - alphaA));
+
+        red   = Math.min(red,   255);
+        green = Math.min(green, 255);
+        blue  = Math.min(blue,  255);
+        alpha = Math.min(alpha, 255);
+
+        return Color.argb(alpha, red, green, blue);
     }
 
     //-------------------------------------------------------------------------

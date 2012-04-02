@@ -13,6 +13,7 @@
         android:padding="5dip" >
 
         <LinearLayout
+            android:id="@+id/coupon_gradient"
             android:layout_width="96dip"
             android:layout_height="96dip"
             android:background="@drawable/coupon_icon"
