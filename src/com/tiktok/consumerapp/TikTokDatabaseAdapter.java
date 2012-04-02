@@ -206,7 +206,10 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyIsSoldOut,
             CouponTable.sKeyMerchant,
         };
-        return mDatabase.query(CouponTable.sName, rows, null, null, null, null, null);
+
+        String limit   = "20";
+        String orderBy = String.format("%s DESC", CouponTable.sKeyEndTime);
+        return mDatabase.query(CouponTable.sName, rows, null, null, null, null, orderBy, limit);
     }
 
     //-------------------------------------------------------------------------
