@@ -15,6 +15,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -96,6 +97,18 @@ public final class CouponAdapter extends CursorAdapter
         // update color
         GradientDrawable background = (GradientDrawable)viewHolder.linearLayout.getBackground();
         background.setColor(getColor(endTime, startTime));
+
+        // setup timer
+        mHandler.removeCallbacks(viewHolder.timer);
+        viewHolder.timer = new Runnable() {
+           public void run() {
+                viewHolder.expiresTime.setText(getExpirationTime(endTime));
+                GradientDrawable background = (GradientDrawable)viewHolder.linearLayout.getBackground();
+                background.setColor(getColor(endTime, startTime));
+                mHandler.postDelayed(this, 1000);
+           }
+        };
+        mHandler.post(viewHolder.timer);
 
         // set icon image
         IconManager.IconData iconData = mIconManager.new IconData(iconId, iconUrl);
@@ -197,6 +210,7 @@ public final class CouponAdapter extends CursorAdapter
         public TextView     expiresTime;
         public LinearLayout linearLayout;
         public ImageView    icon;
+        public Runnable     timer;
     }
 
     //-------------------------------------------------------------------------
@@ -243,15 +257,15 @@ public final class CouponAdapter extends CursorAdapter
 
     public int getColor(Date endTime, Date startTime)
     {
-        final int sixty_minutes  = 60 * 60;
-        final int thirty_minutes = 30 * 60;
-        final int five_minutes   =  5 * 60;
+        final int sixty_minutes  = 60 * 60 * 1000;
+        final int thirty_minutes = 30 * 60 * 1000;
+        final int five_minutes   =  5 * 60 * 1000;
 
         // return the default color if expired
         if (isExpired(endTime)) return UIDefaults.getTokColor();
 
         // calculate interp value
-        long secondsLeft  = endTime.getTime() - new Date().getTime();
+        float secondsLeft = (float)(endTime.getTime() - new Date().getTime());
         long totalSeconds = endTime.getTime() - startTime.getTime();
 
         // green  should be solid until 60 minutes
@@ -306,7 +320,8 @@ public final class CouponAdapter extends CursorAdapter
             int start  = sColorTable[index].start;
             int end    = sColorTable[index].end;
             float newT = (t - sColorTable[index].offset) / 0.33f;
-            return colorByInterpolatingToColor(start, end, newT);
+            int color  = colorByInterpolatingToColor(start, end, newT);
+            return color;
         }
 
         // in case something went wrong...
@@ -345,4 +360,5 @@ public final class CouponAdapter extends CursorAdapter
     //-------------------------------------------------------------------------
 
     private IconManager mIconManager;
+    private Handler     mHandler = new Handler();
 }
