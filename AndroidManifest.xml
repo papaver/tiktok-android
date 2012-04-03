@@ -72,12 +72,14 @@
         <!-- Coupon Activity -->
         <activity
             android:label="@string/coupon_view"
-            android:name=".CouponActivity" />
+            android:name=".CouponActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
 
         <!-- Merchant Activity -->
         <activity
             android:label="@string/merchant_view"
-            android:name=".MerchantActivity" />
+            android:name=".MerchantActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
 
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->
         <receiver android:name=".C2DMReceiver"
