@@ -6,10 +6,12 @@
     android:gravity="bottom"
     android:orientation="vertical" >
 
+    <!-- Coupon -->
     <LinearLayout
+        android:id="@+id/coupon"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="150"
         android:orientation="vertical" >
 
         <ScrollView
@@ -24,7 +26,7 @@
                 android:orientation="vertical" >
 
                 <!-- Title -->
-                <TextView android:id="@+id/coupon_title"
+                <TextView android:id="@+id/title"
                     android:text="Buy an Offer, Get Another One Free!"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -42,7 +44,7 @@
 
                     <!-- Icon Container -->
                     <LinearLayout
-                        android:id="@+id/coupon_gradient"
+                        android:id="@+id/gradient"
                         android:layout_width="96dip"
                         android:layout_height="96dip"
                         android:background="@drawable/coupon_icon"
@@ -64,8 +66,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
-                            android:textSize="17sp"
+                            android:textSize="16sp"
                             android:textColor="#FFFFFF"
+                            android:shadowDx=".5"
+                            android:shadowDy=".5"
+                            android:shadowRadius=".5"
+                            android:shadowColor="#000000"
+                            android:paddingLeft="2dip"
+                            android:paddingRight="2dip"
                             android:paddingBottom="2dip" />
 
                     <!-- Icon Container End -->
@@ -87,7 +95,8 @@
                             android:layout_width="fill_parent"
                             android:layout_height="match_parent"
                             android:enabled="true"
-                            android:clickable="true"
+                            android:clickable="false"
+                            android:focusable="false"
                             android:apiKey="0WSFFLZqlLwmTRDpL6NKSRkXwCk_e2OhADq98Hw" />
 
                     <!-- Map Container End -->
@@ -189,7 +198,6 @@
 
                         <!-- Merchant Button -->
                         <ImageView
-                            android:id="@+id/banner"
                             android:src="@drawable/arrowmore"
                             android:layout_weight=".09"
                             android:layout_width="0dp"
@@ -219,21 +227,94 @@
 
         </ScrollView>
 
+    <!-- Coupon End -->
     </LinearLayout>
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-5dip"
-        android:layout_marginBottom="-10dip"
-        android:orientation="vertical" >
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
-        <!-- Deal Banner -->
-        <ImageView
-            android:id="@+id/banner"
-            android:src="@drawable/dealexpiredbanner"
+        <!-- Default -->
+        <Button
+            android:id="@+id/banner_redeem"
+            android:background="@drawable/redeembaritembutton"
+            android:onClick="onClickRedeem"
+            android:clickable="true"
+            android:layout_margin="3dip"
+            android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <!-- Expired -->
+        <ImageView
+            android:id="@+id/banner_expired"
+            android:src="@drawable/dealexpiredbanner"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            android:layout_gravity="bottom|center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- SoldOut -->
+        <ImageView
+            android:id="@+id/banner_soldout"
+            android:src="@drawable/dealsoldoutbanner"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            android:layout_gravity="bottom|center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Redeemed -->
+        <FrameLayout
+            android:id="@+id/banner_redeemed"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:src="@drawable/dealactivebanner"
+                android:adjustViewBounds="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:orientation="horizontal" >
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="8" />
+
+                    <Button
+                        android:id="@+id/barcode"
+                        android:text="0123456"
+                        android:background="@drawable/dealbarcodebutton"
+                        android:textSize="18sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="1"
+                        android:shadowColor="#000000"
+                        android:clickable="false"
+                        android:layout_weight="1"
+                        android:layout_gravity="bottom|center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="8" />
+
+            </LinearLayout>
+
+        <!-- Redeemed End -->
+        </FrameLayout>
 
     </FrameLayout>
 

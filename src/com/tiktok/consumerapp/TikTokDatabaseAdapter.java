@@ -21,7 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class TikTokDatabaseAdapter 
+public class TikTokDatabaseAdapter
 {
 
     public TikTokDatabaseAdapter(Context context)
@@ -46,7 +46,7 @@ public class TikTokDatabaseAdapter
     /**
      * Close the database.
      */
-    public void close() 
+    public void close()
     {
         mDatabaseHelper.close();
     }
@@ -72,10 +72,11 @@ public class TikTokDatabaseAdapter
     public long createCoupon(long id, String title, String details,
                              int iconId, String iconUrl,
                              long startTime, long endTime, String barcode,
-                             boolean wasRedeemed, Merchant merchant)
+                             boolean isSoldOut, boolean wasRedeemed,
+                             Merchant merchant)
     {
         Coupon coupon = new Coupon(id, title, details, iconId, iconUrl,
-            startTime, endTime, barcode, wasRedeemed, merchant);
+            startTime, endTime, barcode, isSoldOut, wasRedeemed, merchant);
         return createCoupon(coupon);
     }
 
@@ -116,10 +117,11 @@ public class TikTokDatabaseAdapter
     public boolean updateCoupon(long id, String title, String details,
                                 int iconId, String iconUrl,
                                 long startTime, long endTime, String barcode,
-                                boolean wasRedeemed, Merchant merchant)
+                                boolean isSoldOut, boolean wasRedeemed,
+                                Merchant merchant)
     {
         Coupon coupon = new Coupon(id, title, details, iconId, iconUrl,
-            startTime, endTime, barcode, wasRedeemed, merchant);
+            startTime, endTime, barcode, isSoldOut, wasRedeemed, merchant);
         return updateCoupon(coupon);
     }
 
@@ -190,7 +192,7 @@ public class TikTokDatabaseAdapter
      * Fetch all the coupons from the database.
      * @returns Cursor over all the coupons.
      */
-    public Cursor fetchAllCoupons() 
+    public Cursor fetchAllCoupons()
     {
         String rows[] = new String[] {
             CouponTable.sKeyRowId,
@@ -202,8 +204,8 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyStartTime,
             CouponTable.sKeyEndTime,
             CouponTable.sKeyBarcode,
-            CouponTable.sKeyWasRedeemed,
             CouponTable.sKeyIsSoldOut,
+            CouponTable.sKeyWasRedeemed,
             CouponTable.sKeyMerchant,
         };
 
@@ -243,7 +245,7 @@ public class TikTokDatabaseAdapter
      * Fetch all the coupons from the database.
      * @returns Cursor over all the coupons.
      */
-    public List<Long> fetchAllCouponIds() 
+    public List<Long> fetchAllCouponIds()
     {
         String rows[] = new String[] {
             CouponTable.sKeyId,
@@ -309,6 +311,17 @@ public class TikTokDatabaseAdapter
     //-------------------------------------------------------------------------
 
     /**
+     * Fetch coupon from the database.
+     * @returns Cursor positioned at the requested coupon.
+     */
+    public Coupon fetchCouponByRowId(long id) throws SQLException
+    {
+        return CouponTable.fetchByRowId(mDatabase, id);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * Fetch merchant from the database.
      * @returns Cursor positioned at the requested coupon.
      */
@@ -333,8 +346,8 @@ public class TikTokDatabaseAdapter
         values.put(CouponTable.sKeyStartTime,   coupon.startTimeRaw());
         values.put(CouponTable.sKeyEndTime,     coupon.endTimeRaw());
         values.put(CouponTable.sKeyBarcode,     coupon.barcode());
-        values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
         values.put(CouponTable.sKeyIsSoldOut,   coupon.isSoldOut());
+        values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
         values.put(CouponTable.sKeyMerchant,    coupon.merchant().id());
 
         return values;
@@ -367,7 +380,7 @@ public class TikTokDatabaseAdapter
     //-------------------------------------------------------------------------
 
     private Context              mContext;
-    private SQLiteDatabase       mDatabase; 
+    private SQLiteDatabase       mDatabase;
     private TikTokDatabaseHelper mDatabaseHelper;
 
 }

@@ -51,7 +51,7 @@ public class IconManager
     // IconData
     //-------------------------------------------------------------------------
 
-    public class IconData
+    public static class IconData
     {
         public IconData(int id, String url)
         {
@@ -149,7 +149,7 @@ public class IconManager
 
             // add to image cache
             String imageId = mIconData.getImageName();
-            mImages.put(imageId, new SoftReference<BitmapDrawable>(drawable));
+            sImages.put(imageId, new SoftReference<BitmapDrawable>(drawable));
 
             // run the completion handler
             if (drawable != kNullDrawable) {
@@ -182,7 +182,7 @@ public class IconManager
         String imageId          = iconData.getImageName();
 
         // check if image already exist in the memory cache
-        SoftReference<BitmapDrawable> reference = mImages.get(imageId);
+        SoftReference<BitmapDrawable> reference = sImages.get(imageId);
         if (reference != null) {
             drawable = reference.get();
         }
@@ -196,7 +196,7 @@ public class IconManager
                 drawable = kNullDrawable;
             }
 
-            mImages.put(imageId, new SoftReference<BitmapDrawable>(drawable));
+            sImages.put(imageId, new SoftReference<BitmapDrawable>(drawable));
         }
 
         return drawable == kNullDrawable ? null : drawable;
@@ -213,7 +213,7 @@ public class IconManager
 
     public void deleteImage(IconData iconData)
     {
-        mImages.remove(iconData.getImageName());
+        sImages.remove(iconData.getImageName());
         mFileCache.removeFile(iconData);
     }
 
@@ -221,8 +221,15 @@ public class IconManager
 
     public void deleteAllImages()
     {
-        mImages.clear();
+        sImages.clear();
         mFileCache.clear();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void clearAllRequests()
+    {
+        mExecutorService.shutdownNow();
     }
 
     //-------------------------------------------------------------------------
@@ -327,7 +334,7 @@ public class IconManager
     /**
      * Memory cache for icons.
      */
-    private Map<String, SoftReference<BitmapDrawable>> mImages =
+    private static Map<String, SoftReference<BitmapDrawable>> sImages =
         Collections.synchronizedMap(new HashMap<String, SoftReference<BitmapDrawable>>());
 
     /**

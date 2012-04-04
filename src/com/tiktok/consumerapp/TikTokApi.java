@@ -79,8 +79,8 @@ public final class TikTokApi
     public enum CouponKey
     {
         kCoupons ("coupons"),
-        kKilled ("killed"),
-        kSoldOut  ("sold_out");
+        kKilled  ("killed"),
+        kSoldOut ("sold_out");
 
         CouponKey(String key) { mKey = key; }
         public String key() { return mKey; }

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// UIDefaults
+// TextUtilities
 //-----------------------------------------------------------------------------
 
 package com.tiktok.consumerapp.utilities;
@@ -8,42 +8,43 @@ package com.tiktok.consumerapp.utilities;
 // imports
 //-----------------------------------------------------------------------------
 
-import android.graphics.Color;
 //import android.util.Log;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public final class UIDefaults
+public final class TextUtilities
 {
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
 
-    //private static final String kLogTag = "UIDefaults";
+    //private static final String kLogTag = "TextUtilities";
 
     //-------------------------------------------------------------------------
     // methods
     //-------------------------------------------------------------------------
 
-    public static int getTikColor()
+    public static String capitalizeWords(String text)
     {
-        return Color.argb(255, 130, 179, 79);
-    }
+        final StringBuilder result = new StringBuilder(text.length());
 
-    //-------------------------------------------------------------------------
+        String[] words = text.split("\\s");
+        for (int index = 0; index < words.length; ++index) {
+            if (index > 0) result.append(" ");
+            result.append(Character.toUpperCase(words[index].charAt(0)))
+                  .append(words[index].substring(1).toLowerCase());
+        }
 
-    public static int getTokColor()
-    {
-        return Color.argb(255, 211, 61, 61);
+        return result.toString();
     }
 
     //-------------------------------------------------------------------------
     // constructor
     //-------------------------------------------------------------------------
 
-    private UIDefaults()
+    private TextUtilities()
     {
     }
 }

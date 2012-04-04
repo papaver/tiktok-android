@@ -10,9 +10,13 @@ package com.tiktok.consumerapp;
 
 import java.util.Date;
 
+import android.graphics.Color;
+
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.tiktok.consumerapp.utilities.ColorUtilities;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -76,7 +80,6 @@ public final class Coupon
         mBarcode     = barcode;
         mIsSoldOut   = isSoldOut;
         mWasRedeemed = wasRedeemed;
-        mIsSoldOut   = isSoldOut;
         mMerchant    = merchant;
     }
 
@@ -137,6 +140,7 @@ public final class Coupon
      */
     public long startTimeRaw()
     {
+        // [moiz] fuck me fix this shit
         return mStartTime;
     }
 
@@ -147,7 +151,7 @@ public final class Coupon
      */
     public Date startTime()
     {
-        return new Date(mStartTime);
+        return new Date(mStartTime * 1000);
     }
 
     //-------------------------------------------------------------------------
@@ -157,6 +161,7 @@ public final class Coupon
      */
     public long endTimeRaw()
     {
+        // [moiz] fuck me fix this shit
         return mEndTime;
     }
 
@@ -167,7 +172,7 @@ public final class Coupon
      */
     public Date endTime()
     {
-        return new Date(mEndTime);
+        return new Date(mEndTime * 1000);
     }
 
     //-------------------------------------------------------------------------
@@ -231,6 +236,116 @@ public final class Coupon
     }
 
     //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns icon data representing icon's id and url for download.
+     */
+    public IconManager.IconData iconData()
+    {
+        return new IconManager.IconData(iconId(), iconUrl());
+    }
+
+    //-------------------------------------------------------------------------
+    // helper methods
+    //-------------------------------------------------------------------------
+
+    public static boolean isExpired(Date time)
+    {
+        return time.before(new Date());
+    }
+
+    //-------------------------------------------------------------------------
+
+    public static String getExpirationTime(Date time)
+    {
+        // return the default color if expired
+        if (Coupon.isExpired(time)) return "TIMES UP!";
+
+        // calculate interval value
+        long secondsLeft  = (time.getTime() - new Date().getTime()) / 1000;
+        float minutesLeft = (float)secondsLeft / 60.0f;
+
+        // update the coupon expire timer
+        String timer = String.format("%02d:%02d:%02d",
+            (int)minutesLeft / 60, (int)minutesLeft % 60, (int)secondsLeft % 60);
+        return timer;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public static int getColor(Date endTime, Date startTime)
+    {
+        final int sixty_minutes  = 60 * 60 * 1000;
+        final int thirty_minutes = 30 * 60 * 1000;
+        final int five_minutes   =  5 * 60 * 1000;
+
+        // return the default color if expired
+        if (Coupon.isExpired(endTime)) return ColorUtilities.kTok;
+
+        // calculate seconds left till expiration
+        float secondsLeft = (float)(endTime.getTime() - new Date().getTime());
+
+        // green  should be solid until 60 minutes
+        // yellow should be solid at 30 minutes
+        // orange should be solid at  5 minutes
+        float t = 0.0f;
+        if (secondsLeft > sixty_minutes) {
+            t = 0.0f;
+        } else if (secondsLeft > thirty_minutes) {
+            t = (secondsLeft - thirty_minutes) / thirty_minutes;
+            t = 0.00f + (1.0f - t) * 0.33f;
+        } else if (secondsLeft > five_minutes) {
+            t = (secondsLeft - five_minutes) / (thirty_minutes - five_minutes);
+            t = 0.33f + (1.0f - t) * 0.33f;
+        } else {
+            t = (secondsLeft / five_minutes);
+            t = 0.66f + (1.0f - t) * 0.33f;
+        }
+
+        // colors to transition between
+        final int tik    = ColorUtilities.kTik;
+        final int yellow = Color.YELLOW;
+        final int orange = ColorUtilities.kOrange;
+        final int tok    = ColorUtilities.kTok;
+
+        // class to make computations cleaner
+        class ColorTable
+        {
+            public ColorTable(float t, float offset, int start, int end)
+            {
+                this.t      = t;
+                this.offset = offset;
+                this.start  = start;
+                this.end    = end;
+            }
+
+            public float t, offset;
+            public int start, end;
+        }
+
+        ColorTable sColorTable[] = {
+            new ColorTable(0.33f, 0.00f, tik,    yellow),
+            new ColorTable(0.66f, 0.33f, yellow, orange),
+            new ColorTable(1.00f, 0.66f, orange, tok   )
+        };
+
+        // return the interpolated color
+        int index = 0;
+        for (; index < sColorTable.length; ++index) {
+            if (t > sColorTable[index].t) continue;
+
+            int start  = sColorTable[index].start;
+            int end    = sColorTable[index].end;
+            float newT = (t - sColorTable[index].offset) / 0.33f;
+            int color  = ColorUtilities.interpolateColor(start, end, newT);
+            return color;
+        }
+
+        // in case something went wrong...
+        return Color.BLACK;
+    }
+
+    //-------------------------------------------------------------------------
     // methods
     //-------------------------------------------------------------------------
 
@@ -248,8 +363,8 @@ public final class Coupon
             "  startTime: " + startTime().toString() + newLine +
             "  endTime: "   + endTime().toString() + newLine +
             "  barcode: "   + barcode() + newLine +
-            "  redeemed: "  + Boolean.toString(wasRedeemed()) + newLine +
             "  isSoldOut: " + Boolean.toString(isSoldOut()) + newLine +
+            "  redeemed: "  + Boolean.toString(wasRedeemed()) + newLine +
             "  merchant: "  + merchant().toString() + newLine +
             "}";
         return string;
@@ -267,8 +382,8 @@ public final class Coupon
     private final long     mStartTime;
     private final long     mEndTime;
     private final String   mBarcode;
-    private       boolean  mWasRedeemed;
     private       boolean  mIsSoldOut;
+    private       boolean  mWasRedeemed;
     private final Merchant mMerchant;
 
 }

@@ -67,8 +67,8 @@ public class CouponTable
             sKeyStartTime    + " integer not null,                  " +
             sKeyEndTime      + " integer not null,                  " +
             sKeyBarcode      + " text    not null,                  " +
-            sKeyWasRedeemed  + " integer not null,                  " +
             sKeyIsSoldOut    + " integer not null default 0,        " +
+            sKeyWasRedeemed  + " integer not null,                  " +
             sKeyMerchant     + " integer not null                   "
                              + String.format(" references %s(%s)", MerchantTable.sName, MerchantTable.sKeyId)
                              + " on delete cascade                  " + ");";
@@ -115,8 +115,8 @@ public class CouponTable
             sKeyStartTime,
             sKeyEndTime,
             sKeyBarcode,
-            sKeyWasRedeemed,
             sKeyIsSoldOut,
+            sKeyWasRedeemed,
             sKeyMerchant,
         };
 
@@ -143,8 +143,65 @@ public class CouponTable
                     cursor.getLong(cursor.getColumnIndex(sKeyStartTime)),
                     cursor.getLong(cursor.getColumnIndex(sKeyEndTime)),
                     cursor.getString(cursor.getColumnIndex(sKeyBarcode)),
-                    cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
                     cursor.getInt(cursor.getColumnIndex(sKeyIsSoldOut)) == 1,
+                    cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
+                    merchant
+                );
+                return coupon;
+            }
+        }
+
+        return null;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Fetch coupon from the database.
+     * @returns Cursor positioned at the requested coupon.
+     */
+    public static Coupon fetchByRowId(SQLiteDatabase database, long id) throws SQLException
+    {
+        String rows[] = new String[] {
+            sKeyRowId,
+            sKeyId,
+            sKeyTitle,
+            sKeyDetails,
+            sKeyIconId,
+            sKeyIconUrl,
+            sKeyStartTime,
+            sKeyEndTime,
+            sKeyBarcode,
+            sKeyIsSoldOut,
+            sKeyWasRedeemed,
+            sKeyMerchant,
+        };
+
+        String equalsSQL = String.format("%s = %d", sKeyRowId, id);
+        Cursor cursor    = database.query(true, sName, rows, equalsSQL,
+            null, null, null, null, null);
+
+        // create a coupon from the cursor
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            // grab merchant
+            long merchantId   = cursor.getLong(cursor.getColumnIndex(sKeyMerchant));
+            Merchant merchant = MerchantTable.fetch(database, merchantId);
+
+            // can't have coupons without merchants!
+            if (merchant != null) {
+                Coupon coupon = new Coupon(
+                    cursor.getLong(cursor.getColumnIndex(sKeyId)),
+                    cursor.getString(cursor.getColumnIndex(sKeyTitle)),
+                    cursor.getString(cursor.getColumnIndex(sKeyDetails)),
+                    cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
+                    cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
+                    cursor.getLong(cursor.getColumnIndex(sKeyStartTime)),
+                    cursor.getLong(cursor.getColumnIndex(sKeyEndTime)),
+                    cursor.getString(cursor.getColumnIndex(sKeyBarcode)),
+                    cursor.getInt(cursor.getColumnIndex(sKeyIsSoldOut)) == 1,
+                    cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
                     merchant
                 );
                 return coupon;
