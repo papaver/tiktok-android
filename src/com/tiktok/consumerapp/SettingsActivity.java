@@ -8,26 +8,35 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.util.Log;
+
+import com.facebook.android.Facebook;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
 public class SettingsActivity extends    PreferenceActivity
-                              implements OnSharedPreferenceChangeListener
+                              implements OnSharedPreferenceChangeListener,
+                                         OnPreferenceChangeListener
 {
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
 
-    static final String kLogTag = "SettingsActivity";
+    static final String kLogTag             = "SettingsActivity";
+    static final String kFBConnectedSummary = "Connected.";
+    static final String kFBDefaultSummary   = "Log into Facebook to receive customized deals!";
 
     //-------------------------------------------------------------------------
     // activity
@@ -64,6 +73,13 @@ public class SettingsActivity extends    PreferenceActivity
             ListPreference textPreference =
                 (ListPreference)getPreferenceScreen().findPreference(Settings.kTagGender);
             textPreference.setSummary(mSettings.gender());
+        }
+
+        // add listener to deal with facebook connect
+        CheckBoxPreference facebookConnect = (CheckBoxPreference)findPreference("TTS_fb");
+        facebookConnect.setOnPreferenceChangeListener(this);
+        if (facebookConnect.isChecked()) {
+            facebookConnect.setSummary(kFBConnectedSummary);
         }
     }
 
@@ -131,10 +147,64 @@ public class SettingsActivity extends    PreferenceActivity
     }
 
     //-------------------------------------------------------------------------
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        FacebookManager manager = FacebookManager.getInstance(this);
+        manager.facebook().authorizeCallback(requestCode, resultCode, data);
+    }
+
+    //-------------------------------------------------------------------------
     // shared preferences listener
     //-------------------------------------------------------------------------
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+    public boolean onPreferenceChange(Preference preference, Object newValue)
+    {
+        final Boolean connected                     = (Boolean)newValue;
+        final CheckBoxPreference checkboxPreference = (CheckBoxPreference)preference;
+
+        // track weather to allow change to occur
+        Boolean result = false;
+
+        // log into facebook
+        FacebookManager manager = FacebookManager.getInstance(this);
+        if (connected) {
+
+            // attempt to authorize session
+            manager.authorize(this, new FacebookManager.CompletionHandler() {
+
+                public void onSuccess(Facebook facebook) {
+                    Log.i(kLogTag, "Logged into facebook!");
+                    checkboxPreference.setChecked(true);
+                    checkboxPreference.setSummary(kFBConnectedSummary);
+                }
+
+                public void onError(Throwable error) {
+                    checkboxPreference.setSummary(kFBDefaultSummary);
+                }
+
+                public void onCancel() {
+                    checkboxPreference.setSummary(kFBDefaultSummary);
+                }
+
+            });
+
+        // log out of facebook
+        } else {
+            Log.i(kLogTag, "Logged out of facebook!");
+            manager.logout(this);
+            checkboxPreference.setSummary(kFBDefaultSummary);
+            result = true;
+        }
+
+        return result;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
                                           String key)
     {
         Log.i(kLogTag, String.format("Updated setting %s", key));

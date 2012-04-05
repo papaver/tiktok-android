@@ -9,11 +9,12 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -70,7 +71,7 @@ public final class FacebookManager
 
     //-------------------------------------------------------------------------
 
-    public void authorize(Activity activity, final CompletionHandler handler)
+    public void authorize(final Activity activity, final CompletionHandler handler)
     {
         String[] permissions = {
             "user_likes",
@@ -85,10 +86,11 @@ public final class FacebookManager
         };
 
         // attempt to log into facebook
-        mFacebook.authorize(activity, permissions, new DialogListener() {
+        mFacebook.authorize(activity, permissions, 1, new DialogListener() {
 
             public void onComplete(Bundle values) {
                 saveFacebookData();
+                syncToken(activity);
                 if (handler != null) handler.onSuccess(mFacebook);
             }
 
@@ -164,6 +166,17 @@ public final class FacebookManager
         editor.remove("fb_access_token");
         editor.remove("fb_access_expires");
         editor.commit();
+
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void syncToken(Context context)
+    {
+        TikTokApi api                = new TikTokApi(context);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("fb", mFacebook.getAccessToken());
+        api.updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
