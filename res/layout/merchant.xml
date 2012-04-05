@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:gravity="bottom"
+    android:orientation="vertical" >
+
+    <!-- Merchant -->
+    <LinearLayout
+        android:id="@+id/coupon"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="150"
+        android:orientation="vertical" >
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent" >
+
+            <!-- Scroll Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:padding="5dip"
+                android:orientation="vertical" >
+
+                <!-- Category -->
+                <TextView android:id="@+id/category"
+                    android:text="Resturaunt"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp"
+                    android:lines="1"
+                    android:padding="3dip" />
+
+                <!-- Icon / Info -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dip" >
+
+                    <!-- Icon Container -->
+                    <LinearLayout
+                        android:id="@+id/gradient"
+                        android:layout_width="96dip"
+                        android:layout_height="96dip"
+                        android:background="@drawable/coupon_icon"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="5dip" >
+
+                        <!-- Icon -->
+                        <ImageView
+                            android:id="@+id/icon"
+                            android:src="@drawable/icon03"
+                            android:layout_width="74dip"
+                            android:layout_height="74dip" />
+
+                    <!-- Icon Container End -->
+                    </LinearLayout>
+
+                    <!-- Info Container -->
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_marginLeft="5dip"
+                        android:gravity="center|fill_vertical"
+                        android:orientation="vertical"
+                        android:padding="1dip" >
+
+                        <!-- Name -->
+                        <TextView
+                            android:id="@+id/name"
+                            android:text="MERCHANT NAME"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <!-- Address -->
+                        <TextView android:id="@+id/address"
+                            android:text="2156 Mathews Ave,\nRedondo Beach, CA, 91605"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:textSize="12sp"
+                            android:autoLink="map"
+                            android:lines="2"
+                            android:paddingTop="1dip" />
+
+                        <!-- Phone -->
+                        <TextView android:id="@+id/phone"
+                            android:text="555-555-5555"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:autoLink="phone"
+                            android:paddingTop="1dip" />
+
+                        <!-- Url -->
+                        <TextView android:id="@+id/url"
+                            android:text="www.tiktok.com"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:autoLink="web"
+                            android:paddingTop="1dip" />
+
+                   <!-- Info Container End -->
+                    </LinearLayout>
+
+                <!-- Icon / Map End-->
+                </LinearLayout>
+
+                <!-- Details -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="2dip"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:orientation="vertical" >
+
+                    <!-- Details -->
+                    <TextView
+                        android:id="@+id/details"
+                        android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autoLink="web"
+                        android:textSize="14sp"
+                        android:paddingTop="5dip"
+                        android:paddingBottom="5dip" />
+
+                <!-- Details End -->
+                </LinearLayout>
+
+            <!-- Scroll Container End -->
+            </LinearLayout>
+
+        </ScrollView>
+
+    <!-- Merchant End -->
+    </LinearLayout>
+
+</LinearLayout>

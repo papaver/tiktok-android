@@ -25,7 +25,7 @@ import com.tiktok.consumerapp.R;
 public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<OverlayItem>
 {
     //-------------------------------------------------------------------------
-    // methods
+    // constructors
     //-------------------------------------------------------------------------
 
     public ItemizedOverlay(Drawable defaultMarker, Context context)
@@ -34,10 +34,16 @@ public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<Ove
         mContext = context;
     }
 
+    //-------------------------------------------------------------------------
+
     public ItemizedOverlay(Context context)
     {
         this(context.getResources().getDrawable(R.drawable.pin), context);
     }
+
+    //-------------------------------------------------------------------------
+    // methods
+    //-------------------------------------------------------------------------
 
     public void addOverlay(OverlayItem overlay)
     {
@@ -45,11 +51,17 @@ public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<Ove
         populate();
     }
 
+    //-------------------------------------------------------------------------
+    // ItemizedOverlay<OverlayItem>
+    //-------------------------------------------------------------------------
+
     @Override
     protected OverlayItem createItem(int index)
     {
         return mOverlays.get(index);
     }
+
+    //-------------------------------------------------------------------------
 
     @Override
     public int size()

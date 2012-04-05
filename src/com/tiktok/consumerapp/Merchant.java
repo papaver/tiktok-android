@@ -161,6 +161,16 @@ public final class Merchant
     }
 
     //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns icon data representing icon's id and url for download.
+     */
+    public IconManager.IconData iconData()
+    {
+        return new IconManager.IconData(iconId(), iconUrl());
+    }
+
+    //-------------------------------------------------------------------------
     // methods
     //-------------------------------------------------------------------------
 
