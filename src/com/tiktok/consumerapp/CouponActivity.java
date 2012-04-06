@@ -11,6 +11,9 @@ package com.tiktok.consumerapp;
 import java.util.Date;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -18,9 +21,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
@@ -36,6 +36,7 @@ import com.google.android.maps.OverlayItem;
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
 import com.tiktok.consumerapp.map.ItemizedOverlay;
 import com.tiktok.consumerapp.utilities.TextUtilities;
+import com.tiktok.consumerapp.utilities.UIUtilities;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -184,7 +185,12 @@ public class CouponActivity extends MapActivity
 
     public void onClickFacebook(View view)
     {
-        Log.i(kLogTag, "Share Facebook");
+        FacebookManager manager = FacebookManager.getInstance(this);
+        if (manager.facebook().isSessionValid()) {
+            postFacebook();
+        } else {
+            setupFacebook();
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -243,7 +249,7 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
-    // help functions
+    // helper functions
     //-------------------------------------------------------------------------
 
     private void setupCouponDetails(Coupon coupon)
@@ -312,7 +318,7 @@ public class CouponActivity extends MapActivity
 
             // set activity indicator
             iconView.setImageResource(R.drawable.activity_indicator);
-            iconView.startAnimation(getActivityAnimation());
+            iconView.startAnimation(UIUtilities.getActivityIndicatorAnimation());
 
             // download icon from server
             mIconManager.requestImage(iconData, new IconManager.CompletionHandler() {
@@ -452,21 +458,85 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
+    // share functions
+    //-------------------------------------------------------------------------
 
-    private RotateAnimation getActivityAnimation()
+    private void setupFacebook()
     {
-        RotateAnimation rotation = new RotateAnimation(
-            0.0f,
-            360.0f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f,
-            Animation.RELATIVE_TO_SELF,
-            0.5f);
-        rotation.setDuration(360 * 4);
-        rotation.setInterpolator(new LinearInterpolator());
-        rotation.setRepeatMode(Animation.RESTART);
-        rotation.setRepeatCount(Animation.INFINITE);
-        return rotation;
+        String title   = getString(R.string.facebook_setup);
+        String message = getString(R.string.facebook_not_setup);
+
+        // ask user to log into facebook before posting
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Facebook",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    authorizeAndPostFacebook();
+                }
+            });
+
+        // display alert
+        alertDialog.show();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void authorizeAndPostFacebook()
+    {
+        FacebookManager manager = FacebookManager.getInstance(this);
+        manager.authorize(this, new FacebookManager.CompletionHandler() {
+            public void onSuccess(Bundle values) {
+                postFacebook();
+            }
+            public void onError(Throwable error) {}
+            public void onCancel() {}
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void postFacebook()
+    {
+        // format the post description
+        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String deal      = String.format("%s at %s! " +
+                                         "Grab your free deal at www.tiktok.com!",
+                                         formatted, mCoupon.merchant().name());
+
+        // package up the params
+        Bundle params = new Bundle();
+        params.putString("link",        "www.tiktok.com");
+        params.putString("picture",     mCoupon.iconUrl());
+        params.putString("name",        "TikTok");
+        params.putString("caption",     "www.tiktok.com");
+        params.putString("description", deal);
+
+        // pop open dialog to allow user to confimr post
+        final Context context   = this;
+        FacebookManager manager = FacebookManager.getInstance(this);
+        manager.postToWall(this, params, new FacebookManager.CompletionHandler() {
+            public void onSuccess(Bundle values) {
+                if (values.containsKey("post_id")) {
+
+                    // let server know of share
+                    TikTokApi api = new TikTokApi(context);
+                    api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kFacebook);
+
+                    // alert user of successful post
+                    String title   = getString(R.string.facebook);
+                    String message = getString(R.string.facebook_deal_post);
+                    Utilities.displaySimpleAlert(context, title, message);
+                }
+            }
+            public void onError(Throwable error) {}
+            public void onCancel() {}
+        });
     }
 
     //-------------------------------------------------------------------------

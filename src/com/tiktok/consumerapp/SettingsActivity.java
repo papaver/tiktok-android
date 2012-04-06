@@ -20,8 +20,6 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.util.Log;
 
-import com.facebook.android.Facebook;
-
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
@@ -75,9 +73,13 @@ public class SettingsActivity extends    PreferenceActivity
             textPreference.setSummary(mSettings.gender());
         }
 
-        // add listener to deal with facebook connect
+        // add listener to deal with facebook connect and make sure its in sync
+        FacebookManager manager            = FacebookManager.getInstance(this);
         CheckBoxPreference facebookConnect = (CheckBoxPreference)findPreference("TTS_fb");
         facebookConnect.setOnPreferenceChangeListener(this);
+        if (manager.facebook().isSessionValid() && !facebookConnect.isChecked()) {
+            facebookConnect.setChecked(true);
+        }
         if (facebookConnect.isChecked()) {
             facebookConnect.setSummary(kFBConnectedSummary);
         }
@@ -175,7 +177,7 @@ public class SettingsActivity extends    PreferenceActivity
             // attempt to authorize session
             manager.authorize(this, new FacebookManager.CompletionHandler() {
 
-                public void onSuccess(Facebook facebook) {
+                public void onSuccess(Bundle values) {
                     Log.i(kLogTag, "Logged into facebook!");
                     checkboxPreference.setChecked(true);
                     checkboxPreference.setSummary(kFBConnectedSummary);

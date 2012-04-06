@@ -36,7 +36,7 @@ public final class FacebookManager
 
     public static interface CompletionHandler
     {
-        public abstract void onSuccess(Facebook facebook);
+        public abstract void onSuccess(Bundle values);
         public abstract void onError(Throwable error);
         public abstract void onCancel();
     }
@@ -67,8 +67,16 @@ public final class FacebookManager
     {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         mFacebook    = new Facebook(Constants.kFacebookApiKey);
+
+        // load session variables
+        loadFacebookData();
+
+        // extend the access token
+        mFacebook.extendAccessTokenIfNeeded(context, null);
     }
 
+    //-------------------------------------------------------------------------
+    // methods
     //-------------------------------------------------------------------------
 
     public void authorize(final Activity activity, final CompletionHandler handler)
@@ -91,7 +99,7 @@ public final class FacebookManager
             public void onComplete(Bundle values) {
                 saveFacebookData();
                 syncToken(activity);
-                if (handler != null) handler.onSuccess(mFacebook);
+                if (handler != null) handler.onSuccess(values);
             }
 
             public void onFacebookError(FacebookError error) {
@@ -106,6 +114,36 @@ public final class FacebookManager
 
             public void onCancel() {
                 Log.w(kLogTag, "Login canceled.");
+                if (handler != null) handler.onCancel();
+            }
+
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void postToWall(final Context context, final Bundle params,
+                           final CompletionHandler handler)
+    {
+        // attempt to log into facebook
+        mFacebook.dialog(context, "feed", params, new DialogListener() {
+
+            public void onComplete(Bundle values) {
+                if (handler != null) handler.onSuccess(values);
+            }
+
+            public void onFacebookError(FacebookError error) {
+                Log.e(kLogTag, String.format("Post failed", error));
+                if (handler != null) handler.onError(error);
+            }
+
+            public void onError(DialogError error) {
+                Log.e(kLogTag, String.format("Post failed", error));
+                if (handler != null) handler.onError(error);
+            }
+
+            public void onCancel() {
+                Log.w(kLogTag, "Post canceled.");
                 if (handler != null) handler.onCancel();
             }
 
@@ -142,10 +180,8 @@ public final class FacebookManager
     {
         String token = mPreferences.getString("fb_access_token", null);
         long expires = mPreferences.getLong("fb_access_expires", 0);
-        if ((token != null) && (expires != 0)) {
-            mFacebook.setAccessToken(token);
-            mFacebook.setAccessExpires(expires);
-        }
+        if (token != null) mFacebook.setAccessToken(token);
+        if (expires != 0) mFacebook.setAccessExpires(expires);
     }
 
     //-------------------------------------------------------------------------
