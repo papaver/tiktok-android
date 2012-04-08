@@ -16,8 +16,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -49,6 +51,9 @@ public class CouponActivity extends MapActivity
     //-------------------------------------------------------------------------
 
     private static final String kLogTag = "CouponActivity";
+
+    private static final int kIntentSMS   = 1;
+    private static final int kIntentEmail = 2;
 
     //-------------------------------------------------------------------------
     // enum
@@ -164,6 +169,22 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == kIntentEmail) {
+            TikTokApi api = new TikTokApi(this);
+            api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kEmail);
+        } else if (requestCode == kIntentSMS) {
+            TikTokApi api = new TikTokApi(this);
+            api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kSMS);
+        }
+    }
+
+    //-------------------------------------------------------------------------
     // Events
     //-------------------------------------------------------------------------
 
@@ -197,7 +218,22 @@ public class CouponActivity extends MapActivity
 
     public void onClickMore(View view)
     {
-        Log.i(kLogTag, "Share More");
+        final String[] items = { "SMS", "Email" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Share Deal");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    String choice = items[item];
+                    if (choice.equals("SMS")) {
+                        shareSMS();
+                    } else if (choice.equals("Email")) {
+                        shareEmail();
+                    }
+                }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     //-------------------------------------------------------------------------
@@ -537,6 +573,45 @@ public class CouponActivity extends MapActivity
             public void onError(Throwable error) {}
             public void onCancel() {}
         });
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void shareEmail()
+    {
+        // present the email controller
+        String merchant  = mCoupon.merchant().name();
+        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String subject   = String.format("TikTok: Checkout this amazing deal for %s!", merchant);
+        String body      = String.format("<h3>TikTok</h3>" +
+                                         "<b>%s</b> at <b>%s</b>" +
+                                         "<br><br>" +
+                                         "<a href='http://www.tiktok.com'>Get your deal on!</a>",
+                                         formatted, merchant);
+
+        // present email controller
+        Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("email:"));
+        intent.setType("text/html");
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(body));
+        startActivityForResult(intent, kIntentEmail);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void shareSMS()
+    {
+        String merchant  = mCoupon.merchant().name();
+        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String deal      = String.format("%s at %s", formatted, merchant);
+        String body      = String.format("TikTok: %s! www.tiktok.com", deal);
+
+        // present sms controller
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("smsto:"));
+        intent.putExtra("sms_body", body);
+        intent.putExtra("compose_mode", true);
+        intent.setType("vnd.android-dir/mms-sms");
+        startActivityForResult(intent, kIntentSMS);
     }
 
     //-------------------------------------------------------------------------
