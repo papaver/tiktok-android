@@ -414,7 +414,7 @@ public class CouponActivity extends MapActivity
 
         // add a pin
         List<Overlay> mapOverlays = mapView.getOverlays();
-        ItemizedOverlay overlay   = new ItemizedOverlay(this);
+        ItemizedOverlay overlay   = new ItemizedOverlay(mapView);
         OverlayItem item          = new OverlayItem(location, "", "");
         overlay.addOverlay(item);
         mapOverlays.add(overlay);

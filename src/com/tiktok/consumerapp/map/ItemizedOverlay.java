@@ -14,7 +14,10 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
+
+import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 
 import com.tiktok.consumerapp.R;
 
@@ -22,23 +25,23 @@ import com.tiktok.consumerapp.R;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<OverlayItem>
+public class ItemizedOverlay extends BalloonItemizedOverlay<OverlayItem>
 {
     //-------------------------------------------------------------------------
     // constructors
     //-------------------------------------------------------------------------
 
-    public ItemizedOverlay(Drawable defaultMarker, Context context)
+    public ItemizedOverlay(Drawable defaultMarker, MapView mapView)
     {
-        super(boundCenterBottom(defaultMarker));
-        mContext = context;
+        super(boundCenterBottom(defaultMarker), mapView);
+        mContext = mapView.getContext();
     }
 
     //-------------------------------------------------------------------------
 
-    public ItemizedOverlay(Context context)
+    public ItemizedOverlay(MapView mapView)
     {
-        this(context.getResources().getDrawable(R.drawable.pin), context);
+        this(mapView.getContext().getResources().getDrawable(R.drawable.pin), mapView);
     }
 
     //-------------------------------------------------------------------------
@@ -49,6 +52,13 @@ public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<Ove
     {
         mOverlays.add(overlay);
         populate();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void clear()
+    {
+        mOverlays.clear();
     }
 
     //-------------------------------------------------------------------------
@@ -73,7 +83,6 @@ public class ItemizedOverlay extends com.google.android.maps.ItemizedOverlay<Ove
     // fields
     //-------------------------------------------------------------------------
 
-    @SuppressWarnings("unused")
-    private Context           mContext;
-    private List<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
+    protected Context           mContext;
+    protected List<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 }
