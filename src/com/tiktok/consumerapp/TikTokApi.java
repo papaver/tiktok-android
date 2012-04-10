@@ -27,6 +27,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
+import android.os.Handler;
 import android.location.Location;
 import android.util.Log;
 
@@ -37,17 +38,13 @@ import org.codehaus.jackson.type.TypeReference;
 // class implementation
 //-----------------------------------------------------------------------------
 
-/**
- * [moiz] need to have all the networking and json parsing happening in the
- *      background
- *
- */
-
 public final class TikTokApi
 {
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
+
+    public static final String kLogTag = "TikTokApi";
 
     public static final String kTikTokApiKeyStatus  = "status";
     public static final String kTikTokApiKeyError   = "error";
@@ -88,12 +85,78 @@ public final class TikTokApi
     }
 
     //-------------------------------------------------------------------------
+    // CompletionHandler
+    //-------------------------------------------------------------------------
+
+    public interface CompletionHandler
+    {
+        public abstract void onSuccess(final Object drawable);
+        public abstract void onError(Throwable error);
+    }
+
+    //-------------------------------------------------------------------------
+    // DownloadHandler
+    //-------------------------------------------------------------------------
+
+    private interface DownloadHandler
+    {
+        public abstract void onSuccess(final Object data);
+        public abstract void onError(final Throwable error);
+    }
+
+    //-------------------------------------------------------------------------
+    // Downloader
+    //-------------------------------------------------------------------------
+
+    private class Downloader implements Runnable
+    {
+        public Downloader(HttpUriRequest request, Class<?> type,
+                          DownloadHandler handler)
+        {
+            mType     = type;
+            mHandler  = handler;
+            mRequest  = request;
+        }
+
+        public void run()
+        {
+            try {
+
+                // attempt to query the request from the server
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpResponse response    = client.execute(mRequest);
+                Object data              = parseResponse(response, mType);
+
+                // run completion handler
+                if (mHandler != null) mHandler.onSuccess(data);
+
+            } catch (Exception e) {
+                Log.e("TikTokApi::Downloader", String.format(
+                    "Query failed for %s", mRequest.getURI()), e);
+
+                // kill the connection
+                mRequest.abort();
+
+                // run completion handler
+                if (mHandler != null) mHandler.onError(e);
+            }
+        }
+
+        private final Class<?>        mType;
+        private final HttpUriRequest  mRequest;
+        private final DownloadHandler mHandler;
+    }
+
+    //-------------------------------------------------------------------------
     // constructor
     //-------------------------------------------------------------------------
 
-    public TikTokApi(Context context)
+    public TikTokApi(Context context, Handler handler,
+                     CompletionHandler completionHandler)
     {
-        mContext = context.getApplicationContext();
+        mContext           = context.getApplicationContext();
+        mHandler           = handler;
+        mCompletionHandler = completionHandler;
     }
 
     //-------------------------------------------------------------------------
@@ -117,36 +180,36 @@ public final class TikTokApi
     /**
      * Register the device with the server.
      */
-    public String registerDevice(String deviceId)
+    public void registerDevice(String deviceId)
     {
         // get route to register device with server
         String url = String.format("%s/register?uuid=%s", getApiUrl(), deviceId);
 
-        // process request
-        HttpGet request    = new HttpGet(url);
-        InputStream stream = processRequest(request);
+        // query the server
+        HttpGet request = new HttpGet(url);
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
 
-        try {
+                    // parse out the consumerId
+                    String consumerId = null;
+                    TikTokApiResponse response = (TikTokApiResponse)data;
+                    if (response.isOkay()) {
+                        ObjectMapper mapper          = new ObjectMapper();
+                        Map<String, Integer> results = mapper.convertValue(
+                            response.getResults(),
+                            new TypeReference<Map<String, Integer>>() {});
+                        consumerId = results.get("id").toString();
+                    }
 
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiResponse response =
-                mapper.readValue(stream, TikTokApiResponse.class);
+                    // run handler
+                    postSuccess(consumerId);
+                }
 
-            // parse the results if the query was a success
-            if (response.isOkay()) {
-                Map<String, Integer> results = mapper.convertValue(
-                    response.getResults(),
-                    new TypeReference<Map<String, Integer>>() {});
-                return results.get("id").toString();
-            }
-
-        } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format(
-                "exception: %s", e.toString()));
-        }
-
-        return null;
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
@@ -154,37 +217,37 @@ public final class TikTokApi
     /**
      * Check if the device is registered with the server.
      */
-    public boolean validateRegistration()
+    public void validateRegistration()
     {
         // get route to register device with server
         String url = String.format("%s/consumers/%s/registered?uuid=%s",
             getApiUrl(), utilities().getConsumerId(), utilities().getDeviceId());
 
-        // process request
-        HttpGet request    = new HttpGet(url);
-        InputStream stream = processRequest(request);
+        // query the server
+        HttpGet request = new HttpGet(url);
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
 
-        try {
+                    // parse out the consumerId
+                    Boolean isRegistered = null;
+                    TikTokApiResponse response = (TikTokApiResponse)data;
+                    if (response.isOkay()) {
+                        ObjectMapper mapper          = new ObjectMapper();
+                        Map<String, Boolean> results = mapper.convertValue(
+                            response.getResults(),
+                            new TypeReference<Map<String, Boolean>>() {});
+                        isRegistered = results.get("registered");
+                    }
 
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiResponse response =
-                mapper.readValue(stream, TikTokApiResponse.class);
+                    // run handler
+                    postSuccess(isRegistered);
+                }
 
-            // parse the results if the query was a success
-            if (response.isOkay()) {
-                Map<String, Boolean> results = mapper.convertValue(
-                    response.getResults(),
-                    new TypeReference<Map<String, Boolean>>() {});
-                return results.get("registered").booleanValue();
-            }
-
-        } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format(
-                "exception: %s", e.toString()));
-        }
-
-        return false;
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
@@ -192,14 +255,14 @@ public final class TikTokApi
     /**
      * Register the notification token with the server.
      */
-    public TikTokApiResponse registerNotificationToken(String token)
+    public void registerNotificationToken(String token)
     {
         // add to hash
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("token", token);
 
         // update server
-        return updateSettings(settings);
+        updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -207,48 +270,30 @@ public final class TikTokApi
     /**
      * @return Get the list of available coupons.
      */
-    public Map<CouponKey, Object> syncActiveCoupons()
+    public void syncActiveCoupons()
     {
         // get the route to the list of coupons
         String url = String.format("%s/consumers/%s/coupons",
             getApiUrl(), utilities().getConsumerId());
 
-        // get the json content from the url
-        HttpGet request    = new HttpGet(url);
-        InputStream stream = processRequest(request);
+        // query the server
+        HttpGet request = new HttpGet(url);
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
 
-        try {
+                    // parse the coupon data on another thread
+                    new Thread(new Runnable() {
+                        public void run() {
+                            processCouponData((TikTokApiResponse)data);
+                        }
+                    }).start();
+                }
 
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiResponse response = mapper.readValue(stream, TikTokApiResponse.class);
-            if (response.isOkay()) {
-
-                // convert the top level results structure
-                Map<String, Object> results = mapper.convertValue(
-                    response.getResults(), new TypeReference<Map<String, Object>>() {});
-
-                // process the new coupons
-                Coupon[] coupons  = mapper.convertValue(
-                    results.get(CouponKey.kCoupons.key()), Coupon[].class);
-                Long[] killed  = mapper.convertValue(
-                    results.get(CouponKey.kKilled.key()), Long[].class);
-                Long[] soldOut = mapper.convertValue(
-                    results.get(CouponKey.kSoldOut.key()), Long[].class);
-
-                // pack into map
-                Map<CouponKey, Object> data = new HashMap<CouponKey, Object>();
-                data.put(CouponKey.kCoupons, coupons);
-                data.put(CouponKey.kKilled, killed);
-                data.put(CouponKey.kSoldOut, soldOut);
-
-                return data;
-            }
-        } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format("exception: %s", e.toString()));
-        }
-
-        return null;
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
@@ -257,7 +302,7 @@ public final class TikTokApi
      * @return Updates server with consumers current location, currently
      *   ignores the response from the server.
      */
-    public TikTokApiResponse updateCurrentLocation(Location location)
+    public void updateCurrentLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -269,7 +314,7 @@ public final class TikTokApi
         settings.put("longitude", longitude);
 
         // update server
-        return updateSettings(settings);
+        updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -278,7 +323,7 @@ public final class TikTokApi
      * @return Updates server with consumer settings, currently ignores the
      *   response from the server.
      */
-    public TikTokApiResponse updateSettings(Map<String, String> settings)
+    public void updateSettings(Map<String, String> settings)
     {
         // construct route to update coupon attribute
         String url = String.format("%s/consumers/%s",
@@ -287,35 +332,29 @@ public final class TikTokApi
         // setup put request for desired attribute
         HttpPut request = new HttpPut(url);
 
-        // parse the json data
-        try {
-
-            // add settings to request
-            List<NameValuePair> pairs =
-                new ArrayList<NameValuePair>(settings.size());
-            for (Map.Entry<String, String> entry : settings.entrySet()) {
-                pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-            }
-            request.setEntity(new UrlEncodedFormEntity(pairs));
-
-            // process request
-            InputStream stream = processRequest(request);
-
-            // nothing to do if response did not go through
-            if (stream == null) return null;
-
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiResponse response =
-                mapper.readValue(stream, TikTokApiResponse.class);
-            return response;
-
-        } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format(
-                "exception: %s", e.toString()));
+        // add settings to request
+        List<NameValuePair> pairs =
+            new ArrayList<NameValuePair>(settings.size());
+        for (Map.Entry<String, String> entry : settings.entrySet()) {
+            pairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
 
-        return null;
+        // add data to the entity
+        try {
+            request.setEntity(new UrlEncodedFormEntity(pairs));
+        } catch (Exception e) {
+        }
+
+        // query the server
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+                    postSuccess(data);
+                }
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
@@ -324,7 +363,7 @@ public final class TikTokApi
      * @return Updates server with consumers home location, currently
      *   ignores the response from the server.
      */
-    public TikTokApiResponse updateHomeLocation(Location location)
+    public void updateHomeLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -336,7 +375,7 @@ public final class TikTokApi
         settings.put("home_longitude", longitude);
 
         // update server
-        return updateSettings(settings);
+        updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -345,7 +384,7 @@ public final class TikTokApi
      * @return Updates server with consumers work location, currently
      *   ignores the response from the server.
      */
-    public TikTokApiResponse updateWorkLocation(Location location)
+    public void updateWorkLocation(Location location)
     {
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
@@ -357,7 +396,7 @@ public final class TikTokApi
         settings.put("work_longitude", longitude);
 
         // update server
-        return updateSettings(settings);
+        updateSettings(settings);
     }
 
     //-------------------------------------------------------------------------
@@ -365,7 +404,7 @@ public final class TikTokApi
     /**
      * @return Update coupon attribute.
      */
-    public TikTokApiResponse updateCoupon(long couponId, CouponAttribute attribute)
+    public void updateCoupon(long couponId, final CouponAttribute attribute)
     {
         // construct route to update coupon attribute
         String url = String.format("%s/consumers/%s/coupons/%d",
@@ -374,34 +413,27 @@ public final class TikTokApi
         // setup put request for desired attribute
         HttpPut request = new HttpPut(url);
 
-        // parse the json data
+        // add attribute to request
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>(1);
+        pairs.add(new BasicNameValuePair(attribute.key(), "1"));
+
+        // add data to entity
         try {
-
-            // add attribute to request
-            List<NameValuePair> pairs = new ArrayList<NameValuePair>(1);
-            pairs.add(new BasicNameValuePair(attribute.key(), "1"));
             request.setEntity(new UrlEncodedFormEntity(pairs));
-
-            // process request
-            InputStream stream = processRequest(request);
-
-            // nothing to do if response did not go through
-            if (stream == null) return null;
-
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiMultiResponse response =
-                mapper.readValue(stream, TikTokApiMultiResponse.class);
-
-            // return the response for the attribute that was updated
-            return response.getResponse(attribute.key());
-
         } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format(
-                "exception: %s", e.toString()));
         }
 
-        return null;
+        // query the server
+        new Thread(new Downloader(request, TikTokApiMultiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+                    TikTokApiMultiResponse response = (TikTokApiMultiResponse)data;
+                    postSuccess(response.getResponse(attribute.key()));
+                }
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
@@ -409,78 +441,205 @@ public final class TikTokApi
     /**
      * @return Syncs the most current karma points stats from the server.
      */
-    public Map<String, Integer> syncKarmaPoints()
+    public void syncKarmaPoints()
     {
         // construct route to retrieve karma points
         String url = String.format("%s/consumers/%s/loyalty_points",
             getApiUrl(), utilities().getConsumerId());
 
-        // pull data from the server
-        HttpGet request    = new HttpGet(url);
-        InputStream stream = processRequest(request);
+        // query the server
+        HttpGet request = new HttpGet(url);
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
 
-        // nothing to do if response did not go through
-        if (stream == null) return null;
+                    // parse out the consumerId
+                    Map<String, Integer> karma = null;
+                    TikTokApiResponse response   = (TikTokApiResponse)data;
+                    if (response.isOkay()) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        karma = mapper.convertValue(
+                            response.getResults(),
+                            new TypeReference<Map<String, Integer>>() {});
+                    }
 
-        // parse the json data
-        try {
+                    // run handler
+                    postSuccess(karma);
+                }
 
-            // parse the top level response structure
-            ObjectMapper mapper = new ObjectMapper();
-            TikTokApiResponse response =
-                mapper.readValue(stream, TikTokApiResponse.class);
-
-            // parse the results if the query was a success
-            if (response.isOkay()) {
-                Map<String, Integer> results = mapper.convertValue(
-                    response.getResults(),
-                    new TypeReference<Map<String, Integer>>() {});
-                return results;
-            }
-
-        } catch (Exception e) {
-            Log.w(getClass().getSimpleName(), String.format(
-                "exception: %s", e.toString()));
-        }
-
-        return null;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Content from the uri request.
-     */
-    private InputStream processRequest(HttpUriRequest request)
-    {
-        try {
-
-            // attempt to query the request from the server
-            DefaultHttpClient client = new DefaultHttpClient();
-            HttpResponse response    = client.execute(request);
-            final int statusCode     = response.getStatusLine().getStatusCode();
-
-            // make sure we get a success response
-            if (statusCode != HttpStatus.SC_OK) {
-                Log.w(getClass().getSimpleName(), String.format(
-                    "Error: %d for url %s", statusCode, request.getURI()));
-                return null;
-            }
-
-            HttpEntity responseEntity = response.getEntity();
-            return responseEntity.getContent();
-
-        } catch (IOException e) {
-            request.abort();
-            Log.w(getClass().getSimpleName(), String.format(
-                "Error for URL: %s", request.getURI()));
-        }
-
-        return null;
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
     }
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    private Object parseResponse(HttpResponse response, Class<?> type)
+        throws IOException, org.codehaus.jackson.map.JsonMappingException
+    {
+        // make sure we get a success response
+        final int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode == HttpStatus.SC_OK) {
+
+            // grab the content from the response
+            HttpEntity responseEntity = response.getEntity();
+            InputStream stream        = responseEntity.getContent();
+
+            // parse the top level response structure
+            ObjectMapper mapper = new ObjectMapper();
+            Object value        = mapper.readValue(stream, type);
+            return value;
+
+        } else {
+            Log.e(kLogTag, String.format("Invalid response: %d", statusCode));
+        }
+
+        return null;
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void postSuccess(final Object response)
+    {
+        if (mCompletionHandler == null) return;
+
+        mHandler.post(new Runnable() {
+            public void run() {
+                mCompletionHandler.onSuccess(response);
+            }
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void postError(final Throwable error)
+    {
+        if (mCompletionHandler == null) return;
+
+        mHandler.post(new Runnable() {
+            public void run() {
+                mCompletionHandler.onError(error);
+            }
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
+    private Map<CouponKey, Object> repackCouponData(TikTokApiResponse response)
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> results = mapper.convertValue(
+            response.getResults(), new TypeReference<Map<String, Object>>() {});
+
+        // process the new coupons
+        Coupon[] coupons  = mapper.convertValue(
+            results.get(CouponKey.kCoupons.key()), Coupon[].class);
+        Long[] killed  = mapper.convertValue(
+            results.get(CouponKey.kKilled.key()), Long[].class);
+        Long[] soldOut = mapper.convertValue(
+            results.get(CouponKey.kSoldOut.key()), Long[].class);
+
+        // pack into map
+        Map<CouponKey, Object> data = new HashMap<CouponKey, Object>();
+        data.put(CouponKey.kCoupons, coupons);
+        data.put(CouponKey.kKilled, killed);
+        data.put(CouponKey.kSoldOut, soldOut);
+
+        return data;
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void processCouponData(TikTokApiResponse response)
+    {
+        // process the coupons
+        if (response.isOkay()) {
+
+            // open up a database connection
+            TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(mContext);
+            adapter.open();
+
+            // repack the data for easier processing
+            Map<CouponKey, Object> data = repackCouponData(response);
+
+            // process new coupons
+            Coupon[] coupons = (Coupon[])data.get(TikTokApi.CouponKey.kCoupons);
+            processCoupons(coupons, adapter);
+
+            // kill coupons
+            Long[] killed = (Long[])data.get(TikTokApi.CouponKey.kKilled);
+            processKilled(killed, adapter);
+
+            // update sold out coupons
+            Long[] soldOut = (Long[])data.get(TikTokApi.CouponKey.kSoldOut);
+            processSoldOut(soldOut, adapter);
+
+            // cleanup
+            adapter.close();
+        }
+
+        // run handler
+        postSuccess(response);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void processCoupons(Coupon[] coupons, TikTokDatabaseAdapter adapter)
+    {
+        // add only new coupons to the database
+        List<Long> couponIds   = adapter.fetchAllCouponIds();
+        List<Long> merchantIds = adapter.fetchAllMerchantIds();
+        for (final Coupon coupon : coupons) {
+
+            if (!merchantIds.contains(coupon.merchant().id())) {
+                adapter.createMerchant(coupon.merchant());
+                Log.i(kLogTag, String.format(
+                    "Added merchant to db: %s", coupon.merchant().name()));
+            }
+
+            if (!couponIds.contains(coupon.id())) {
+                Log.w(getClass().getSimpleName(), coupon.toString());
+                adapter.createCoupon(coupon);
+                Log.i(kLogTag, String.format(
+                    "Added coupon to db: %s", coupon.title()));
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void processKilled(Long[] killed, TikTokDatabaseAdapter adapter)
+    {
+        List<Long> couponIds = adapter.fetchAllCouponIds();
+        for (final Long id : killed) {
+            if (couponIds.contains(id)) {
+                Log.i(kLogTag, String.format("Killed deal id: %d", id));
+                adapter.deleteCoupon(id);
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void processSoldOut(Long[] soldOut, TikTokDatabaseAdapter adapter)
+    {
+        List<Long> couponIds = adapter.fetchAllCouponIds();
+        for (final Long id : soldOut) {
+            if (couponIds.contains(id)) {
+                Coupon coupon = adapter.fetchCoupon(id);
+                if (!coupon.isSoldOut()) {
+                    Log.i(kLogTag, String.format(
+                        "SoldOut deal: %d / %s", coupon.id(), coupon.title()));
+                    coupon.sellOut();
+                    adapter.updateCoupon(coupon);
+                }
+            }
+        }
+    }
+
     //-------------------------------------------------------------------------
 
     private Utilities utilities()
@@ -495,7 +654,9 @@ public final class TikTokApi
     // fields
     //-------------------------------------------------------------------------
 
-    private Context   mContext;
-    private Utilities mUtilities;
+    final private Handler           mHandler;
+    final private Context           mContext;
+    final private CompletionHandler mCompletionHandler;
 
+    private Utilities mUtilities;
 }

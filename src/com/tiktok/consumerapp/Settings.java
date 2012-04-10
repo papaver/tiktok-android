@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -87,7 +88,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncName()
     {
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("name", name());
         api.updateSettings(settings);
@@ -112,7 +113,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncEmail()
     {
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("email", email());
         api.updateSettings(settings);
@@ -138,7 +139,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public void syncGender()
     {
         // push update to server
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("sex", gender().toLowerCase().substring(0, 1));
         api.updateSettings(settings);
@@ -183,7 +184,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public void syncBirthday()
     {
         // push update to server
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("birthday", birthdayStr());
         api.updateSettings(settings);
@@ -210,7 +211,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncHome()
     {
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         api.updateHomeLocation(home());
     }
 
@@ -247,7 +248,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncWork()
     {
-        TikTokApi api = new TikTokApi(mContext);
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         api.updateWorkLocation(work());
     }
 

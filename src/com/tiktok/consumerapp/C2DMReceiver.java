@@ -11,6 +11,7 @@ package com.tiktok.consumerapp;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 //import android.widget.Toast;
@@ -39,14 +40,14 @@ public class C2DMReceiver extends BroadcastReceiver
             handleMessage(context, intent);
         }
     }
-    
+
     //-------------------------------------------------------------------------
 
     private void handleRegistration(Context context, Intent intent)
     {
-        String token        = intent.getStringExtra("registration_id");
-        String unregistered = intent.getStringExtra("registered");
-        String error        = intent.getStringExtra("error");
+        final String token        = intent.getStringExtra("registration_id");
+        final String unregistered = intent.getStringExtra("registered");
+        final String error        = intent.getStringExtra("error");
 
         if (error != null) {
             Log.e(kLogTag, "Registration failed: " + error);
@@ -58,20 +59,28 @@ public class C2DMReceiver extends BroadcastReceiver
             Log.i(kLogTag, "Registered: " + token);
 
             // [moiz] this needs to be implemented on the server side and tested
-            Utilities utilities = new Utilities(context);
-            String oldToken     = utilities.getNotificationToken();
+            final Utilities utilities = new Utilities(context);
+            String oldToken           = utilities.getNotificationToken();
             if (!token.equals(oldToken)) {
-                TikTokApi api = new TikTokApi(context);
-                if (api.registerNotificationToken(token) != null) {
-                    Log.i(kLogTag, String.format("Cached new token: %s", token));
-                    utilities.cacheNotificationToken(token);
-                }
+                TikTokApi api = new TikTokApi(context, new Handler(),
+                    new TikTokApi.CompletionHandler() {
+                        public void onSuccess(Object data) {
+                            Log.i(kLogTag, String.format("Cached new token: %s", token));
+                            utilities.cacheNotificationToken(token);
+                        }
+
+                        public void onError(Throwable error) {
+                        }
+                    });
+
+                // run query
+                api.registerNotificationToken(token);
             }
         }
     }
 
     //-------------------------------------------------------------------------
-    
+
     private void handleMessage(Context context, Intent intent)
     {
         String message = intent.getStringExtra("message");
@@ -89,16 +98,16 @@ public class C2DMReceiver extends C2DMBaseReceiver
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
-    
+
     static String sC2DMSender = "papaver@gmail.com";
 
     //-------------------------------------------------------------------------
-    
+
     public C2DMReceiver()
     {
         super(sC2DMSender);
     }
-    
+
     //-------------------------------------------------------------------------
 
     @Override
@@ -122,7 +131,7 @@ public class C2DMReceiver extends C2DMBaseReceiver
     //-------------------------------------------------------------------------
 
     /**
-     * Register or unregister app with notification server. 
+     * Register or unregister app with notification server.
      * /
     public static void registerApp(Context context, boolean registerWithServer)
     {
@@ -139,6 +148,6 @@ public class C2DMReceiver extends C2DMBaseReceiver
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
-    
+
 }
 */

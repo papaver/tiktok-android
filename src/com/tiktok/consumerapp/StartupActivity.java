@@ -10,8 +10,10 @@ package com.tiktok.consumerapp;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 //-----------------------------------------------------------------------------
@@ -38,50 +40,6 @@ public class StartupActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.startup);
-
-        /*
-        // [moiz] example of grabbing image container
-        //ImageView imageView = (ImageView)findViewById(R.id.background);
-        //imageView.setImageResource();
-
-        // [moiz] add the startup process here once the final json package
-        //   that will be used is integrated into the sytem
-        //    1) startup location services
-        //    2) register notifications with server
-        //    3) validate guid with server, assign a consumer id to the device
-        //    4) sync coupons? or let the deals activity automatically do that?
-
-        final Context context = this;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-
-                    // just wait for a while
-                    int waited = 50;
-                    while (waited > 0) {
-                        sleep(100);
-                        --waited;
-                    }
-
-                } catch (InterruptedException e) {
-                    // nothing to see here
-
-                } finally {
-
-                    // close this activity, will remove it from the stack
-                    finish();
-
-                    // create an intent to start the main deals activity
-                    Intent dealsActivity = new Intent(context, MainTabActivity.class);
-                    startActivity(dealsActivity);
-                }
-            };
-        };
-
-        // start the thread
-        thread.start();
-        */
     }
 
     //-------------------------------------------------------------------------
@@ -176,7 +134,7 @@ public class StartupActivity extends Activity
     private void runStartupProcess()
     {
         // set user id for analytics
-        Utilities utilities = new Utilities(getApplicationContext());
+        Utilities utilities = new Utilities(this);
         Analytics.setUserId(utilities.getDeviceId());
 
         // kick off registration for notifications
@@ -195,30 +153,46 @@ public class StartupActivity extends Activity
     {
         Log.i(kLogTag, "registering device id...");
 
-        TikTokApi api       = new TikTokApi(getApplicationContext());
-        Utilities utilities = new Utilities(getApplicationContext());
-
         // generate a new device id
-        String deviceId = utilities.getDeviceId();
-        if (deviceId == null) {
-            deviceId = Device.generateGUID();
-        }
+        final Utilities utilities = new Utilities(getApplicationContext());
+        String currentId          = utilities.getDeviceId();
+        final String deviceId     = (currentId == null) ?
+            Device.generateGUID() : currentId;
 
-        // attempt to register the device
-        String consumerId = api.registerDevice(deviceId);
-        if (consumerId != null) {
-            utilities.cacheDeviceId(deviceId);
-            utilities.cacheConsumerId(consumerId);
-            runStartupProcess();
+        // setup the api
+        final Context context = this;
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
 
-        // something went horribly wrong
-        } else {
-            Log.e(kLogTag, "registration failed...");
-            String title   = "Registration Error";
-            String message = "Failed to register with the server. Please " +
-                             "try again later.";
-            Utilities.displaySimpleAlert(this, title, message);
-        }
+            public void onSuccess(Object data) {
+                String consumerId = (String)data;
+
+                // cache info and start registration process
+                if (consumerId != null) {
+                    utilities.cacheDeviceId(deviceId);
+                    utilities.cacheConsumerId(consumerId);
+                    runStartupProcess();
+
+                // something went horribly wrong
+                } else {
+                    Log.e(kLogTag, "registration failed...");
+                    String title   = "Registration Error";
+                    String message = "Failed to register with the server. Please " +
+                                     "try again later.";
+                    Utilities.displaySimpleAlert(context, title, message);
+                }
+            }
+
+            public void onError(Throwable error) {
+                Log.e(kLogTag, "registration failed...", error);
+                String title   = "Registration Error";
+                String message = "Failed to register with the server. Please " +
+                                "try again later.";
+                Utilities.displaySimpleAlert(context, title, message);
+            }
+        });
+
+        // run the query
+        api.registerDevice(deviceId);
     }
 
     //-------------------------------------------------------------------------
@@ -227,25 +201,37 @@ public class StartupActivity extends Activity
     {
         Log.i(kLogTag, "validating registration with server...");
 
-        TikTokApi api       = new TikTokApi(getApplicationContext());
-        Utilities utilities = new Utilities(getApplicationContext());
+        // setup the api
+        final Utilities utilities = new Utilities(getApplicationContext());
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
 
-        // allow the startup process to continue
-        boolean isRegistered = api.validateRegistration();
-        if (isRegistered) {
-            runStartupProcess();
+            public void onSuccess(Object data) {
+                Boolean isRegistered = (Boolean)data;
 
-        // re-run the registration process if server no longer registered
-        } else {
+                // something was wrong with the registeration
+                if (isRegistered == null || !isRegistered) {
 
-            // clean up the existing cached data
-            utilities.clearConsumerId();
-            utilities.clearDeviceId();
+                    // clean up the existing cached data
+                    utilities.clearConsumerId();
+                    utilities.clearDeviceId();
 
-            // re-register with the server
-            purgeData();
-            registerDevice();
-        }
+                    // re-register with the server
+                    purgeData();
+                    registerDevice();
+
+                // looks like we are already registered
+                } else {
+                    runStartupProcess();
+                }
+            }
+
+            public void onError(Throwable error) {
+                validateRegistration();
+            }
+        });
+
+        // run the query
+        api.validateRegistration();
     }
 
     //-------------------------------------------------------------------------

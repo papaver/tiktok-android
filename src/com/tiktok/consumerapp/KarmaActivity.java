@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 //import android.util.Log;
@@ -56,25 +57,7 @@ public class KarmaActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-
-        // grab the point count from the server
-        TikTokApi api               = new TikTokApi(this);
-        Map<String, Integer> points = api.syncKarmaPoints();
-
-        // update the points
-        Iterator<Map.Entry<String, Integer>> iterator = points.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Integer> pair = iterator.next();
-
-            // find the id of the text view
-            String name = String.format("%s_points", pair.getKey());
-            int id = getResources().getIdentifier(name, "id", getPackageName());
-            if (id == 0) continue;
-
-            // update the text view
-            final TextView textView = (TextView)findViewById(id);
-            textView.setText(pair.getValue().toString());
-        }
+        syncPoints();
     }
 
     //-------------------------------------------------------------------------
@@ -118,6 +101,51 @@ public class KarmaActivity extends Activity
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
         startActivity(intent);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void syncPoints()
+    {
+        // grab the point count from the server
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+            @SuppressWarnings("unchecked")
+            public void onSuccess(Object data) {
+                Map<String, Integer> points = (Map<String, Integer>)data;
+                if (points != null) {
+                    updatePoints(points);
+                }
+            }
+            public void onError(Throwable error) {
+            }
+        });
+
+        // run query
+        api.syncKarmaPoints();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void updatePoints(Map<String, Integer> points)
+    {
+        // reset the view, probably not the best way but this view is light
+        //  and i don't feel like messing with this shit right now...
+        setContentView(R.layout.karma);
+
+        // update the points
+        Iterator<Map.Entry<String, Integer>> iterator = points.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Integer> pair = iterator.next();
+
+            // find the id of the text view
+            String name = String.format("%s_points", pair.getKey());
+            int id = getResources().getIdentifier(name, "id", getPackageName());
+            if (id == 0) continue;
+
+            // update the text view
+            TextView textView = (TextView)findViewById(id);
+            textView.setText(pair.getValue().toString());
+        }
     }
 }
 

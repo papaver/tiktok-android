@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -209,7 +210,7 @@ public final class FacebookManager
 
     public void syncToken(Context context)
     {
-        TikTokApi api                = new TikTokApi(context);
+        TikTokApi api                = new TikTokApi(context, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("fb", mFacebook.getAccessToken());
         api.updateSettings(settings);

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -176,10 +177,10 @@ public class CouponActivity extends MapActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == kIntentEmail) {
-            TikTokApi api = new TikTokApi(this);
+            TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kEmail);
         } else if (requestCode == kIntentSMS) {
-            TikTokApi api = new TikTokApi(this);
+            TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kSMS);
         }
     }
@@ -240,38 +241,58 @@ public class CouponActivity extends MapActivity
 
     public void onClickRedeem(View view)
     {
-        Log.i(kLogTag, "Redeemed");
+        // setup progress dialog
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Redeeming...");
+        progressDialog.show();
 
         // redeem the coupon with the server
-        TikTokApi api = new TikTokApi(this);
-        TikTokApiResponse response =
-            api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kRedeem);
+        final Context context = this;
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
 
-        // validate the registration status
-        if (response.getStatus().equals(TikTokApi.kTikTokApiStatusOkay)) {
+            public void onSuccess(Object data) {
+                TikTokApiResponse response = (TikTokApiResponse)data;
 
-            // redeem the coupon
-            mCoupon.redeem();
-            TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
-            adapter.open();
-            adapter.updateCoupon(mCoupon);
+                // cancel dialog
+                progressDialog.cancel();
 
-            // update the banner
-            updateBanner(CouponState.kActive);
+                // validate the registration status
+                String status = response.getStatus();
+                if (status.equals(TikTokApi.kTikTokApiStatusOkay)) {
 
-            // cleanup
-            adapter.close();
+                    // redeem the coupon
+                    mCoupon.redeem();
+                    TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
+                    adapter.open();
+                    adapter.updateCoupon(mCoupon);
+                    adapter.close();
 
-        // alert user of a problem
-        } else if (response.getStatus().equals(TikTokApi.kTikTokApiStatusForbidden)) {
-            String title   = "Redeem";
-            String message = response.getError();
-            Utilities.displaySimpleAlert(this, title, message);
+                    // update the banner
+                    updateBanner(CouponState.kActive);
 
-            // [moiz] sync coupons to make sure status' are up to date
-        }
+                // alert user of a problem
+                } else if (status.equals(TikTokApi.kTikTokApiStatusForbidden)) {
+                    String title   = "Redeem";
+                    String message = response.getError();
+                    Utilities.displaySimpleAlert(context, title, message);
+                }
+            }
 
-        // [moiz] should be able to check for network errors
+            public void onError(Throwable error) {
+                Log.e(kLogTag, "registration failed...", error);
+
+                // cancel dialog
+                progressDialog.cancel();
+
+                // alert user of a problem
+                String title   = "Redeem";
+                String message = "Failed to redeem deal. Try again.";
+                Utilities.displaySimpleAlert(context, title, message);
+            }
+        });
+
+        // run the query
+        api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kRedeem);
     }
 
     //-------------------------------------------------------------------------
@@ -561,7 +582,7 @@ public class CouponActivity extends MapActivity
                 if (values.containsKey("post_id")) {
 
                     // let server know of share
-                    TikTokApi api = new TikTokApi(context);
+                    TikTokApi api = new TikTokApi(context, new Handler(), null);
                     api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kFacebook);
 
                     // alert user of successful post

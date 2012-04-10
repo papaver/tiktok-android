@@ -8,15 +8,11 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.util.List;
-import java.util.Map;
-
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -51,22 +47,14 @@ public class CouponListActivity extends ListActivity
         startManagingCursor(mCursor);
 
         // create a new array adapter and set it to display the row
-        final CouponAdapter adapter = new CouponAdapter(this, mCursor);
+        CouponAdapter adapter = new CouponAdapter(this, mCursor);
 
         // update list view to use adapter
         final ListView listView = getListView();
         listView.setAdapter(adapter);
 
-        // run sync coupons task
-        new SyncCouponsTask(this, new SyncTaskCompletionHandler() {
-            public void onCursorUpdate(Cursor cursor) {
-                adapter.changeCursor(cursor);
-                if (mCursor != null) {
-                    mCursor.close();
-                    mCursor = cursor;
-                }
-            }
-        }).execute();
+        // sync coupons
+        syncCoupons(adapter);
     }
 
     //-------------------------------------------------------------------------
@@ -148,145 +136,46 @@ public class CouponListActivity extends ListActivity
     }
 
     //-------------------------------------------------------------------------
-    // fields
-    //-------------------------------------------------------------------------
 
-    private TikTokDatabaseAdapter mDatabaseAdapter;
-    private Cursor                mCursor;
-
-}
-
-//-----------------------------------------------------------------------------
-// SyncCouponsTask
-//-----------------------------------------------------------------------------
-
-class SyncCouponsTask extends AsyncTask<Void, Void, Cursor>
-{
-
-    static final String kLogTag = "SyncCouponsTask";
-
-    //-------------------------------------------------------------------------
-
-    public SyncCouponsTask(Context context,
-                           SyncTaskCompletionHandler handler)
+    private void syncCoupons(final CouponAdapter adapter)
     {
-        mHandler         = handler;
-        mContext         = context;
-        mDatabaseAdapter = new TikTokDatabaseAdapter(context);
-        mDatabaseAdapter.open();
-    }
+        final Handler handler = new Handler();
+        TikTokApi api = new TikTokApi(this, handler, new TikTokApi.CompletionHandler() {
 
-    //-------------------------------------------------------------------------
+            public void onSuccess(Object data) {
 
-    @Override
-    public void onPreExecute()
-    {
-    }
+                // run database query in another thread
+                new Thread(new Runnable() {
+                    public void run() {
+                        final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
 
-    //-------------------------------------------------------------------------
-
-    public Cursor doInBackground(Void... params)
-    {
-        // create and instance of the tiktok api and grab the available coupons
-        TikTokApi api = new TikTokApi(mContext);
-        Map<TikTokApi.CouponKey, Object> data = api.syncActiveCoupons();
-
-        // process new coupons
-        Coupon[] coupons = (Coupon[])data.get(TikTokApi.CouponKey.kCoupons);
-        processCoupons(coupons);
-
-        // kill coupons
-        Long[] killed = (Long[])data.get(TikTokApi.CouponKey.kKilled);
-        processKilled(killed);
-
-        // update sold out coupons
-        Long[] soldOut = (Long[])data.get(TikTokApi.CouponKey.kSoldOut);
-        processSoldOut(soldOut);
-
-        // update the cursor in the adapter
-        return mDatabaseAdapter.fetchAllCoupons();
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void processCoupons(Coupon[] coupons)
-    {
-        // add only new coupons to the database
-        List<Long> couponIds   = mDatabaseAdapter.fetchAllCouponIds();
-        List<Long> merchantIds = mDatabaseAdapter.fetchAllMerchantIds();
-        for (final Coupon coupon : coupons) {
-
-            if (!merchantIds.contains(coupon.merchant().id())) {
-                mDatabaseAdapter.createMerchant(coupon.merchant());
-                Log.i(kLogTag, String.format(
-                    "Added merchant to db: %s", coupon.merchant().name()));
+                        // update the ui in the ui thread
+                        handler.post(new Runnable() {
+                            public void run() {
+                                adapter.changeCursor(cursor);
+                                if (mCursor != null) {
+                                    mCursor.close();
+                                    mCursor = cursor;
+                                }
+                            }
+                        });
+                    }
+                }).start();
             }
 
-            if (!couponIds.contains(coupon.id())) {
-                Log.w(getClass().getSimpleName(), coupon.toString());
-                mDatabaseAdapter.createCoupon(coupon);
-                Log.i(kLogTag, String.format(
-                    "Added coupon to db: %s", coupon.title()));
+            public void onError(Throwable error) {
             }
-        }
-    }
+        });
 
-    //-------------------------------------------------------------------------
-
-    private void processKilled(Long[] killed)
-    {
-        List<Long> couponIds = mDatabaseAdapter.fetchAllCouponIds();
-        for (final Long id : killed) {
-            if (couponIds.contains(id)) {
-                Log.i(kLogTag, String.format("Killed deal id: %d", id));
-                mDatabaseAdapter.deleteCoupon(id);
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void processSoldOut(Long[] soldOut)
-    {
-        List<Long> couponIds = mDatabaseAdapter.fetchAllCouponIds();
-        for (final Long id : soldOut) {
-            if (couponIds.contains(id)) {
-                Coupon coupon = mDatabaseAdapter.fetchCoupon(id);
-                if (!coupon.isSoldOut()) {
-                    coupon.sellOut();
-                    Log.i(kLogTag, String.format(
-                        "SoldOut deal: %d / %s", coupon.id(), coupon.title()));
-                    boolean result = mDatabaseAdapter.updateCoupon(coupon);
-                    Log.i(kLogTag, String.format("Update result: %s", result ? "yes" : "no"));
-                }
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-
-    @Override
-    public void onPostExecute(Cursor cursor)
-    {
-        if (mHandler != null) mHandler.onCursorUpdate(cursor);
-        mDatabaseAdapter.close();
+        api.syncActiveCoupons();
     }
 
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
-    private SyncTaskCompletionHandler mHandler;
-    private Context                   mContext;
-    private TikTokDatabaseAdapter     mDatabaseAdapter;
+    private TikTokDatabaseAdapter mDatabaseAdapter;
+    private Cursor                mCursor;
 }
 
-//-----------------------------------------------------------------------------
-// SyncCompletionHandler
-//-----------------------------------------------------------------------------
-
-interface SyncTaskCompletionHandler
-{
-    public abstract void onCursorUpdate(Cursor cursor);
-}
 
