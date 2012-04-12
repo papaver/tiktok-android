@@ -24,5 +24,12 @@
     <string name="facebook_setup">Facebook Setup</string>
     <string name="facebook_not_setup">You are not currently connected to Facebook.  Connect before posting.</string>
     <string name="facebook_deal_post">Your deal has been posted!</string>
+    <string name="facebook_deal_post_fail">Failed to post deal!</string>
+
+    <string name="twitter">Twitter</string>
+    <string name="twitter_setup">Twitter Setup</string>
+    <string name="twitter_not_setup">You are not currently connected to Twitter.  Connect before tweeting.</string>
+    <string name="twitter_deal_post">Your deal has been tweeted!</string>
+    <string name="twitter_deal_post_fail">Failed to tweet deal. Try again.</string>
 
 </resources>

@@ -23,6 +23,8 @@ public final class Constants
     public static final String kFlurryApiKey            = "J88FCCBJXIBWMRE55UN6";
     public static final String kFlurryApiDevKey         = "DYVTRQV7BHTXEEZHBXA2";
     public static final String kFacebookApiKey          = "142431149201814";
+    public static final String kTwitterApiKey           = "Y3G1Ot2CFt36LBMfXEtg";
+    public static final String kTwitterApiSecret        = "ZCru4WB19sAUSSuGGifYDSehJfrLLK12VTJENl6caI";
 
     //-------------------------------------------------------------------------
     // constructor

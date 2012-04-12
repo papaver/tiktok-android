@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -200,7 +201,12 @@ public class CouponActivity extends MapActivity
 
     public void onClickTwitter(View view)
     {
-        Log.i(kLogTag, "Share Twitter");
+        TwitterManager manager = TwitterManager.getInstance(this);
+        if (manager.twitter().isSessionValid()) {
+            postTwitter();
+        } else {
+            setupTwitter();
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -518,6 +524,95 @@ public class CouponActivity extends MapActivity
     // share functions
     //-------------------------------------------------------------------------
 
+    private void setupTwitter()
+    {
+        String title   = getString(R.string.twitter_setup);
+        String message = getString(R.string.twitter_not_setup);
+
+        // ask user to log into facebook before posting
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {}
+            });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Twitter",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    authorizeAndPostTwitter();
+                }
+            });
+
+        // display alert
+        alertDialog.show();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void authorizeAndPostTwitter()
+    {
+        TwitterManager manager = TwitterManager.getInstance(this);
+        manager.authorize(this, new TwitterManager.CompletionHandler() {
+            public void onSuccess(Object object) {
+                postTwitter();
+            }
+            public void onError(Throwable error) {}
+            public void onCancel() {}
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void postTwitter()
+    {
+        // setup tweet info
+        String city      = mCoupon.merchant().getCity().toLowerCase();
+        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String deal      = String.format("@tiktok #%s - I just scored a #deal... %s at %s! " +
+                                         "FREE deals at www.tiktok.com!",
+                                         city, formatted, mCoupon.merchant().name());
+
+        // make sure message is tweetable
+        if (deal.length() > 130) {
+            deal = deal.substring(0, 126) + "...";
+        }
+
+        // display progress
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Tweeting...");
+        progressDialog.show();
+
+        // tweet deal
+        final Context context = this;
+        final Handler handler = new Handler();
+        TwitterManager manager = TwitterManager.getInstance(this);
+        manager.tweet(deal, handler, new TwitterManager.CompletionHandler() {
+
+            public void onSuccess(Object object) {
+                progressDialog.cancel();
+
+                // let server know of share
+                TikTokApi api = new TikTokApi(context, handler, null);
+                api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kTwitter);
+
+                // alert user of successful post
+                String message = getString(R.string.twitter_deal_post);
+                Toast.makeText(context, message, 1000).show();
+            }
+
+            public void onError(Throwable error) {
+                String message = getString(R.string.twitter_deal_post_fail);
+                Toast.makeText(context, message, 1000).show();
+                progressDialog.cancel();
+            }
+
+            public void onCancel() {}
+        });
+    }
+
+    //-------------------------------------------------------------------------
+
     private void setupFacebook()
     {
         String title   = getString(R.string.facebook_setup);
@@ -586,12 +681,14 @@ public class CouponActivity extends MapActivity
                     api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kFacebook);
 
                     // alert user of successful post
-                    String title   = getString(R.string.facebook);
                     String message = getString(R.string.facebook_deal_post);
-                    Utilities.displaySimpleAlert(context, title, message);
+                    Toast.makeText(context, message, 1000).show();
                 }
             }
-            public void onError(Throwable error) {}
+            public void onError(Throwable error) {
+                String message = getString(R.string.facebook_deal_post_fail);
+                Toast.makeText(context, message, 1000).show();
+            }
             public void onCancel() {}
         });
     }
