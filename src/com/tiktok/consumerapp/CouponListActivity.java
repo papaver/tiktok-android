@@ -8,14 +8,15 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,16 +24,22 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.tiktok.consumerapp.utilities.ShareUtilities;
+
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
 public class CouponListActivity extends ListActivity
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
     static final String kLogTag = "CouponListActivity";
 
     //-------------------------------------------------------------------------
-    // DBObserver
+    // activity
     //-------------------------------------------------------------------------
 
     /**
@@ -142,6 +149,7 @@ public class CouponListActivity extends ListActivity
             case R.id.promo:
                 break;
             case R.id.share:
+                shareApp();
                 break;
         }
         return true;
@@ -164,10 +172,10 @@ public class CouponListActivity extends ListActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         super.onActivityResult(requestCode, resultCode, intent);
-
-        Log.i(kLogTag, String.format("Result of intent: %d", resultCode));
     }
 
+    //-------------------------------------------------------------------------
+    // methods
     //-------------------------------------------------------------------------
 
     private void syncCoupons(final CouponAdapter adapter, boolean withDialog)
@@ -219,6 +227,133 @@ public class CouponListActivity extends ListActivity
         });
 
         api.syncActiveCoupons();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void shareApp()
+    {
+        final String[] items = { "Twitter", "Facebook", "SMS", "Email" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Share TikTok With Your Friends!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                String choice = items[item];
+                if (choice.equals("Twitter")) {
+                    shareTwitter();
+                } else if (choice.equals("Facebook")) {
+                    shareFacebook();
+                } else if (choice.equals("SMS")) {
+                    shareSMS();
+                } else if (choice.equals("Email")) {
+                    shareEmail();
+                }
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void shareTwitter()
+    {
+        // setup share message
+        Utilities utilities = new Utilities(this);
+        String message = String.format("@tiktok - Checkout this new daily deals app: " +
+                                       "www.tiktok.com/download?ref=%s",
+                                       utilities.getConsumerId());
+
+        // setup share callback
+        final ListActivity activity = this;
+        TwitterManager.CompletionHandler callback = new TwitterManager.CompletionHandler() {
+
+            public void onSuccess(Object object) {
+                String message = getString(R.string.twitter_app_post);
+                Toast.makeText(activity, message, 1000).show();
+            }
+
+            public void onError(Throwable error) {
+                String message = getString(R.string.twitter_app_post_fail);
+                Toast.makeText(activity, message, 1000).show();
+            }
+
+            public void onCancel() {}
+        };
+
+        // tweet
+        ShareUtilities.shareTwitter(
+            new ShareUtilities.TwitterShare(this, message, new Handler(), callback));
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void shareFacebook()
+    {
+        // setup share post
+        Utilities utilities = new Utilities(this);
+        String icon         = "https://www.tiktok.com/images/logo.png";
+        String link         = String.format("http://www.tiktok.com/download?ref=%s",
+                                utilities.getConsumerId());
+        String details      = "Checkout this new daily deals app TikTok!";
+
+        // pack data into bundle
+        Bundle params  = new Bundle();
+        params.putString("link",        link);
+        params.putString("name",        "TikTok");
+        params.putString("picture",     icon);
+        params.putString("caption",     link);
+        params.putString("description", details);
+
+        // setup share callback
+        final ListActivity activity = this;
+        FacebookManager.CompletionHandler callback = new FacebookManager.CompletionHandler() {
+
+            public void onSuccess(Bundle values) {
+                String message = getString(R.string.facebook_app_post);
+                Toast.makeText(activity, message, 1000).show();
+            }
+
+            public void onError(Throwable error) {
+                String message = getString(R.string.facebook_app_post_fail);
+                Toast.makeText(activity, message, 1000).show();
+            }
+
+            public void onCancel() {}
+        };
+
+        // post
+        ShareUtilities.shareFacebook(
+            new ShareUtilities.FacebookShare(this, params, new Handler(), callback));
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void shareSMS()
+    {
+        Utilities utilities = new Utilities(this);
+        String message      = String.format("TikTok: Checkout this awesome new daily " +
+                                            "deal app: www.tiktok.com/download?ref=%s",
+                                            utilities.getConsumerId());
+
+        // present sms controller
+        ShareUtilities.shareSMS(this, 0, message);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void shareEmail()
+    {
+        Utilities utilities = new Utilities(this);
+        String subject      = "TikTok: Checkout this amazing daily deal app!";
+        String body         = String.format("<h3>TikTok</h3>" +
+                                            "<a href='http://www.tiktok.com/download?ref=%s'>" +
+                                            "Get your deal on!</a>",
+                                            utilities.getConsumerId());
+
+        // present email controller
+        ShareUtilities.shareEmail(this, 0, subject, body);
     }
 
     //-------------------------------------------------------------------------

@@ -17,10 +17,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -39,6 +37,7 @@ import com.google.android.maps.OverlayItem;
 
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
 import com.tiktok.consumerapp.map.ItemizedOverlay;
+import com.tiktok.consumerapp.utilities.ShareUtilities;
 import com.tiktok.consumerapp.utilities.TextUtilities;
 import com.tiktok.consumerapp.utilities.UIUtilities;
 
@@ -201,24 +200,14 @@ public class CouponActivity extends MapActivity
 
     public void onClickTwitter(View view)
     {
-        TwitterManager manager = TwitterManager.getInstance(this);
-        if (manager.twitter().isSessionValid()) {
-            postTwitter();
-        } else {
-            setupTwitter();
-        }
+        shareTwitter();
     }
 
     //-------------------------------------------------------------------------
 
     public void onClickFacebook(View view)
     {
-        FacebookManager manager = FacebookManager.getInstance(this);
-        if (manager.facebook().isSessionValid()) {
-            postFacebook();
-        } else {
-            setupFacebook();
-        }
+        shareFacebook();
     }
 
     //-------------------------------------------------------------------------
@@ -229,14 +218,14 @@ public class CouponActivity extends MapActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Share Deal");
         builder.setItems(items, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    String choice = items[item];
-                    if (choice.equals("SMS")) {
-                        shareSMS();
-                    } else if (choice.equals("Email")) {
-                        shareEmail();
-                    }
+            public void onClick(DialogInterface dialog, int item) {
+                String choice = items[item];
+                if (choice.equals("SMS")) {
+                    shareSMS();
+                } else if (choice.equals("Email")) {
+                    shareEmail();
                 }
+            }
         });
 
         AlertDialog alert = builder.create();
@@ -524,136 +513,46 @@ public class CouponActivity extends MapActivity
     // share functions
     //-------------------------------------------------------------------------
 
-    private void setupTwitter()
+    private void shareTwitter()
     {
-        String title   = getString(R.string.twitter_setup);
-        String message = getString(R.string.twitter_not_setup);
-
-        // ask user to log into facebook before posting
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Twitter",
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    authorizeAndPostTwitter();
-                }
-            });
-
-        // display alert
-        alertDialog.show();
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void authorizeAndPostTwitter()
-    {
-        TwitterManager manager = TwitterManager.getInstance(this);
-        manager.authorize(this, new TwitterManager.CompletionHandler() {
-            public void onSuccess(Object object) {
-                postTwitter();
-            }
-            public void onError(Throwable error) {}
-            public void onCancel() {}
-        });
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void postTwitter()
-    {
-        // setup tweet info
+        // setup share message
         String city      = mCoupon.merchant().getCity().toLowerCase();
         String formatted = TextUtilities.capitalizeWords(mCoupon.title());
         String deal      = String.format("@tiktok #%s - I just scored a #deal... %s at %s! " +
                                          "FREE deals at www.tiktok.com!",
                                          city, formatted, mCoupon.merchant().name());
 
-        // make sure message is tweetable
-        if (deal.length() > 130) {
-            deal = deal.substring(0, 126) + "...";
-        }
-
-        // display progress
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Tweeting...");
-        progressDialog.show();
-
-        // tweet deal
-        final Context context = this;
-        final Handler handler = new Handler();
-        TwitterManager manager = TwitterManager.getInstance(this);
-        manager.tweet(deal, handler, new TwitterManager.CompletionHandler() {
+        // setup share callback
+        final Handler handler      = new Handler();
+        final MapActivity activity = this;
+        TwitterManager.CompletionHandler callback = new TwitterManager.CompletionHandler() {
 
             public void onSuccess(Object object) {
-                progressDialog.cancel();
+                String message = getString(R.string.twitter_deal_post);
+                Toast.makeText(activity, message, 1000).show();
 
                 // let server know of share
-                TikTokApi api = new TikTokApi(context, handler, null);
+                TikTokApi api = new TikTokApi(activity, handler, null);
                 api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kTwitter);
-
-                // alert user of successful post
-                String message = getString(R.string.twitter_deal_post);
-                Toast.makeText(context, message, 1000).show();
             }
 
             public void onError(Throwable error) {
+                Log.e(kLogTag, "Failed to tweet deal", error);
                 String message = getString(R.string.twitter_deal_post_fail);
-                Toast.makeText(context, message, 1000).show();
-                progressDialog.cancel();
+                Toast.makeText(activity, message, 1000).show();
             }
 
             public void onCancel() {}
-        });
+        };
+
+        // tweet
+        ShareUtilities.shareTwitter(
+            new ShareUtilities.TwitterShare(this, deal, handler, callback));
     }
 
     //-------------------------------------------------------------------------
 
-    private void setupFacebook()
-    {
-        String title   = getString(R.string.facebook_setup);
-        String message = getString(R.string.facebook_not_setup);
-
-        // ask user to log into facebook before posting
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {}
-            });
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Facebook",
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    authorizeAndPostFacebook();
-                }
-            });
-
-        // display alert
-        alertDialog.show();
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void authorizeAndPostFacebook()
-    {
-        FacebookManager manager = FacebookManager.getInstance(this);
-        manager.authorize(this, new FacebookManager.CompletionHandler() {
-            public void onSuccess(Bundle values) {
-                postFacebook();
-            }
-            public void onError(Throwable error) {}
-            public void onCancel() {}
-        });
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void postFacebook()
+    private void shareFacebook()
     {
         // format the post description
         String formatted = TextUtilities.capitalizeWords(mCoupon.title());
@@ -669,28 +568,45 @@ public class CouponActivity extends MapActivity
         params.putString("caption",     "www.tiktok.com");
         params.putString("description", deal);
 
-        // pop open dialog to allow user to confimr post
-        final Context context   = this;
-        FacebookManager manager = FacebookManager.getInstance(this);
-        manager.postToWall(this, params, new FacebookManager.CompletionHandler() {
+        // setup share callback
+        final Handler handler      = new Handler();
+        final MapActivity activity = this;
+        FacebookManager.CompletionHandler callback = new FacebookManager.CompletionHandler() {
+
             public void onSuccess(Bundle values) {
-                if (values.containsKey("post_id")) {
+                String message = getString(R.string.facebook_deal_post);
+                Toast.makeText(activity, message, 1000).show();
 
-                    // let server know of share
-                    TikTokApi api = new TikTokApi(context, new Handler(), null);
-                    api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kFacebook);
+                // let server know of share
+                TikTokApi api = new TikTokApi(activity, handler, null);
+                api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kFacebook);
+           }
 
-                    // alert user of successful post
-                    String message = getString(R.string.facebook_deal_post);
-                    Toast.makeText(context, message, 1000).show();
-                }
-            }
             public void onError(Throwable error) {
+                Log.e(kLogTag, "Failed to post deal.", error);
                 String message = getString(R.string.facebook_deal_post_fail);
-                Toast.makeText(context, message, 1000).show();
+                Toast.makeText(activity, message, 1000).show();
             }
+
             public void onCancel() {}
-        });
+        };
+
+        // post
+        ShareUtilities.shareFacebook(
+            new ShareUtilities.FacebookShare(this, params, handler, callback));
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void shareSMS()
+    {
+        String merchant  = mCoupon.merchant().name();
+        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String deal      = String.format("%s at %s", formatted, merchant);
+        String body      = String.format("TikTok: %s! www.tiktok.com", deal);
+
+        // present sms controller
+        ShareUtilities.shareSMS(this, kIntentSMS, body);
     }
 
     //-------------------------------------------------------------------------
@@ -708,28 +624,7 @@ public class CouponActivity extends MapActivity
                                          formatted, merchant);
 
         // present email controller
-        Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("email:"));
-        intent.setType("text/html");
-        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        intent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(body));
-        startActivityForResult(intent, kIntentEmail);
-    }
-
-    //-------------------------------------------------------------------------
-
-    public void shareSMS()
-    {
-        String merchant  = mCoupon.merchant().name();
-        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
-        String deal      = String.format("%s at %s", formatted, merchant);
-        String body      = String.format("TikTok: %s! www.tiktok.com", deal);
-
-        // present sms controller
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("smsto:"));
-        intent.putExtra("sms_body", body);
-        intent.putExtra("compose_mode", true);
-        intent.setType("vnd.android-dir/mms-sms");
-        startActivityForResult(intent, kIntentSMS);
+        ShareUtilities.shareEmail(this, kIntentEmail, subject, body);
     }
 
     //-------------------------------------------------------------------------

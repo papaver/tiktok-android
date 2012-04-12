@@ -32,17 +32,6 @@
             </intent-filter>
         </activity>
 
-        <!-- TikTok Test List Activity -->
-        <activity
-            android:label="@string/test_app_name"
-            android:name=".TikTokActivity" />
-
-        <!-- TikTok Test Map Activity -->
-        <activity
-            android:label="@string/test_app_map_name"
-            android:name=".TikTokMapActivity" />
-
-
         <!-- Main Tab Activity -->
         <activity
             android:name=".MainTabActivity"
