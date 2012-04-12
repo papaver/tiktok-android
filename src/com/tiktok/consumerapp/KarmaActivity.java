@@ -16,6 +16,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 //import android.util.Log;
@@ -93,6 +96,29 @@ public class KarmaActivity extends Activity
         super.onDestroy();
     }
 
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.karma, menu);
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.refresh) {
+            syncPoints();
+        }
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    // helper functions
     //-------------------------------------------------------------------------
 
     public void onClickCopy(View view)
