@@ -20,6 +20,8 @@
 
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
 
+    <string name="coupon_sync_fail">Failed to sync deals. Try again.</string>
+
     <string name="facebook">Facebook</string>
     <string name="facebook_setup">Facebook Setup</string>
     <string name="facebook_not_setup">You are not currently connected to Facebook.  Connect before posting.</string>

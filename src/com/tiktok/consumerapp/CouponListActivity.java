@@ -9,13 +9,19 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -47,14 +53,14 @@ public class CouponListActivity extends ListActivity
         startManagingCursor(mCursor);
 
         // create a new array adapter and set it to display the row
-        CouponAdapter adapter = new CouponAdapter(this, mCursor);
+        mCouponAdapter = new CouponAdapter(this, mCursor);
 
         // update list view to use adapter
         final ListView listView = getListView();
-        listView.setAdapter(adapter);
+        listView.setAdapter(mCouponAdapter);
 
         // sync coupons
-        syncCoupons(adapter);
+        syncCoupons(mCouponAdapter, false);
     }
 
     //-------------------------------------------------------------------------
@@ -117,6 +123,33 @@ public class CouponListActivity extends ListActivity
     //-------------------------------------------------------------------------
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.coupon_list, menu);
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                syncCoupons(mCouponAdapter, true);
+                break;
+            case R.id.promo:
+                break;
+            case R.id.share:
+                break;
+        }
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
     protected void onListItemClick(ListView listView, View view, int position, long id)
     {
         super.onListItemClick(listView, view, position, id);
@@ -137,8 +170,16 @@ public class CouponListActivity extends ListActivity
 
     //-------------------------------------------------------------------------
 
-    private void syncCoupons(final CouponAdapter adapter)
+    private void syncCoupons(final CouponAdapter adapter, boolean withDialog)
     {
+        // setup progress dialog
+        final ProgressDialog progressDialog = withDialog ? new ProgressDialog(this) : null;
+        if (progressDialog != null) {
+            progressDialog.setMessage("Syncing Deals...");
+            progressDialog.show();
+        }
+
+        final Context context = this;
         final Handler handler = new Handler();
         TikTokApi api = new TikTokApi(this, handler, new TikTokApi.CompletionHandler() {
 
@@ -152,10 +193,17 @@ public class CouponListActivity extends ListActivity
                         // update the ui in the ui thread
                         handler.post(new Runnable() {
                             public void run() {
+
+                                // update listview
                                 adapter.changeCursor(cursor);
                                 if (mCursor != null) {
                                     mCursor.close();
                                     mCursor = cursor;
+                                }
+
+                                // close dialog
+                                if (progressDialog != null) {
+                                    progressDialog.cancel();
                                 }
                             }
                         });
@@ -164,6 +212,9 @@ public class CouponListActivity extends ListActivity
             }
 
             public void onError(Throwable error) {
+                if (progressDialog != null) progressDialog.cancel();
+                String message = context.getString(R.string.coupon_sync_fail);
+                Toast.makeText(context, message, 1000).show();
             }
         });
 
@@ -174,8 +225,9 @@ public class CouponListActivity extends ListActivity
     // fields
     //-------------------------------------------------------------------------
 
-    private TikTokDatabaseAdapter mDatabaseAdapter;
     private Cursor                mCursor;
+    private CouponAdapter         mCouponAdapter;
+    private TikTokDatabaseAdapter mDatabaseAdapter;
 }
 
 
