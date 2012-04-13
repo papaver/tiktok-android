@@ -17,12 +17,15 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.EditText;
 
 import com.tiktok.consumerapp.utilities.ShareUtilities;
 
@@ -147,6 +150,7 @@ public class CouponListActivity extends ListActivity
                 syncCoupons(mCouponAdapter, true);
                 break;
             case R.id.promo:
+                redeemPromoCode();
                 break;
             case R.id.share:
                 shareApp();
@@ -357,6 +361,82 @@ public class CouponListActivity extends ListActivity
     }
 
     //-------------------------------------------------------------------------
+
+    private void redeemPromoCode()
+    {
+        // inflate layout
+        LayoutInflater inflator =
+            (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflator.inflate(R.layout.promo, null);
+
+        // create dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Redeem", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                EditText input = (EditText)view.findViewById(R.id.input);
+                validatePromoCode(input.getText().toString());
+            }
+        });
+
+        // show dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void validatePromoCode(String promoCode)
+    {
+        // setup progress dialog
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Redeeming...");
+        progressDialog.show();
+
+        // redeem the coupon with the server
+        final Context context = this;
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+
+            public void onSuccess(Object data) {
+                TikTokApiResponse response = (TikTokApiResponse)data;
+
+                // cancel dialog
+                progressDialog.cancel();
+
+                // verify promo code succeeded
+                String message = null;
+                String status  = response.getStatus();
+                if (status.equals(TikTokApi.kTikTokApiStatusOkay)) {
+                    message = getString(R.string.promo_success);
+                    syncCoupons(mCouponAdapter, false);
+                } else if (status.equals(TikTokApi.kTikTokApiStatusForbidden)) {
+                    message = getString(R.string.promo_used);
+                } else if (status.equals(TikTokApi.kTikTokApiStatusNotFound)) {
+                    message = getString(R.string.promo_invalid);
+                }
+
+                // show message
+                Toast.makeText(context, message, 3000).show();
+            }
+
+            public void onError(Throwable error) {
+                Log.e(kLogTag, "promo code redemption failed...", error);
+
+                // cancel dialog
+                progressDialog.cancel();
+
+                // alert user of a problem
+                String message = getString(R.string.promo_fail);
+                Toast.makeText(context, message, 2000).show();
+            }
+        });
+
+        // run the query
+        api.redeemPromotion(promoCode);
+    }
+
+    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
@@ -364,5 +444,4 @@ public class CouponListActivity extends ListActivity
     private CouponAdapter         mCouponAdapter;
     private TikTokDatabaseAdapter mDatabaseAdapter;
 }
-
 

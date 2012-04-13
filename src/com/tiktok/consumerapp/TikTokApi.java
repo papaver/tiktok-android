@@ -53,7 +53,7 @@ public final class TikTokApi
     public static final String kTikTokApiStatusOkay      = "OK";
     public static final String kTikTokApiStatusInvalid   = "INVALID REQUEST";
     public static final String kTikTokApiStatusForbidden = "FORBIDDEN";
-    public static final String kTikTokApiStatusNotFound  = "NOT FOUND";
+    public static final String kTikTokApiStatusNotFound  = "NOT_FOUND";
 
     //-------------------------------------------------------------------------
     // enums
@@ -467,6 +467,26 @@ public final class TikTokApi
                     postSuccess(karma);
                 }
 
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            })).start();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void redeemPromotion(String promoCode)
+    {
+        String url = String.format("%s/consumers/%s/promotions/redeem?code=%s",
+            getApiUrl(), utilities().getConsumerId(), promoCode);
+
+        // query the server
+        HttpGet request = new HttpGet(url);
+        new Thread(new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+                    postSuccess(data);
+                }
                 public void onError(Throwable error) {
                     postError(error);
                 }

@@ -163,8 +163,8 @@
         android:paddingLeft="45dip"
         android:paddingRight="45dip"
         android:paddingBottom="10dip"
-        android:textSize="17sp" 
-        android:onClick="onClickCopy"                
+        android:textSize="17sp"
+        android:onClick="onClickCopy"
         android:clickable="true" />
 
     <ImageView
@@ -173,6 +173,7 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:scaleType="fitCenter"
+        android:onClick="onClickCopy"
         android:layout_width="75dip"
         android:layout_height="wrap_content" />
 

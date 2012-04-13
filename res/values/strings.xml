@@ -39,4 +39,11 @@
     <string name="twitter_app_post">TikTok info has been tweeted!</string>
     <string name="twitter_app_post_fail">Failed to tweet TikTok info. Try again.</string>
 
+    <!-- Promo -->
+    <string name="promo">Promotion Code</string>
+    <string name="promo_success">Congratulations, you have won a FREE deal!</string>
+    <string name="promo_fail">Failed to redeem promotion, try again.</string>
+    <string name="promo_used">Promotion code can only be redeemed once, try another code.</string>
+    <string name="promo_invalid">The promotion code you entered was not recognized, try another code.</string>
+
 </resources>
