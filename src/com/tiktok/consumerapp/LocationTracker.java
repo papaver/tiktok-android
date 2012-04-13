@@ -165,6 +165,11 @@ public class LocationTracker implements LocationListener
             return true;
         }
 
+        // old location is always better than no location
+        if (location == null) {
+            return false;
+        }
+
         // check weather the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
         boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
