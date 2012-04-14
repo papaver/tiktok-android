@@ -16,10 +16,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
@@ -66,6 +69,42 @@ public class CouponActivity extends MapActivity
         kExpired,
         kSoldOut,
         kActive
+    }
+
+    //-------------------------------------------------------------------------
+
+    private class MapOverlay extends ItemizedOverlay
+    {
+
+        public MapOverlay(Drawable defaultMarker, MapView mapView)
+        {
+            super(defaultMarker, mapView);
+
+            // iOS-like  defaults
+            setShowClose(false);
+            setShowDisclosure(true);
+            setSnapToCenter(false);
+
+            setBalloonBottomOffset(defaultMarker.getBounds().height());
+        }
+
+        //-------------------------------------------------------------------------
+
+        public MapOverlay(MapView mapView)
+        {
+            this(mapView.getContext().getResources().getDrawable(R.drawable.pin), mapView);
+        }
+
+        //-------------------------------------------------------------------------
+
+            @Override
+            public boolean onTouchEvent(MotionEvent e, MapView mapView)
+            {
+                if (e.getAction() == MotionEvent.ACTION_UP) {
+                    onClickMap(mapView);
+                }
+                return false;
+            }
     }
 
     //-------------------------------------------------------------------------
@@ -187,6 +226,17 @@ public class CouponActivity extends MapActivity
 
     //-------------------------------------------------------------------------
     // Events
+    //-------------------------------------------------------------------------
+
+    public void onClickMap(View view)
+    {
+        String merchant = mCoupon.merchant().name();
+        String address  = mCoupon.merchant().address().replace(" ", "+");
+        String uri      = String.format("geo:0,0?q=%s+%s", merchant, address);
+        Intent intent   = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        startActivity(intent);
+    }
+
     //-------------------------------------------------------------------------
 
     public void onClickMerchant(View view)
@@ -409,7 +459,7 @@ public class CouponActivity extends MapActivity
 
         // add a pin
         List<Overlay> mapOverlays = mapView.getOverlays();
-        ItemizedOverlay overlay   = new ItemizedOverlay(mapView);
+        MapOverlay overlay        = new MapOverlay(mapView);
         OverlayItem item          = new OverlayItem(location, "", "");
         overlay.addOverlay(item);
         mapOverlays.add(overlay);

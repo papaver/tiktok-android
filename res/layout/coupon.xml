@@ -95,7 +95,7 @@
                             android:layout_width="fill_parent"
                             android:layout_height="match_parent"
                             android:enabled="true"
-                            android:clickable="false"
+                            android:clickable="true"
                             android:focusable="false"
                             android:apiKey="0WSFFLZqlLwmTRDpL6NKSRkXwCk_e2OhADq98Hw" />
 
