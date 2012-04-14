@@ -272,7 +272,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public Date lastUpdate()
     {
         long lastUpdate = mPreferences.getLong(kTagLastUpdate, 0);
-        return new Date(lastUpdate);
+        return lastUpdate == 0 ? null : new Date(lastUpdate);
     }
 
     //-------------------------------------------------------------------------

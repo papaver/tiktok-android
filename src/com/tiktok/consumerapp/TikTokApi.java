@@ -11,6 +11,7 @@ package com.tiktok.consumerapp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -270,11 +271,16 @@ public final class TikTokApi
     /**
      * @return Get the list of available coupons.
      */
-    public void syncActiveCoupons()
+    public void syncActiveCoupons(Date date)
     {
         // get the route to the list of coupons
         String url = String.format("%s/consumers/%s/coupons",
             getApiUrl(), utilities().getConsumerId());
+
+        // add time if needed
+        if (date != null) {
+            url = String.format("%s?min_time=%f", url, (float)date.getTime() / 1000.0f);
+        }
 
         // query the server
         HttpGet request = new HttpGet(url);

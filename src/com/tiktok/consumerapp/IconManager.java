@@ -81,12 +81,13 @@ public class IconManager
             // make sure the directory exists
             if (!mDirectory.exists()) {
                 mDirectory.mkdirs();
+            }
 
-                // add no media tag
-                try {
-                    new File(mDirectory, ".nomedia").createNewFile();
-                } catch (Exception e) {
-                }
+            // add no media tag
+            File noMedia = new File(mDirectory, ".nomedia");
+            try {
+                if (!noMedia.exists()) noMedia.createNewFile();
+            } catch (Exception e) {
             }
         }
 

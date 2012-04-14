@@ -8,6 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Date;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -191,8 +193,9 @@ public class CouponListActivity extends ListActivity
             progressDialog.show();
         }
 
-        final Context context = this;
-        final Handler handler = new Handler();
+        final Context context   = this;
+        final Handler handler   = new Handler();
+        final Settings settings = new Settings(this);
         TikTokApi api = new TikTokApi(this, handler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
@@ -205,6 +208,7 @@ public class CouponListActivity extends ListActivity
                         // update the ui in the ui thread
                         handler.post(new Runnable() {
                             public void run() {
+                                settings.setLastUpdate(new Date());
 
                                 // update listview
                                 adapter.changeCursor(cursor);
@@ -230,7 +234,8 @@ public class CouponListActivity extends ListActivity
             }
         });
 
-        api.syncActiveCoupons();
+        // query server
+        api.syncActiveCoupons(settings.lastUpdate());
     }
 
     //-------------------------------------------------------------------------
