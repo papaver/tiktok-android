@@ -178,6 +178,25 @@ public class CouponListActivity extends ListActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         super.onActivityResult(requestCode, resultCode, intent);
+
+        // update cursor
+        final Handler handler = new Handler();
+        if (resultCode == CouponActivity.kResultRedeemed) {
+            new Thread(new Runnable() {
+                public void run() {
+                    final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
+                    handler.post(new Runnable() {
+                        public void run() {
+                            mCouponAdapter.changeCursor(cursor);
+                            if (mCursor != null) {
+                                mCursor.close();
+                                mCursor = cursor;
+                            }
+                        }
+                    });
+                }
+            }).run();
+        }
     }
 
     //-------------------------------------------------------------------------

@@ -59,6 +59,9 @@ public class CouponActivity extends MapActivity
     private static final int kIntentSMS   = 1;
     private static final int kIntentEmail = 2;
 
+    public static final int kResultDefault  = 1;
+    public static final int kResultRedeemed = 2;
+
     //-------------------------------------------------------------------------
     // enum
     //-------------------------------------------------------------------------
@@ -150,6 +153,9 @@ public class CouponActivity extends MapActivity
         } else {
             expireCoupon(mCoupon, 0);
         }
+
+        // set default result
+        setResult(kResultDefault);
     }
 
     //-------------------------------------------------------------------------
@@ -314,6 +320,9 @@ public class CouponActivity extends MapActivity
 
                     // update the banner
                     updateBanner(CouponState.kActive);
+
+                    // set result
+                    setResult(kResultRedeemed);
 
                 // alert user of a problem
                 } else if (status.equals(TikTokApi.kTikTokApiStatusForbidden)) {
