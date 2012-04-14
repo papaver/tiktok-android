@@ -9,6 +9,7 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -209,9 +210,11 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyMerchant,
         };
 
-        String limit   = "20";
-        String orderBy = String.format("%s DESC", CouponTable.sKeyEndTime);
-        return mDatabase.query(CouponTable.sName, rows, null, null, null, null, orderBy, limit);
+        long threeDays    = 3 * 24 * 60 * 60 * 1000;
+        long threeDaysAgo = (new Date().getTime() - threeDays) / 1000;
+        String orderBy    = String.format("%s DESC", CouponTable.sKeyEndTime);
+        String where      = String.format("%s > %d", CouponTable.sKeyEndTime, threeDaysAgo);
+        return mDatabase.query(CouponTable.sName, rows, where, null, null, null, orderBy);
     }
 
     //-------------------------------------------------------------------------
