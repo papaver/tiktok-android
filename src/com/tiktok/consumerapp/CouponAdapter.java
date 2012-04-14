@@ -79,6 +79,8 @@ public final class CouponAdapter extends CursorAdapter
         final Date startTime        = new Date(startTimeSeconds * 1000);
         final int iconId            = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIconId));
         final String iconUrl        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
+        final boolean isSoldOut     = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsSoldOut)) == 1;
+        final boolean wasRedeemed   = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyWasRedeemed)) == 1;
 
         // query merchant from cursor
         final Merchant merchant = adapter.fetchMerchant(merchantId);
@@ -96,6 +98,16 @@ public final class CouponAdapter extends CursorAdapter
         // update color
         GradientDrawable background = (GradientDrawable)viewHolder.linearLayout.getBackground();
         background.setColor(Coupon.getColor(endTime, startTime));
+
+        // update sash
+        viewHolder.sash.setVisibility(View.VISIBLE);
+        if (wasRedeemed) {
+            viewHolder.sash.setImageResource(R.drawable.redeemedsash);
+        } else if (isSoldOut) {
+            viewHolder.sash.setImageResource(R.drawable.soldoutsash);
+        } else {
+            viewHolder.sash.setVisibility(View.GONE);
+        }
 
         // setup timer
         mHandler.removeCallbacks(viewHolder.timer);
@@ -186,6 +198,7 @@ public final class CouponAdapter extends CursorAdapter
         public LinearLayout linearLayout;
         public ImageView    icon;
         public Runnable     timer;
+        public ImageView    sash;
     }
 
     //-------------------------------------------------------------------------
@@ -202,6 +215,7 @@ public final class CouponAdapter extends CursorAdapter
             holder.expiresTime  = (TextView)view.findViewById(R.id.coupon_expire);
             holder.linearLayout = (LinearLayout)view.findViewById(R.id.coupon_gradient);
             holder.icon         = (ImageView)view.findViewById(R.id.coupon_icon);
+            holder.sash         = (ImageView)view.findViewById(R.id.coupon_sash);
             view.setTag(holder);
         }
 
