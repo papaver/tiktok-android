@@ -8,12 +8,15 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Date;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.TabHost;
-//import android.util.Log;
+import android.util.Log;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -25,10 +28,12 @@ public class MainTabActivity extends TabActivity
     // statics
     //-------------------------------------------------------------------------
 
-    static final String kTagCouponList = "list";
-    static final String kTagCouponMap  = "map";
-    static final String kTagKarma      = "karma";
-    static final String kTagSettings   = "settings";
+    private static final String kLogTag = "MainTabActivity";
+
+    private static final String kTagCouponList = "list";
+    private static final String kTagCouponMap  = "map";
+    private static final String kTagKarma      = "karma";
+    private static final String kTagSettings   = "settings";
 
     //-------------------------------------------------------------------------
     // activity events
@@ -102,6 +107,27 @@ public class MainTabActivity extends TabActivity
     protected void onDestroy()
     {
         super.onDestroy();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        Log.i(kLogTag, "New intent...");
+
+        // setup api
+        final Settings settings = new Settings(this);
+        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+            public void onSuccess(Object data) {
+                settings.setLastUpdate(new Date());
+            }
+            public void onError(Throwable error) {}
+        });
+
+        // query server
+        api.syncActiveCoupons(settings.lastUpdate());
     }
 
     //-------------------------------------------------------------------------

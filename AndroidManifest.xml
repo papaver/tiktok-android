@@ -10,6 +10,7 @@
     <uses-permission android:name="com.tiktok.consumerapp.permission.C2D_MESSAGE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
@@ -36,6 +37,7 @@
         <activity
             android:name=".MainTabActivity"
             android:label="@string/tabs_name"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar" />
 
         <!-- Coupons List Activity -->

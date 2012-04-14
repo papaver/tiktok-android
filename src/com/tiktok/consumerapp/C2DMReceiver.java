@@ -8,11 +8,19 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.List;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 
 //import android.widget.Toast;
 //import com.google.android.c2dm.C2DMBaseReceiver;
@@ -85,6 +93,63 @@ public class C2DMReceiver extends BroadcastReceiver
     {
         String message = intent.getStringExtra("message");
         Log.i(kLogTag, "Message: " + message);
+        sendNotification(context, message);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void sendNotification(Context context, String message)
+    {
+        NotificationManager notificationManager =
+            (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int icon                    = R.drawable.ic_launcher;
+        long time                   = System.currentTimeMillis();
+        Context appContext          = context.getApplicationContext();
+        String title                = "New TikTok Deal!";
+        String text                 = message;
+        String ticker               = "TikTok New Deal Available!";
+
+        // create intent
+        Intent notificationIntent = new Intent(appContext, MainTabActivity.class);
+
+        // create pending intent to start intent later
+        PendingIntent contentIntent = PendingIntent.getActivity(
+            context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // setup notification
+        Notification notification = new Notification(icon, ticker, time);
+        notification.setLatestEventInfo(context, title, text, contentIntent);
+        notification.defaults = Notification.DEFAULT_ALL;
+        notification.flags   |= Notification.FLAG_AUTO_CANCEL;
+        notificationManager.notify(0, notification);
+    }
+
+    //-------------------------------------------------------------------------
+
+    @SuppressWarnings("unused")
+    private boolean isAppOnForeground(Context context)
+    {
+        final Context appContext        = context.getApplicationContext();
+        ActivityManager activityManager =
+            (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        // grab new activities
+        List<RunningAppProcessInfo> processes = activityManager.getRunningAppProcesses();
+
+        // can't be in foreground
+        if (processes == null) return false;
+
+        // check if app is running
+        final String packageName = appContext.getPackageName();
+        for (RunningAppProcessInfo process : processes) {
+            if (process.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+                process.processName.equals(packageName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
