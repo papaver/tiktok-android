@@ -2,6 +2,7 @@
 
 <!-- Layout for individual coupon entries in a list -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/coupon"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
