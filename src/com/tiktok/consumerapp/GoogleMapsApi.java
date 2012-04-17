@@ -10,22 +10,13 @@ package com.tiktok.consumerapp;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.os.Handler;
@@ -34,7 +25,6 @@ import android.util.Log;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -269,7 +259,8 @@ public final class GoogleMapsApi
     // fields
     //-------------------------------------------------------------------------
 
-    final private Handler           mHandler;
+    @SuppressWarnings("unused")
     final private Context           mContext;
+    final private Handler           mHandler;
     final private CompletionHandler mCompletionHandler;
 }

@@ -160,17 +160,9 @@ public class C2DMReceiver extends BroadcastReceiver
 /*
 public class C2DMReceiver extends C2DMBaseReceiver
 {
-    //-------------------------------------------------------------------------
-    // statics
-    //-------------------------------------------------------------------------
-
-    static String sC2DMSender = "papaver@gmail.com";
-
-    //-------------------------------------------------------------------------
-
     public C2DMReceiver()
     {
-        super(sC2DMSender);
+        super(Constants.kPushNotificationAccount);
     }
 
     //-------------------------------------------------------------------------
@@ -203,7 +195,7 @@ public class C2DMReceiver extends C2DMBaseReceiver
         boolean registered = !C2DMessaging.getRegistrationId(context).equals("");
         if (registerWithServer != registered) {
             if (registerWithServer) {
-                C2DMessaging.register(context, sC2DMSender);
+                C2DMessaging.register(context, Constants.kPushNotificationAccount);
             } else {
                 C2DMessaging.unregister(context);
             }
