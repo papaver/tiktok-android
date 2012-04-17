@@ -44,7 +44,11 @@
         <!-- Coupons List Activity -->
         <activity
             android:label="@string/tab_list"
-            android:name=".CouponListActivity" />
+            android:name=".CouponListActivity" >
+            <intent-filter>
+                <action android:name="com.tiktok.consumer.app.redeemed" />
+            </intent-filter>
+        </activity>
 
         <!-- Coupons Map Activity -->
         <activity

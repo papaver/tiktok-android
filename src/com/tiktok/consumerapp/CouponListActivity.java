@@ -14,8 +14,10 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,6 +72,9 @@ public class CouponListActivity extends ListActivity
         // update list view to use adapter
         final ListView listView = getListView();
         listView.setAdapter(mCouponAdapter);
+
+        // setup intent filter to recieve re-sync messages
+        setupIntentFilter();
 
         // sync coupons
         syncCoupons(mCouponAdapter, false);
@@ -201,6 +206,20 @@ public class CouponListActivity extends ListActivity
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    private void setupIntentFilter()
+    {
+        IntentFilter filter = new IntentFilter("com.tiktok.consumer.app.redeemed");
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(kLogTag, "Received intent from filter...");
+                syncCoupons(mCouponAdapter, false);
+            }
+        }, filter);
+    }
+
     //-------------------------------------------------------------------------
 
     private void syncCoupons(final CouponAdapter adapter, boolean withDialog)

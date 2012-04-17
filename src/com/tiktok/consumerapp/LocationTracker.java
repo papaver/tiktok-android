@@ -58,7 +58,7 @@ public class LocationTracker implements LocationListener
     {
         Log.i(kLogTag, String.format(
             "Location Changed: %f / %f",
-            location.getLongitude(), location.getLatitude()));
+            location.getLatitude(), location.getLongitude()));
 
         // update the location if it is better than the last one
         if (isBetterLocation(location, mLastKnownLocation)) {

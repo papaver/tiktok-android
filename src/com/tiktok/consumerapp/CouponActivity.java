@@ -324,6 +324,11 @@ public class CouponActivity extends MapActivity
                     // set result
                     setResult(kResultRedeemed);
 
+                    // broadcast intent
+                    Intent intent = new Intent();
+                    intent.setAction("com.tiktok.consumer.app.redeemed");
+                    sendBroadcast(intent);
+
                 // alert user of a problem
                 } else if (status.equals(TikTokApi.kTikTokApiStatusForbidden)) {
                     String title   = "Redeem";
