@@ -11,11 +11,12 @@
     <string name="tab_settings">Settings</string>
     <string name="coupon_view">Deal</string>
     <string name="merchant_view">Merchant</string>
+    <string name="location_picker_view">Location Picker</string>
 
     <!-- Settings -->
     <string name="settings_birthday">Date of Birth</string>
 
-    <!-- Karms -->
+    <!-- Karma -->
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
 
     <!-- Coupons -->
@@ -45,5 +46,9 @@
     <string name="promo_fail">Failed to redeem promotion, try again.</string>
     <string name="promo_used">Promotion code can only be redeemed once, try another code.</string>
     <string name="promo_invalid">The promotion code you entered was not recognized, try another code.</string>
+
+    <!-- Location -->
+    <string name="location_search">Location Search</string>
+    <string name="location_not_found">Location not found. Try again.</string>
 
 </resources>

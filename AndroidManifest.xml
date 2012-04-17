@@ -19,6 +19,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
 
+
         <!-- External Libraries -->
         <uses-library android:name="com.google.android.maps" />
 
@@ -70,6 +71,12 @@
         <activity
             android:label="@string/merchant_view"
             android:name=".MerchantActivity"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <!-- Location Picker Activity -->
+        <activity
+            android:label="@string/location_picker_view"
+            android:name=".LocationPickerActivity"
             android:theme="@android:style/Theme.NoTitleBar" />
 
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->

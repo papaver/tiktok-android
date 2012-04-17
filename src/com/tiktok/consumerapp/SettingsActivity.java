@@ -8,11 +8,15 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.CheckBoxPreference;
@@ -36,6 +40,9 @@ public class SettingsActivity extends    PreferenceActivity
     static final String kFBConnectedSummary = "Connected.";
     static final String kFBDefaultSummary   = "Log into Facebook to receive customized deals!";
 
+    static final int kIntentWorkLocation = 1;
+    static final int kIntentHomeLocation = 2;
+
     //-------------------------------------------------------------------------
     // activity
     //-------------------------------------------------------------------------
@@ -48,6 +55,8 @@ public class SettingsActivity extends    PreferenceActivity
     {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+
+        final Context context = this;
 
         // update the summaries
         mSettings = new Settings(this);
@@ -82,6 +91,46 @@ public class SettingsActivity extends    PreferenceActivity
         }
         if (facebookConnect.isChecked()) {
             facebookConnect.setSummary(kFBConnectedSummary);
+        }
+
+        // home location
+        Preference homePreference = (Preference)findPreference("TTS_home");
+        homePreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+                Location home = mSettings.home();
+                Intent intent = new Intent(context, LocationPickerActivity.class);
+                if (home != null) {
+                    intent.putExtra(LocationPickerActivity.kIntentExtraLatitude,
+                        Double.toString(home.getLatitude()));
+                    intent.putExtra(LocationPickerActivity.kIntentExtraLongitude,
+                        Double.toString(home.getLongitude()));
+                }
+                startActivityForResult(intent, kIntentHomeLocation);
+                return true;
+            }
+        });
+        if (!mSettings.homeLocality().equals("")) {
+            homePreference.setSummary(mSettings.homeLocality());
+        }
+
+        // work location
+        Preference workPreference = (Preference)findPreference("TTS_work");
+        workPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+                Location work = mSettings.work();
+                Intent intent = new Intent(context, LocationPickerActivity.class);
+                if (work != null) {
+                    intent.putExtra(LocationPickerActivity.kIntentExtraLatitude,
+                        Double.toString(work.getLatitude()));
+                    intent.putExtra(LocationPickerActivity.kIntentExtraLongitude,
+                        Double.toString(work.getLongitude()));
+                }
+                startActivityForResult(intent, kIntentWorkLocation);
+                return true;
+            }
+        });
+        if (!mSettings.workLocality().equals("")) {
+            workPreference.setSummary(mSettings.workLocality());
         }
     }
 
@@ -154,8 +203,17 @@ public class SettingsActivity extends    PreferenceActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        FacebookManager manager = FacebookManager.getInstance(this);
-        manager.facebook().authorizeCallback(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == kIntentHomeLocation) {
+                saveHomeLocation(data);
+            } else if (requestCode == kIntentWorkLocation) {
+                saveWorkLocation(data);
+            }
+        }
+
+        //FacebookManager manager = FacebookManager.getInstance(this);
+        //manager.facebook().authorizeCallback(requestCode, resultCode, data);
     }
 
     //-------------------------------------------------------------------------
@@ -224,6 +282,48 @@ public class SettingsActivity extends    PreferenceActivity
                 (ListPreference)getPreferenceScreen().findPreference(key);
             listPreference.setSummary(sharedPreferences.getString(key, ""));
         }
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void saveHomeLocation(Intent data)
+    {
+        String address   = data.getStringExtra(LocationPickerActivity.kIntentExtraAddress);
+        String latitude  = data.getStringExtra(LocationPickerActivity.kIntentExtraLatitude);
+        String longitude = data.getStringExtra(LocationPickerActivity.kIntentExtraLongitude);
+        Log.i(kLogTag, String.format("Home Location: %s %s %s", latitude, longitude, address));
+
+        // update settings
+        Location home = new Location("");
+        home.setLatitude(Double.valueOf(latitude).doubleValue());
+        home.setLongitude(Double.valueOf(longitude).doubleValue());
+        mSettings.setHome(home);
+        mSettings.setHomeLocality(address);
+
+        // update summary
+        Preference preference = findPreference("TTS_home");
+        preference.setSummary(address);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void saveWorkLocation(Intent data)
+    {
+        String address   = data.getStringExtra(LocationPickerActivity.kIntentExtraAddress);
+        String latitude  = data.getStringExtra(LocationPickerActivity.kIntentExtraLatitude);
+        String longitude = data.getStringExtra(LocationPickerActivity.kIntentExtraLongitude);
+        Log.i(kLogTag, String.format("Work Location: %s %s %s", latitude, longitude, address));
+
+        // update settings
+        Location work = new Location("");
+        work.setLatitude(Double.valueOf(latitude).doubleValue());
+        work.setLongitude(Double.valueOf(longitude).doubleValue());
+        mSettings.setWork(work);
+        mSettings.setWorkLocality(address);
+
+        // update summary
+        Preference preference = findPreference("TTS_work");
+        preference.setSummary(address);
     }
 
     //-------------------------------------------------------------------------

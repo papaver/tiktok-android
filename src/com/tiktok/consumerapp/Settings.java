@@ -306,10 +306,13 @@ public final class Settings implements OnSharedPreferenceChangeListener
         float longitude = mPreferences.getFloat(lngKey, 0.0f);
 
         // encapsulate data in location object
-        String provider   = null;
-        Location location = new Location(provider);
-        location.setLatitude(latitude);
-        location.setLongitude(longitude);
+        Location location = null;
+        if ((latitude != 0.0f) && (longitude != 0.0f)) {
+            String provider = null;
+            location        = new Location(provider);
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+        }
 
         return location;
     }
@@ -345,6 +348,10 @@ public final class Settings implements OnSharedPreferenceChangeListener
             syncGender();
         } else if (key.equals(kTagBirthday)) {
             syncBirthday();
+        } else if (key.equals(kTagHome + "_lng")) {
+            syncHome();
+        } else if (key.equals(kTagWork + "_lng")) {
+            syncWork();
         }
     }
 

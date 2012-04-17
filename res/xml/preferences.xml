@@ -20,4 +20,10 @@
                       android:title="@string/settings_birthday"
                       android:defaultValue="1970.01.01"
                       android:summary="Set your birthday for special deals!" />
+  <Preference         android:title="Home Location"
+                      android:key="TTS_home"
+                      android:summary="Get better deals around your home!" />
+  <Preference         android:title="Work Location"
+                      android:key="TTS_work"
+                      android:summary="Get better deals around your work!" />
 </PreferenceScreen>
