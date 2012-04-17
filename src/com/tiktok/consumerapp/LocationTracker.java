@@ -46,8 +46,8 @@ public class LocationTracker implements LocationListener
 
     private LocationTracker(Context context)
     {
-        mContext = context;
-        mHandler = new Handler();
+        mContext           = context;
+        mHandler           = new Handler();
     }
 
     //-------------------------------------------------------------------------
@@ -61,7 +61,7 @@ public class LocationTracker implements LocationListener
             location.getLongitude(), location.getLatitude()));
 
         // update the location if it is better than the last one
-        if (isBetterLocation(mLastKnownLocation, location)) {
+        if (isBetterLocation(location, mLastKnownLocation)) {
             updateLocation(location);
         }
     }
