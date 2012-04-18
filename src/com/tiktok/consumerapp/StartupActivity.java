@@ -157,7 +157,7 @@ public class StartupActivity extends Activity
         final Utilities utilities = new Utilities(getApplicationContext());
         String currentId          = utilities.getDeviceId();
         final String deviceId     = (currentId == null) ?
-            Device.generateGUID() : currentId;
+            Device.deviceId(this) : currentId;
 
         // setup the api
         final Context context = this;
