@@ -11,6 +11,7 @@ package com.tiktok.consumerapp;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -56,8 +57,8 @@ public class CouponActivity extends MapActivity
 
     private static final String kLogTag = "CouponActivity";
 
-    private static final int kIntentSMS   = 1;
-    private static final int kIntentEmail = 2;
+    private static final int kIntentSMS   = 100;
+    private static final int kIntentEmail = 101;
 
     public static final int kResultDefault  = 1;
     public static final int kResultRedeemed = 2;
@@ -227,6 +228,9 @@ public class CouponActivity extends MapActivity
         } else if (requestCode == kIntentSMS) {
             TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kSMS);
+        } else if (resultCode == Activity.RESULT_OK) {
+            FacebookManager manager = FacebookManager.getInstance(this);
+            manager.facebook().authorizeCallback(requestCode, resultCode, data);
         }
     }
 

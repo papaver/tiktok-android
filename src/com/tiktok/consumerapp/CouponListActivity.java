@@ -10,6 +10,7 @@ package com.tiktok.consumerapp;
 
 import java.util.Date;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -201,6 +202,9 @@ public class CouponListActivity extends ListActivity
                     });
                 }
             }).run();
+        } else if (resultCode == Activity.RESULT_OK) {
+            FacebookManager manager = FacebookManager.getInstance(this);
+            manager.facebook().authorizeCallback(requestCode, resultCode, intent);
         }
     }
 

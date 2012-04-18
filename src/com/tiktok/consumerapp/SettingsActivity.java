@@ -40,8 +40,8 @@ public class SettingsActivity extends    PreferenceActivity
     static final String kFBConnectedSummary = "Connected.";
     static final String kFBDefaultSummary   = "Log into Facebook to receive customized deals!";
 
-    static final int kIntentWorkLocation = 1;
-    static final int kIntentHomeLocation = 2;
+    static final int kIntentWorkLocation = 100;
+    static final int kIntentHomeLocation = 101;
 
     //-------------------------------------------------------------------------
     // activity
@@ -209,11 +209,11 @@ public class SettingsActivity extends    PreferenceActivity
                 saveHomeLocation(data);
             } else if (requestCode == kIntentWorkLocation) {
                 saveWorkLocation(data);
+            } else {
+                FacebookManager manager = FacebookManager.getInstance(this);
+                manager.facebook().authorizeCallback(requestCode, resultCode, data);
             }
         }
-
-        //FacebookManager manager = FacebookManager.getInstance(this);
-        //manager.facebook().authorizeCallback(requestCode, resultCode, data);
     }
 
     //-------------------------------------------------------------------------
