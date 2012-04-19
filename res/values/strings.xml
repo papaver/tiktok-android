@@ -51,4 +51,9 @@
     <string name="location_search">Location Search</string>
     <string name="location_not_found">Location not found. Try again.</string>
 
+    <!-- Device Sspport -->
+    <string name="device_support">Device Support</string>
+    <string name="device_no_sms">Sending SMS is not supported on this device.</string>
+    <string name="device_no_email">Sending Email is not supported on this device.</string>
+
 </resources>

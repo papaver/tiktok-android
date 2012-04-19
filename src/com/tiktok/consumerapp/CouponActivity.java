@@ -14,6 +14,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -624,8 +625,11 @@ public class CouponActivity extends MapActivity
     {
         // format the post description
         String formatted = TextUtilities.capitalizeWords(mCoupon.title());
-        String deal      = String.format("%s at %s! " +
-                                         "Grab your free deal at www.tiktok.com!",
+        String deal      = String.format("%s at %s! - " +
+                                         "I just scored this awesome deal with my " +
+                                         "TikTok app. Sad you missed it? Don't be " +
+                                         "a square... download the app and start " +
+                                         "getting your own deals right now.",
                                          formatted, mCoupon.merchant().name());
 
         // package up the params
@@ -674,7 +678,13 @@ public class CouponActivity extends MapActivity
         String body      = String.format("TikTok: %s! www.tiktok.com", deal);
 
         // present sms controller
-        ShareUtilities.shareSMS(this, kIntentSMS, body);
+        try {
+            ShareUtilities.shareSMS(this, kIntentSMS, body);
+        } catch (ActivityNotFoundException error) {
+            String title   = getString(R.string.device_support);
+            String message = getString(R.string.device_no_sms);
+            Utilities.displaySimpleAlert(this, title, message);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -688,11 +698,22 @@ public class CouponActivity extends MapActivity
         String body      = String.format("<h3>TikTok</h3>" +
                                          "<b>%s</b> at <b>%s</b>" +
                                          "<br><br>" +
+                                         "I just scored this awesome deal with my " +
+                                         "TikTok app. Sad you missed it? Don't be " +
+                                         "a square... download the app and start " +
+                                         "getting your own deals right now." +
+                                         "<br><br>" +
                                          "<a href='http://www.tiktok.com'>Get your deal on!</a>",
                                          formatted, merchant);
 
         // present email controller
-        ShareUtilities.shareEmail(this, kIntentEmail, subject, body);
+        try {
+            ShareUtilities.shareEmail(this, kIntentEmail, subject, body);
+        } catch (ActivityNotFoundException error) {
+            String title   = getString(R.string.device_support);
+            String message = getString(R.string.device_no_email);
+            Utilities.displaySimpleAlert(this, title, message);
+        }
     }
 
     //-------------------------------------------------------------------------
