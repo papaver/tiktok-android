@@ -260,7 +260,7 @@ public final class TikTokApi
     {
         // add to hash
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("token", token);
+        settings.put("registration_id", token);
 
         // update server
         updateSettings(settings);
