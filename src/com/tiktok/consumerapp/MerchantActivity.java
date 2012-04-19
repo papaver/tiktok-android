@@ -51,6 +51,8 @@ public class MerchantActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.merchant);
 
+        Analytics.passCheckpoint("Merchant");
+
         // grab merchant id from intent
         Long id = (savedInstanceState == null) ? null :
             (Long)savedInstanceState.getSerializable(MerchantTable.sKeyId);

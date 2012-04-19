@@ -38,6 +38,7 @@ public class KarmaActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.karma);
+        Analytics.passCheckpoint("Karma");
     }
 
     //-------------------------------------------------------------------------

@@ -76,6 +76,8 @@ public class CouponMapActivity extends MapActivity
         @Override
         protected boolean onBalloonTap(int index, OverlayItem item)
         {
+            Analytics.passCheckpoint("Deal Map Details");
+
             CouponOverlayItem couponItem = (CouponOverlayItem)item;
 
             // open up coupon details
@@ -123,6 +125,8 @@ public class CouponMapActivity extends MapActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.couponmap);
+
+        Analytics.passCheckpoint("Deal Map");
 
         // grab the map view
         mMapView = (TapControlledMapView)findViewById(R.id.map_view);

@@ -125,6 +125,8 @@ public class CouponActivity extends MapActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.coupon);
 
+        Analytics.passCheckpoint("Deal");
+
         // grab coupon id from intent
         Long id = (savedInstanceState == null) ? null :
             (Long)savedInstanceState.getSerializable(CouponTable.sKeyId);
@@ -224,9 +226,11 @@ public class CouponActivity extends MapActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == kIntentEmail) {
+            Analytics.passCheckpoint("Deal Emailed");
             TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kEmail);
         } else if (requestCode == kIntentSMS) {
+            Analytics.passCheckpoint("Deal SMSed");
             TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kSMS);
         } else if (resultCode == Activity.RESULT_OK) {
@@ -241,6 +245,8 @@ public class CouponActivity extends MapActivity
 
     public void onClickMap(View view)
     {
+        Analytics.passCheckpoint("Deal Map Opened");
+
         String merchant = mCoupon.merchant().name();
         String address  = mCoupon.merchant().address().replace(" ", "+");
         String uri      = String.format("geo:0,0?q=%s+%s", merchant, address);
@@ -532,6 +538,8 @@ public class CouponActivity extends MapActivity
 
     private void expireCoupon(Coupon coupon, long milliseconds)
     {
+        Analytics.passCheckpoint("Deal Expired");
+
         // fade out
         AlphaAnimation alpha = new AlphaAnimation(1.0f, 0.6f);
         alpha.setDuration(milliseconds);
@@ -596,6 +604,7 @@ public class CouponActivity extends MapActivity
         TwitterManager.CompletionHandler callback = new TwitterManager.CompletionHandler() {
 
             public void onSuccess(Object object) {
+                Analytics.passCheckpoint("Deal Tweeted");
                 String message = getString(R.string.twitter_deal_post);
                 Toast.makeText(activity, message, 1000).show();
 
@@ -645,6 +654,7 @@ public class CouponActivity extends MapActivity
         FacebookManager.CompletionHandler callback = new FacebookManager.CompletionHandler() {
 
             public void onSuccess(Bundle values) {
+                Analytics.passCheckpoint("Deal Facebooked");
                 String message = getString(R.string.facebook_deal_post);
                 Toast.makeText(activity, message, 1000).show();
 

@@ -59,6 +59,8 @@ public class CouponListActivity extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.couponlist);
 
+        Analytics.passCheckpoint("Deals");
+
         // open up the database
         mDatabaseAdapter = new TikTokDatabaseAdapter(this);
         mDatabaseAdapter.open();
@@ -155,6 +157,7 @@ public class CouponListActivity extends ListActivity
     {
         switch (item.getItemId()) {
             case R.id.refresh:
+                Analytics.passCheckpoint("Deal Header Reload");
                 syncCoupons(mCouponAdapter, true);
                 break;
             case R.id.promo:
@@ -321,6 +324,7 @@ public class CouponListActivity extends ListActivity
         TwitterManager.CompletionHandler callback = new TwitterManager.CompletionHandler() {
 
             public void onSuccess(Object object) {
+                Analytics.passCheckpoint("App Tweeted");
                 String message = getString(R.string.twitter_app_post);
                 Toast.makeText(activity, message, 1000).show();
             }
@@ -362,6 +366,7 @@ public class CouponListActivity extends ListActivity
         FacebookManager.CompletionHandler callback = new FacebookManager.CompletionHandler() {
 
             public void onSuccess(Bundle values) {
+                Analytics.passCheckpoint("App Facebooked");
                 String message = getString(R.string.facebook_app_post);
                 Toast.makeText(activity, message, 1000).show();
             }
@@ -383,6 +388,8 @@ public class CouponListActivity extends ListActivity
 
     private void shareSMS()
     {
+        Analytics.passCheckpoint("App SMSed");
+
         Utilities utilities = new Utilities(this);
         String message      = String.format("TikTok: Checkout this awesome new daily " +
                                             "deal app: www.tiktok.com/download?ref=%s",
@@ -396,6 +403,8 @@ public class CouponListActivity extends ListActivity
 
     private void shareEmail()
     {
+        Analytics.passCheckpoint("App Emailed");
+
         Utilities utilities = new Utilities(this);
         String subject      = "TikTok: Checkout this amazing daily deal app!";
         String body         = String.format("<h3>TikTok</h3>" +
@@ -411,6 +420,8 @@ public class CouponListActivity extends ListActivity
 
     private void redeemPromoCode()
     {
+        Analytics.passCheckpoint("Promo");
+
         // inflate layout
         LayoutInflater inflator =
             (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);

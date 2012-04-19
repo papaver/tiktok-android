@@ -63,6 +63,7 @@ public class MainTabActivity extends TabActivity
     protected void onStart()
     {
         super.onStart();
+        Analytics.startSession(this);
     }
 
     //-------------------------------------------------------------------------
@@ -96,6 +97,7 @@ public class MainTabActivity extends TabActivity
     protected void onStop()
     {
         super.onStop();
+        Analytics.endSession(this);
     }
 
     //-------------------------------------------------------------------------
