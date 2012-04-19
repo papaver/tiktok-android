@@ -587,9 +587,8 @@ public class CouponActivity extends MapActivity
         // setup share message
         String city      = mCoupon.merchant().getCity().toLowerCase();
         String formatted = TextUtilities.capitalizeWords(mCoupon.title());
-        String deal      = String.format("@tiktok #%s - I just scored a #deal... %s at %s! " +
-                                         "FREE deals at www.tiktok.com!",
-                                         city, formatted, mCoupon.merchant().name());
+        String deal      = String.format("I just got %s from %s! #FREEisBETTER #%s",
+                                         formatted, mCoupon.merchant().name(), city);
 
         // setup share callback
         final Handler handler      = new Handler();
