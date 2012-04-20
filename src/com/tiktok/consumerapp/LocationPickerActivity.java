@@ -173,6 +173,8 @@ public class LocationPickerActivity extends MapActivity
 
     private void centerMapToGeocoding(JsonNode geoData)
     {
+        if (geoData == null) return;
+
         // make sure search results exist
         String status = geoData.get("status") != null ? geoData.get("status").getTextValue() : null;
         if ((status == null) || status.equals("ZERO_RESULTS")) {
