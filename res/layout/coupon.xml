@@ -97,7 +97,7 @@
                             android:enabled="true"
                             android:clickable="true"
                             android:focusable="false"
-                            android:apiKey="0xwxb_DAfECWZkvg3t_GSSgn8D3L08smPFLoFhg" />
+                            android:apiKey="0xwxb_DAfECWYdmrqOYRwjKmfyvkvhvs7pIiL0g" />
 
                     <!-- Map Container End -->
                     </LinearLayout>
