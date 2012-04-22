@@ -158,7 +158,7 @@ public class LocationPickerActivity extends MapActivity
         GoogleMapsApi api = new GoogleMapsApi(this, handler, new GoogleMapsApi.CompletionHandler() {
             public void onSuccess(final JsonNode node) {
                 progressDialog.cancel();
-                centerMapToGeocoding(node);
+                centerMapToGeocodingSafe(node);
             }
             public void onError(Throwable error) {
                 progressDialog.cancel();
@@ -167,6 +167,20 @@ public class LocationPickerActivity extends MapActivity
 
         // run query
         api.getGeocodingForAddress(search);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void centerMapToGeocodingSafe(JsonNode geoData)
+    {
+        try {
+            centerMapToGeocoding(geoData);
+        } catch (Exception error) {
+            Log.e(kLogTag, "Centering failed...", error);
+            String title   = getString(R.string.location_search);
+            String message = getString(R.string.location_search_fail);
+            Utilities.displaySimpleAlert(this, title, message);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -189,12 +203,12 @@ public class LocationPickerActivity extends MapActivity
         JsonNode location  = results.get("geometry").get("location");
         JsonNode northEast = results.get("geometry").get("bounds").get("northeast");
         JsonNode southWest = results.get("geometry").get("bounds").get("southwest");
-        double latitude        = location.get("lat").getDoubleValue();
-        double longitude       = location.get("lng").getDoubleValue();
-        double neLatitude      = northEast.get("lat").getDoubleValue();
-        double neLongitude     = northEast.get("lng").getDoubleValue();
-        double swLatitude      = southWest.get("lat").getDoubleValue();
-        double swLongitude     = southWest.get("lng").getDoubleValue();
+        double latitude    = location.get("lat").getDoubleValue();
+        double longitude   = location.get("lng").getDoubleValue();
+        double neLatitude  = northEast.get("lat").getDoubleValue();
+        double neLongitude = northEast.get("lng").getDoubleValue();
+        double swLatitude  = southWest.get("lat").getDoubleValue();
+        double swLongitude = southWest.get("lng").getDoubleValue();
 
         // calculate center and region
         double latitudeSpan  = Math.abs(neLatitude - swLatitude) * 1.05;

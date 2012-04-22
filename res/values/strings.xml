@@ -50,6 +50,7 @@
     <!-- Location -->
     <string name="location_search">Location Search</string>
     <string name="location_not_found">Location not found. Try again.</string>
+    <string name="location_search_fail">Something went horribly wrong. Try again.</string>
 
     <!-- Device Sspport -->
     <string name="device_support">Device Support</string>
