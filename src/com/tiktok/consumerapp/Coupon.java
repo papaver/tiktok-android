@@ -259,7 +259,7 @@ public final class Coupon
     public static String getExpirationTime(Date time)
     {
         // return the default color if expired
-        if (Coupon.isExpired(time)) return "TIMES UP!";
+        if (Coupon.isExpired(time)) return "TIME'S UP!";
 
         // calculate interval value
         long secondsLeft  = (time.getTime() - new Date().getTime()) / 1000;
