@@ -52,12 +52,24 @@
                         android:orientation="vertical"
                         android:padding="5dip" >
 
-                        <!-- Icon -->
-                        <ImageView
-                            android:id="@+id/icon"
-                            android:src="@drawable/icon03"
-                            android:layout_width="64dip"
-                            android:layout_height="64dip" />
+                        <!-- Icon White Backing -->
+                        <FrameLayout
+                            android:id="@+id/coupon_gradient"
+                            android:layout_width="96dip"
+                            android:layout_height="64dip"
+                            android:background="#ffffff"
+                            android:gravity="center" >
+
+                            <!-- Icon -->
+                            <ImageView
+                                android:id="@+id/icon"
+                                android:src="@drawable/icon03"
+                                android:layout_gravity="center"
+                                android:layout_width="64dip"
+                                android:layout_height="64dip" />
+
+                        <!-- Icon White Backing End -->
+                        </FrameLayout>
 
                         <!-- Coupon Expire Time -->
                         <TextView

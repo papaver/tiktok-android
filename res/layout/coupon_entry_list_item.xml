@@ -26,12 +26,22 @@
                 android:orientation="vertical"
                 android:padding="5dip" >
 
-                <!-- Icon shown next to the title/text -->
-                <ImageView
-                    android:id="@+id/coupon_icon"
-                    android:src="@drawable/icon03"
-                    android:layout_width="64dip"
-                    android:layout_height="64dip" />
+                <FrameLayout
+                    android:id="@+id/coupon_gradient"
+                    android:layout_width="96dip"
+                    android:layout_height="64dip"
+                    android:background="#ffffff"
+                    android:gravity="center" >
+
+                    <!-- Icon shown next to the title/text -->
+                    <ImageView
+                        android:id="@+id/coupon_icon"
+                        android:src="@drawable/icon03"
+                        android:layout_gravity="center"
+                        android:layout_width="64dip"
+                        android:layout_height="64dip" />
+
+                </FrameLayout>>
 
                 <!-- Coupon Expire Time -->
                 <TextView
@@ -51,6 +61,7 @@
                     android:paddingBottom="2dip" />
 
             </LinearLayout>
+
         </FrameLayout>>
 
         <LinearLayout

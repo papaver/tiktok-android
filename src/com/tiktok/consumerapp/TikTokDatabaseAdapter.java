@@ -352,7 +352,6 @@ public class TikTokDatabaseAdapter
         values.put(CouponTable.sKeyIsSoldOut,   coupon.isSoldOut());
         values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
         values.put(CouponTable.sKeyMerchant,    coupon.merchant().id());
-
         return values;
     }
 
