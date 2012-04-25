@@ -210,10 +210,10 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyMerchant,
         };
 
-        long threeDays    = 3 * 24 * 60 * 60 * 1000;
-        long threeDaysAgo = (new Date().getTime() - threeDays) / 1000;
-        String orderBy    = String.format("%s DESC", CouponTable.sKeyEndTime);
-        String where      = String.format("%s > %d", CouponTable.sKeyEndTime, threeDaysAgo);
+        long oneDay    = 24 * 60 * 60 * 1000;
+        long oneDayAgo = (new Date().getTime() - oneDay) / 1000;
+        String orderBy = String.format("%s DESC", CouponTable.sKeyEndTime);
+        String where   = String.format("%s > %d", CouponTable.sKeyEndTime, oneDayAgo);
         return mDatabase.query(CouponTable.sName, rows, where, null, null, null, orderBy);
     }
 
