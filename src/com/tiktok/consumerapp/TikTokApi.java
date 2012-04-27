@@ -484,7 +484,7 @@ public final class TikTokApi
     public void redeemPromotion(String promoCode)
     {
         String url = String.format("%s/consumers/%s/promotions/redeem?code=%s",
-            getApiUrl(), utilities().getConsumerId(), promoCode);
+            getApiUrl(), utilities().getConsumerId(), promoCode.replaceAll("[^a-zA-Z0-9_\\-\\.\\*]", ""));
 
         // query the server
         HttpGet request = new HttpGet(url);
