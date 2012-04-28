@@ -61,6 +61,9 @@ public class CouponListActivity extends ListActivity
 
         Analytics.passCheckpoint("Deals");
 
+        // create a new handler
+        mHandler = new Handler();
+
         // open up the database
         mDatabaseAdapter = new TikTokDatabaseAdapter(this);
         mDatabaseAdapter.open();
@@ -137,7 +140,7 @@ public class CouponListActivity extends ListActivity
     {
         super.onDestroy();
         if (mDatabaseAdapter != null) mDatabaseAdapter.close();
-        if (mCursor != null) mCursor.close();
+        // no need to close cursor since its managed by the activity
     }
 
     //-------------------------------------------------------------------------
@@ -189,22 +192,8 @@ public class CouponListActivity extends ListActivity
         super.onActivityResult(requestCode, resultCode, intent);
 
         // update cursor
-        final Handler handler = new Handler();
         if (resultCode == CouponActivity.kResultRedeemed) {
-            new Thread(new Runnable() {
-                public void run() {
-                    final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
-                    handler.post(new Runnable() {
-                        public void run() {
-                            mCouponAdapter.changeCursor(cursor);
-                            if (mCursor != null) {
-                                mCursor.close();
-                                mCursor = cursor;
-                            }
-                        }
-                    });
-                }
-            }).run();
+            updateCursor();
         } else if (resultCode == Activity.RESULT_OK) {
             FacebookManager manager = FacebookManager.getInstance(this);
             manager.facebook().authorizeCallback(requestCode, resultCode, intent);
@@ -217,14 +206,54 @@ public class CouponListActivity extends ListActivity
 
     private void setupIntentFilter()
     {
-        IntentFilter filter = new IntentFilter("com.tiktok.consumer.app.redeemed");
+        // redeemed filter - update cursor
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.i(kLogTag, "Received intent from filter...");
+                Log.i(kLogTag, "Received redeemed intent from filter...");
+                updateCursor();
+            }
+        }, new IntentFilter("com.tiktok.consumer.app.redeemed"));
+
+        // sync filter - resync coupons
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(kLogTag, "Received resync intent from filter...");
                 syncCoupons(mCouponAdapter, false);
             }
-        }, filter);
+        }, new IntentFilter("com.tiktok.consumer.app.resync"));
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void updateCursor()
+    {
+        // fetch the cursor on a background thread
+        final Activity activity = this;
+        new Thread(new Runnable() {
+            public void run() {
+                final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
+
+                // swap to the new cursor on the main thread
+                mHandler.post(new Runnable() {
+                    public void run() {
+
+                        // clean up the previous cursor
+                        if (mCursor != null) {
+                            activity.stopManagingCursor(mCursor);
+                        }
+
+                        // start using the newer cursor, will get closed
+                        mCouponAdapter.changeCursor(cursor);
+
+                        // start managing the new cursor
+                        mCursor = cursor;
+                        activity.startManagingCursor(mCursor);
+                    }
+                });
+            }
+        }).run();
     }
 
     //-------------------------------------------------------------------------
@@ -239,37 +268,13 @@ public class CouponListActivity extends ListActivity
         }
 
         final Context context   = this;
-        final Handler handler   = new Handler();
         final Settings settings = new Settings(this);
-        TikTokApi api = new TikTokApi(this, handler, new TikTokApi.CompletionHandler() {
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
-
-                // run database query in another thread
-                new Thread(new Runnable() {
-                    public void run() {
-                        final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
-
-                        // update the ui in the ui thread
-                        handler.post(new Runnable() {
-                            public void run() {
-                                settings.setLastUpdate(new Date());
-
-                                // update listview
-                                adapter.changeCursor(cursor);
-                                if (mCursor != null) {
-                                    mCursor.close();
-                                    mCursor = cursor;
-                                }
-
-                                // close dialog
-                                if (progressDialog != null) {
-                                    progressDialog.cancel();
-                                }
-                            }
-                        });
-                    }
-                }).start();
+                settings.setLastUpdate(new Date());
+                if (progressDialog != null) progressDialog.cancel();
+                updateCursor();
             }
 
             public void onError(Throwable error) {
@@ -339,7 +344,7 @@ public class CouponListActivity extends ListActivity
 
         // tweet
         ShareUtilities.shareTwitter(
-            new ShareUtilities.TwitterShare(this, message, new Handler(), callback));
+            new ShareUtilities.TwitterShare(this, message, mHandler, callback));
     }
 
     //-------------------------------------------------------------------------
@@ -381,7 +386,7 @@ public class CouponListActivity extends ListActivity
 
         // post
         ShareUtilities.shareFacebook(
-            new ShareUtilities.FacebookShare(this, params, new Handler(), callback));
+            new ShareUtilities.FacebookShare(this, params, mHandler, callback));
     }
 
     //-------------------------------------------------------------------------
@@ -454,7 +459,7 @@ public class CouponListActivity extends ListActivity
 
         // redeem the coupon with the server
         final Context context = this;
-        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
                 TikTokApiResponse response = (TikTokApiResponse)data;
@@ -500,6 +505,7 @@ public class CouponListActivity extends ListActivity
 
     private Cursor                mCursor;
     private CouponAdapter         mCouponAdapter;
+    private Handler               mHandler;
     private TikTokDatabaseAdapter mDatabaseAdapter;
 }
 

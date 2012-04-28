@@ -124,6 +124,11 @@ public class MainTabActivity extends TabActivity
         TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
             public void onSuccess(Object data) {
                 settings.setLastUpdate(new Date());
+
+                // broadcast intent
+                Intent intent = new Intent();
+                intent.setAction("com.tiktok.consumer.app.resync");
+                sendBroadcast(intent);
             }
             public void onError(Throwable error) {}
         });

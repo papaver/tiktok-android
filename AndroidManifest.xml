@@ -50,6 +50,7 @@
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="com.tiktok.consumer.app.redeemed" />
+                <action android:name="com.tiktok.consumer.app.resync" />
             </intent-filter>
         </activity>
 
