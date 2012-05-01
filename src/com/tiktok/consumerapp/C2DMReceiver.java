@@ -91,9 +91,12 @@ public class C2DMReceiver extends BroadcastReceiver
 
     private void handleMessage(Context context, Intent intent)
     {
-        String message = intent.getStringExtra("message");
-        Log.i(kLogTag, "Message: " + message);
-        sendNotification(context, message);
+        Settings settings = settings(context);
+        if (settings.notificationsEnabled()) {
+            String message = intent.getStringExtra("message");
+            Log.i(kLogTag, "Message: " + message);
+            sendNotification(context, message);
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -120,7 +123,7 @@ public class C2DMReceiver extends BroadcastReceiver
         // setup notification
         Notification notification = new Notification(icon, ticker, time);
         notification.setLatestEventInfo(context, title, text, contentIntent);
-        notification.defaults = Notification.DEFAULT_ALL;
+        notification.defaults = settings(context).notificationDefaults();
         notification.flags   |= Notification.FLAG_AUTO_CANCEL;
         notificationManager.notify(0, notification);
     }
@@ -151,6 +154,21 @@ public class C2DMReceiver extends BroadcastReceiver
 
         return false;
     }
+
+    //-------------------------------------------------------------------------
+
+    private Settings settings(Context context)
+    {
+        if (mSettings == null) mSettings = new Settings(context);
+        return mSettings;
+    }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+
+    private Settings mSettings;
+
 }
 
 //-----------------------------------------------------------------------------

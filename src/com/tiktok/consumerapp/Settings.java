@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -42,17 +43,19 @@ public final class Settings implements OnSharedPreferenceChangeListener
     // statics
     //-------------------------------------------------------------------------
 
-    public static final String kDomain           = "com.tiktok.comsumerapp.preferences";
-    public static final String kTagName          = "TTS_name";
-    public static final String kTagEmail         = "TTS_email";
-    public static final String kTagGender        = "TTS_gender";
-    public static final String kTagBirthday      = "TTS_birthday";
-    public static final String kTagHome          = "TTS_home";
-    public static final String kTagHomeLocality  = "TTS_homeLocality";
-    public static final String kTagWork          = "TTS_work";
-    public static final String kTagWorkLocality  = "TTS_workLocality";
-    public static final String kTagLastUpdate    = "TTS_lastUpdate";
-    //public static final String kTagTutorialIndex = "TTS_tutorial";
+    public static final String kDomain                 = "com.tiktok.comsumerapp.preferences";
+    public static final String kTagName                = "TTS_name";
+    public static final String kTagEmail               = "TTS_email";
+    public static final String kTagGender              = "TTS_gender";
+    public static final String kTagBirthday            = "TTS_birthday";
+    public static final String kTagHome                = "TTS_home";
+    public static final String kTagHomeLocality        = "TTS_homeLocality";
+    public static final String kTagWork                = "TTS_work";
+    public static final String kTagWorkLocality        = "TTS_workLocality";
+    public static final String kTagLastUpdate          = "TTS_lastUpdate";
+    public static final String kTagNotifications       = "TTS_notifications";
+    public static final String kTagNotificationSound   = "TTS_notifications_sound";
+    public static final String kTagNotificationVibrate = "TTS_notifications_vibrate";
 
     //-------------------------------------------------------------------------
     // constructor
@@ -341,6 +344,30 @@ public final class Settings implements OnSharedPreferenceChangeListener
         mEditor.putFloat(latKey, (float)value.getLatitude());
         mEditor.putFloat(lngKey, (float)value.getLongitude());
         mEditor.commit();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public boolean notificationsEnabled()
+    {
+        return mPreferences.getBoolean(kTagNotifications, true);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public int notificationDefaults()
+    {
+        boolean sound   = mPreferences.getBoolean(kTagNotificationSound, true);
+        boolean vibrate = mPreferences.getBoolean(kTagNotificationVibrate, true);
+        if (sound && vibrate) {
+            return Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE;
+        } else if (sound) {
+            return Notification.DEFAULT_SOUND;
+        } else if (vibrate) {
+            return Notification.DEFAULT_VIBRATE;
+        } else {
+            return 0;
+        }
     }
 
     //-------------------------------------------------------------------------

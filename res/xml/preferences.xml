@@ -26,4 +26,21 @@
   <Preference         android:title="Work Location"
                       android:key="TTS_work"
                       android:summary="Get better deals around your work!" />
+  <PreferenceScreen   android:title="Notifications">
+    <CheckBoxPreference
+                      android:title="Notifications"
+                      android:key="TTS_notifications"
+                      android:defaultValue="true"
+                      android:summary="Configure notifications."/>
+    <CheckBoxPreference
+                      android:title="Sound"
+                      android:key="TTS_notifications_sound"
+                      android:defaultValue="true"
+                      android:summary="Configure notification sound."/>
+    <CheckBoxPreference
+                      android:title="Vibration"
+                      android:key="TTS_notifications_vibrate"
+                      android:defaultValue="true"
+                      android:summary="Configure notification vibration."/>
+  </PreferenceScreen>
 </PreferenceScreen>
