@@ -10,16 +10,16 @@
                       android:key="TTS_email"
                       android:summary="What your email?" />
   <ListPreference     android:title="Gender"
-                      android:summary="Select your gender for better deals!"
                       android:key="TTS_gender"
+                      android:summary="Select your gender for better deals!"
                       android:defaultValue=""
                       android:entries="@array/gender_entries"
                       android:entryValues="@array/gender_values" />
   <org.bostonandroid.datepreference.DatePreference
+                      android:title="Date of Birth"
                       android:key="TTS_birthday"
-                      android:title="@string/settings_birthday"
-                      android:defaultValue="1970.01.01"
-                      android:summary="Set your birthday for special deals!" />
+                      android:summary="Set your birthday for special deals!"
+                      android:defaultValue="1970.01.01" />
   <Preference         android:title="Home Location"
                       android:key="TTS_home"
                       android:summary="Get better deals around your home!" />

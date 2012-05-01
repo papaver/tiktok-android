@@ -88,9 +88,12 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncName()
     {
+        String name = name();
+        if (name.equals("")) return;
+
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("name", name());
+        settings.put("name", name);
         api.updateSettings(settings);
     }
 
@@ -113,9 +116,12 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncEmail()
     {
+        String email = email();
+        if (email.equals("")) return;
+
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("email", email());
+        settings.put("email", email);
         api.updateSettings(settings);
     }
 
@@ -138,10 +144,13 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncGender()
     {
+        String gender = gender();
+        if (gender.equals("")) return;
+
         // push update to server
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("sex", gender().toLowerCase().substring(0, 1));
+        settings.put("sex", gender.toLowerCase().substring(0, 1));
         api.updateSettings(settings);
 
         // update analytics
@@ -183,10 +192,13 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void syncBirthday()
     {
+        String birthday = birthdayStr();
+        if (birthday.equals("")) return;
+
         // push update to server
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("birthday", birthdayStr());
+        settings.put("birthday", birthday);
         api.updateSettings(settings);
 
         // update analytics

@@ -13,9 +13,6 @@
     <string name="merchant_view">Merchant</string>
     <string name="location_picker_view">Location Picker</string>
 
-    <!-- Settings -->
-    <string name="settings_birthday">Date of Birth</string>
-
     <!-- Karma -->
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
 
