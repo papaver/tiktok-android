@@ -118,7 +118,7 @@ public class LocationTracker implements LocationListener
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String fineProvider = locationManager.getBestProvider(criteria, true);
         Log.i(kLogTag, String.format("Fine Provider: %s", fineProvider));
-        if ((fineProvider != null) && (!fineProvider.equals(coarseProvider)) {
+        if ((fineProvider != null) && !fineProvider.equals(coarseProvider)) {
             locationManager.requestLocationUpdates(
                 fineProvider, minTime, minDistance, this);
         }
