@@ -9,6 +9,7 @@ package com.tiktok.consumerapp;
 //-----------------------------------------------------------------------------
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -101,11 +102,26 @@ public class LocationTracker implements LocationListener
         long minTime      = 60 * 60 * 1000;
         float minDistance = 500.0f;
 
-        // register the listener with the location manager for both cell/gps
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER, minTime, minDistance, this);
-        locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER, minTime, minDistance, this);
+        // grab criteria to get proper providers
+        Criteria criteria = new Criteria();
+
+        // set coarse provider
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        String coarseProvider = locationManager.getBestProvider(criteria, true);
+        Log.i(kLogTag, String.format("Coarse Provider: %s", coarseProvider));
+        if (coarseProvider != null) {
+            locationManager.requestLocationUpdates(
+                coarseProvider, minTime, minDistance, this);
+        }
+
+        // set fine provider
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        String fineProvider = locationManager.getBestProvider(criteria, true);
+        Log.i(kLogTag, String.format("Fine Provider: %s", fineProvider));
+        if ((fineProvider != null) && (!fineProvider.equals(coarseProvider)) {
+            locationManager.requestLocationUpdates(
+                fineProvider, minTime, minDistance, this);
+        }
 
         // get the last known location
         Location gpsLocation =
