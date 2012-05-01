@@ -254,7 +254,7 @@ public class SettingsActivity extends    PreferenceActivity
         // log out of facebook
         } else {
             Log.i(kLogTag, "Logged out of facebook!");
-            manager.logout(this);
+            manager.logout(this, null);
             checkboxPreference.setSummary(kFBDefaultSummary);
             result = true;
         }

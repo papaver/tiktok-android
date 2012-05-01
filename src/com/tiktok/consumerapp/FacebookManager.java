@@ -153,19 +153,21 @@ public final class FacebookManager
 
     //-------------------------------------------------------------------------
 
-    public boolean logout(Context context)
+    public void logout(final Context context, final CompletionHandler handler)
     {
-        boolean result = false;
-
-        try {
-            mFacebook.logout(context);
-            clearFacebookData();
-            result = true;
-        } catch (IOException e) {
-            Log.e(kLogTag, "Failed logout", e);
-        }
-
-        return result;
+        // run logout on a seperate thread
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    mFacebook.logout(context);
+                    clearFacebookData();
+                    if (handler != null) handler.onSuccess(null);
+                } catch (IOException e) {
+                    Log.e(kLogTag, "Failed logout", e);
+                    if (handler != null) handler.onError(e);
+                }
+            }
+        }).start();
     }
 
     //-------------------------------------------------------------------------
