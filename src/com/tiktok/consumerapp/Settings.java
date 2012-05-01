@@ -63,11 +63,32 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public Settings(Context context)
     {
+        init(context, false);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public Settings(Context context, boolean addListener)
+    {
+        init(context, addListener);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void init(Context context, boolean addListener)
+    {
         mContext     = context.getApplicationContext();
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         mEditor      = mPreferences.edit();
 
-        mPreferences.registerOnSharedPreferenceChangeListener(this);
+        if (addListener) mPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void close()
+    {
+        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     //-------------------------------------------------------------------------

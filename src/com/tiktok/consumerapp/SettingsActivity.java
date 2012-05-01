@@ -59,7 +59,7 @@ public class SettingsActivity extends    PreferenceActivity
         final Context context = this;
 
         // update the summaries
-        mSettings = new Settings(this);
+        mSettings = new Settings(this, true);
 
         // name
         if (!mSettings.name().equals("")) {
@@ -195,6 +195,7 @@ public class SettingsActivity extends    PreferenceActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        mSettings.close();
     }
 
     //-------------------------------------------------------------------------
