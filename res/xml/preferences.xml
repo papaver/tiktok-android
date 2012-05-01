@@ -15,7 +15,7 @@
                       android:defaultValue=""
                       android:entries="@array/gender_entries"
                       android:entryValues="@array/gender_values" />
-  <org.bostonandroid.datepreference.DatePreference
+  <com.tiktok.consumerapp.preference.DatePreference
                       android:title="Date of Birth"
                       android:key="TTS_birthday"
                       android:summary="Set your birthday for special deals!"
