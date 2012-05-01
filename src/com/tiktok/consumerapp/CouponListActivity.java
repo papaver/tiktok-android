@@ -253,7 +253,7 @@ public class CouponListActivity extends ListActivity
                     }
                 });
             }
-        }).run();
+        }).start();
     }
 
     //-------------------------------------------------------------------------
