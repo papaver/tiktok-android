@@ -581,6 +581,9 @@ public final class TikTokApi
 
     private void processCouponData(TikTokApiResponse response)
     {
+        // nothing to do if the response is empty
+        if (response == null) return;
+
         // process the coupons
         if (response.isOkay()) {
 
