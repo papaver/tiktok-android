@@ -151,6 +151,10 @@ public class MerchantActivity extends Activity
         TextView phone = (TextView)findViewById(R.id.phone);
         phone.setText(merchant.phone());
 
+        // category
+        TextView category = (TextView)findViewById(R.id.category);
+        category.setText(merchant.category());
+
         // url
         TextView url = (TextView)findViewById(R.id.url);
         url.setText(merchant.websiteUrl().replace("http://", ""));
