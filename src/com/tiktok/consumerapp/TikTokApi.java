@@ -117,19 +117,26 @@ public final class TikTokApi
             mType     = type;
             mHandler  = handler;
             mRequest  = request;
+            mClient   = new DefaultHttpClient();
         }
 
         public void run()
         {
+            Thread thread = Thread.currentThread();
+
             try {
 
                 // attempt to query the request from the server
-                DefaultHttpClient client = new DefaultHttpClient();
-                HttpResponse response    = client.execute(mRequest);
-                Object data              = parseResponse(response, mType);
+                HttpResponse response = mClient.execute(mRequest);
+
+                // parse the response
+                if (thread.isInterrupted()) return;
+                Object data = parseResponse(response, mType);
 
                 // run completion handler
-                if (mHandler != null) mHandler.onSuccess(data);
+                if (!thread.isInterrupted() && (mHandler != null)) {
+                    mHandler.onSuccess(data);
+                }
 
             } catch (Exception e) {
                 Log.e("TikTokApi::Downloader", String.format(
@@ -139,13 +146,21 @@ public final class TikTokApi
                 mRequest.abort();
 
                 // run completion handler
-                if (mHandler != null) mHandler.onError(e);
+                if (!thread.isInterrupted() && (mHandler != null)) {
+                    mHandler.onError(e);
+                }
             }
         }
 
-        private final Class<?>        mType;
-        private final HttpUriRequest  mRequest;
-        private final DownloadHandler mHandler;
+        public void interrupt()
+        {
+            mClient.getConnectionManager().shutdown();
+        }
+
+        private final Class<?>          mType;
+        private final DefaultHttpClient mClient;
+        private final DownloadHandler   mHandler;
+        private final HttpUriRequest    mRequest;
     }
 
     //-------------------------------------------------------------------------
@@ -187,8 +202,8 @@ public final class TikTokApi
         String url = String.format("%s/register?uuid=%s", getApiUrl(), deviceId);
 
         // query the server
-        HttpGet request = new HttpGet(url);
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        HttpGet request       = new HttpGet(url);
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
 
@@ -210,7 +225,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -226,7 +243,7 @@ public final class TikTokApi
 
         // query the server
         HttpGet request = new HttpGet(url);
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
 
@@ -248,7 +265,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -284,7 +303,7 @@ public final class TikTokApi
 
         // query the server
         HttpGet request = new HttpGet(url);
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
 
@@ -299,7 +318,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -352,7 +373,7 @@ public final class TikTokApi
         }
 
         // query the server
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
                     postSuccess(data);
@@ -360,7 +381,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -430,7 +453,7 @@ public final class TikTokApi
         }
 
         // query the server
-        new Thread(new Downloader(request, TikTokApiMultiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
                     TikTokApiMultiResponse response = (TikTokApiMultiResponse)data;
@@ -439,7 +462,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -455,7 +480,7 @@ public final class TikTokApi
 
         // query the server
         HttpGet request = new HttpGet(url);
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
 
@@ -476,7 +501,9 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
     }
 
     //-------------------------------------------------------------------------
@@ -488,7 +515,7 @@ public final class TikTokApi
 
         // query the server
         HttpGet request = new HttpGet(url);
-        new Thread(new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
                     postSuccess(data);
@@ -496,11 +523,31 @@ public final class TikTokApi
                 public void onError(Throwable error) {
                     postError(error);
                 }
-            })).start();
+            });
+
+        runOnThread(downloader);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void cancel()
+    {
+        if (mDownloader != null) mDownloader.interrupt();
+        if (mThread != null) mThread.interrupt();
+        mHandler = null;
     }
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    private void runOnThread(Downloader downloader)
+    {
+        mDownloader = downloader;
+        mThread     = new Thread(downloader);
+        mThread.start();
+    }
+
     //-------------------------------------------------------------------------
 
     private Object parseResponse(HttpResponse response, Class<?> type)
@@ -530,7 +577,8 @@ public final class TikTokApi
 
     private void postSuccess(final Object response)
     {
-        if (mCompletionHandler == null) return;
+        if (Thread.currentThread().isInterrupted()) return;
+        if ((mCompletionHandler == null) || (mHandler == null)) return;
 
         mHandler.post(new Runnable() {
             public void run() {
@@ -543,7 +591,8 @@ public final class TikTokApi
 
     private void postError(final Throwable error)
     {
-        if (mCompletionHandler == null) return;
+        if (Thread.currentThread().isInterrupted()) return;
+        if ((mCompletionHandler == null) || (mHandler == null)) return;
 
         mHandler.post(new Runnable() {
             public void run() {
@@ -618,6 +667,8 @@ public final class TikTokApi
 
     private void processCoupons(Coupon[] coupons, TikTokDatabaseAdapter adapter)
     {
+        if (Thread.currentThread().isInterrupted()) return;
+
         // add only new coupons to the database
         List<Long> couponIds   = adapter.fetchAllCouponIds();
         List<Long> merchantIds = adapter.fetchAllMerchantIds();
@@ -642,6 +693,8 @@ public final class TikTokApi
 
     private void processKilled(Long[] killed, TikTokDatabaseAdapter adapter)
     {
+        if (Thread.currentThread().isInterrupted()) return;
+
         List<Long> couponIds = adapter.fetchAllCouponIds();
         for (final Long id : killed) {
             if (couponIds.contains(id)) {
@@ -655,6 +708,8 @@ public final class TikTokApi
 
     private void processSoldOut(Long[] soldOut, TikTokDatabaseAdapter adapter)
     {
+        if (Thread.currentThread().isInterrupted()) return;
+
         List<Long> couponIds = adapter.fetchAllCouponIds();
         for (final Long id : soldOut) {
             if (couponIds.contains(id)) {
@@ -673,9 +728,7 @@ public final class TikTokApi
 
     private Utilities utilities()
     {
-        if (mUtilities == null) {
-            mUtilities = new Utilities(mContext);
-        }
+        if (mUtilities == null) mUtilities = new Utilities(mContext);
         return mUtilities;
     }
 
@@ -683,9 +736,11 @@ public final class TikTokApi
     // fields
     //-------------------------------------------------------------------------
 
-    final private Handler           mHandler;
-    final private Context           mContext;
-    final private CompletionHandler mCompletionHandler;
+    private Handler           mHandler;
+    private Context           mContext;
+    private CompletionHandler mCompletionHandler;
 
-    private Utilities mUtilities;
+    private Thread     mThread;
+    private Downloader mDownloader;
+    private Utilities  mUtilities;
 }

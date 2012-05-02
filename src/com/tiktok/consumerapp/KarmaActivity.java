@@ -143,8 +143,7 @@ public class KarmaActivity extends Activity
                     updatePoints(points);
                 }
             }
-            public void onError(Throwable error) {
-            }
+            public void onError(Throwable error) {}
         });
 
         // run query

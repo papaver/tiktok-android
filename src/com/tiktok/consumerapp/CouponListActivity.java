@@ -61,7 +61,7 @@ public class CouponListActivity extends ListActivity
 
         Analytics.passCheckpoint("Deals");
 
-        // create a new handler
+        // setup new handler
         mHandler = new Handler();
 
         // open up the database
@@ -140,7 +140,7 @@ public class CouponListActivity extends ListActivity
     {
         super.onDestroy();
         if (mDatabaseAdapter != null) mDatabaseAdapter.close();
-        // no need to close cursor since its managed by the activity
+        if (mSyncApi != null) mSyncApi.cancel();
     }
 
     //-------------------------------------------------------------------------
@@ -233,6 +233,7 @@ public class CouponListActivity extends ListActivity
         final Activity activity = this;
         new Thread(new Runnable() {
             public void run() {
+                Log.i(kLogTag, "Updating cursor...");
                 final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
 
                 // swap to the new cursor on the main thread
@@ -260,6 +261,9 @@ public class CouponListActivity extends ListActivity
 
     private void syncCoupons(final CouponAdapter adapter, boolean withDialog)
     {
+        // cancel current request if any
+        if (mSyncApi != null) mSyncApi.cancel();
+
         // setup progress dialog
         final ProgressDialog progressDialog = withDialog ? new ProgressDialog(this) : null;
         if (progressDialog != null) {
@@ -269,15 +273,17 @@ public class CouponListActivity extends ListActivity
 
         final Context context   = this;
         final Settings settings = new Settings(this);
-        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
+        mSyncApi = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
+                mSyncApi = null;
                 settings.setLastUpdate(new Date());
                 if (progressDialog != null) progressDialog.cancel();
                 updateCursor();
             }
 
             public void onError(Throwable error) {
+                mSyncApi = null;
                 if (progressDialog != null) progressDialog.cancel();
                 String message = context.getString(R.string.coupon_sync_fail);
                 Toast.makeText(context, message, 1000).show();
@@ -285,7 +291,7 @@ public class CouponListActivity extends ListActivity
         });
 
         // query server
-        api.syncActiveCoupons(settings.lastUpdate());
+        mSyncApi.syncActiveCoupons(settings.lastUpdate());
     }
 
     //-------------------------------------------------------------------------
@@ -507,5 +513,6 @@ public class CouponListActivity extends ListActivity
     private CouponAdapter         mCouponAdapter;
     private Handler               mHandler;
     private TikTokDatabaseAdapter mDatabaseAdapter;
+    private TikTokApi             mSyncApi;
 }
 

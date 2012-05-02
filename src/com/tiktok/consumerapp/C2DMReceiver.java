@@ -77,8 +77,7 @@ public class C2DMReceiver extends BroadcastReceiver
                             utilities.cacheNotificationToken(token);
                         }
 
-                        public void onError(Throwable error) {
-                        }
+                        public void onError(Throwable error) {}
                     });
 
                 // run query
