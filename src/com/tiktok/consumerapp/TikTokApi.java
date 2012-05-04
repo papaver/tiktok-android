@@ -453,7 +453,7 @@ public final class TikTokApi
         }
 
         // query the server
-        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
+        Downloader downloader = new Downloader(request, TikTokApiMultiResponse.class,
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
                     TikTokApiMultiResponse response = (TikTokApiMultiResponse)data;
