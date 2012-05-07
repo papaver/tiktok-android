@@ -28,6 +28,8 @@ public final class TextUtilities
 
     public static String capitalizeWords(String text)
     {
+        if (text.length() == 0) return "";
+
         final StringBuilder result = new StringBuilder(text.length());
 
         String[] words = text.split("\\s");
