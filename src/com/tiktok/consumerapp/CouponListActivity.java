@@ -139,6 +139,7 @@ public class CouponListActivity extends ListActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        cleanupIntentFilter();
         if (mDatabaseAdapter != null) mDatabaseAdapter.close();
         if (mSyncApi != null) mSyncApi.cancel();
     }
@@ -206,23 +207,39 @@ public class CouponListActivity extends ListActivity
 
     private void setupIntentFilter()
     {
+        Log.i(kLogTag, "settings up intent filters...");
+
         // redeemed filter - update cursor
-        registerReceiver(new BroadcastReceiver() {
+        mRedeemedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.i(kLogTag, "Received redeemed intent from filter...");
                 updateCursor();
             }
-        }, new IntentFilter("com.tiktok.consumer.app.redeemed"));
+        };
+        registerReceiver(mRedeemedReceiver,
+            new IntentFilter("com.tiktok.consumer.app.redeemed"));
 
         // sync filter - resync coupons
-        registerReceiver(new BroadcastReceiver() {
+        mResyncReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.i(kLogTag, "Received resync intent from filter...");
                 syncCoupons(mCouponAdapter, false);
             }
-        }, new IntentFilter("com.tiktok.consumer.app.resync"));
+        };
+        registerReceiver(mResyncReceiver,
+            new IntentFilter("com.tiktok.consumer.app.resync"));
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void cleanupIntentFilter()
+    {
+        Log.i(kLogTag, "removing intent filters...");
+
+        unregisterReceiver(mRedeemedReceiver);
+        unregisterReceiver(mResyncReceiver);
     }
 
     //-------------------------------------------------------------------------
@@ -509,10 +526,13 @@ public class CouponListActivity extends ListActivity
     // fields
     //-------------------------------------------------------------------------
 
+    private BroadcastReceiver     mRedeemedReceiver;
+    private BroadcastReceiver     mResyncReceiver;
     private Cursor                mCursor;
     private CouponAdapter         mCouponAdapter;
     private Handler               mHandler;
     private TikTokDatabaseAdapter mDatabaseAdapter;
     private TikTokApi             mSyncApi;
+
 }
 

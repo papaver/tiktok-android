@@ -119,22 +119,10 @@ public class MainTabActivity extends TabActivity
         super.onNewIntent(intent);
         Log.i(kLogTag, "New intent...");
 
-        // setup api
-        final Settings settings = new Settings(this);
-        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
-            public void onSuccess(Object data) {
-                settings.setLastUpdate(new Date());
-
-                // broadcast intent
-                Intent intent = new Intent();
-                intent.setAction("com.tiktok.consumer.app.resync");
-                sendBroadcast(intent);
-            }
-            public void onError(Throwable error) {}
-        });
-
-        // query server
-        api.syncActiveCoupons(settings.lastUpdate());
+        // broadcast intent
+        Intent newIntent = new Intent();
+        newIntent.setAction("com.tiktok.consumer.app.resync");
+        sendBroadcast(newIntent);
     }
 
     //-------------------------------------------------------------------------
