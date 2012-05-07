@@ -303,6 +303,9 @@ public class LocationPickerActivity extends MapActivity
             "administrative_area_level_3"
         };
 
+        // make sure data exists
+        if (node == null) return "Unknown";
+
         // make sure search results exist
         String status = node.get("status") != null ? node.get("status").getTextValue() : null;
         if ((status == null) || status.equals("ZERO_RESULTS")) {
