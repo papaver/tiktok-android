@@ -32,8 +32,9 @@ public final class TextUtilities
 
         final StringBuilder result = new StringBuilder(text.length());
 
-        String[] words = text.split("\\s");
+        String[] words = text.split("\\s+");
         for (int index = 0; index < words.length; ++index) {
+            if (words[index].length() == 0) continue;
             if (index > 0) result.append(" ");
             result.append(Character.toUpperCase(words[index].charAt(0)))
                   .append(words[index].substring(1).toLowerCase());
