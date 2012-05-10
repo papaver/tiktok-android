@@ -314,8 +314,10 @@ public class CouponMapActivity extends MapActivity
         double minLongitude =  180.0;
         double maxLongitude = -180.0;
 
+        // nothing to do if cursor is empty
+        if (!cursor.moveToFirst()) return;
+
         // add overlays
-        cursor.moveToFirst();
         for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
             long rowId      = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyRowId));
             long merchantId = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
