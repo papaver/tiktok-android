@@ -11,11 +11,15 @@ package com.tiktok.consumerapp;
 import java.util.Date;
 import java.util.List;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-//import android.util.Log;
+import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -43,7 +47,7 @@ public class CouponMapActivity extends MapActivity
     // statics
     //-------------------------------------------------------------------------
 
-    //private static final String kLogTag = "CouponMapActivity";
+    private static final String kLogTag = "CouponMapActivity";
 
     //-------------------------------------------------------------------------
     // CouponsOverlay
@@ -153,6 +157,12 @@ public class CouponMapActivity extends MapActivity
         mCursor = mDatabaseAdapter.fetchAllCoupons();
         startManagingCursor(mCursor);
 
+        // create a handler for the activity
+        mHandler = new Handler();
+
+        // setup intent receivers
+        setupIntentFilter();
+
         // fill map with items
         populateMap(mCursor);
     }
@@ -225,8 +235,8 @@ public class CouponMapActivity extends MapActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        cleanupIntentFilter();
         if (mDatabaseAdapter != null) mDatabaseAdapter.close();
-        if (mCursor != null) mCursor.close();
     }
 
     //-------------------------------------------------------------------------
@@ -261,6 +271,33 @@ public class CouponMapActivity extends MapActivity
 
     //-------------------------------------------------------------------------
     // helper methods
+    //-------------------------------------------------------------------------
+
+    private void setupIntentFilter()
+    {
+        Log.i(kLogTag, "settings up intent filters...");
+
+        // updatemap filter - update cursor, repopluate map
+        mUpdateMapReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(kLogTag, "Received updatemap intent from filter...");
+                updateCursor();
+            }
+        };
+        registerReceiver(mUpdateMapReceiver,
+            new IntentFilter("com.tiktok.consumer.app.updatemap"));
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void cleanupIntentFilter()
+    {
+        Log.i(kLogTag, "removing intent filters...");
+
+        unregisterReceiver(mUpdateMapReceiver);
+    }
+
     //-------------------------------------------------------------------------
 
     private void populateMap(Cursor cursor)
@@ -329,12 +366,46 @@ public class CouponMapActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
+
+    private void updateCursor()
+    {
+        // fetch the cursor on a background thread
+        final MapActivity activity = this;
+        new Thread(new Runnable() {
+            public void run() {
+                Log.i(kLogTag, "Updating cursor...");
+                final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
+
+                // swap to the new cursor on the main thread
+                mHandler.post(new Runnable() {
+                    public void run() {
+
+                        // clean up the previous cursor
+                        if (mCursor != null) {
+                            activity.stopManagingCursor(mCursor);
+                        }
+
+                        // repopulate map
+                        populateMap(cursor);
+
+                        // start managing the new cursor
+                        mCursor = cursor;
+                        activity.startManagingCursor(mCursor);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
+    private BroadcastReceiver     mUpdateMapReceiver;
     private CouponsOverlay        mOverlay;
-    private TapControlledMapView  mMapView;
     private Cursor                mCursor;
+    private Handler               mHandler;
+    private TapControlledMapView  mMapView;
     private TikTokDatabaseAdapter mDatabaseAdapter;
 
     private boolean               mPaused = false;

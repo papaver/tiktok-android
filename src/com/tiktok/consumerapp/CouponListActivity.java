@@ -246,6 +246,11 @@ public class CouponListActivity extends ListActivity
 
     private void updateCursor()
     {
+        // broadcast intent to update map
+        Intent newIntent = new Intent();
+        newIntent.setAction("com.tiktok.consumer.app.updatemap");
+        sendBroadcast(newIntent);
+
         // fetch the cursor on a background thread
         final Activity activity = this;
         new Thread(new Runnable() {
