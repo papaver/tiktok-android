@@ -17,6 +17,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.tiktok.consumerapp.utilities.ColorUtilities;
+import com.tiktok.consumerapp.utilities.TextUtilities;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -106,11 +107,31 @@ public final class Coupon
     //-------------------------------------------------------------------------
 
     /**
+     * @return Title of coupon w/ formatting.
+     */
+    public String formattedTitle()
+    {
+        return Coupon.formatTitle(mTitle);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Description of coupon.
      */
     public String details()
     {
         return mDetails;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Description of coupon w/ formatting.
+     */
+    public String formattedDetails()
+    {
+        return Coupon.formatDetails(mDetails);
     }
 
     //-------------------------------------------------------------------------
@@ -249,6 +270,26 @@ public final class Coupon
     // helper methods
     //-------------------------------------------------------------------------
 
+    public static String formatTitle(String title)
+    {
+        String formatedTitle = TextUtilities.capitalizeWords(title)
+            .replace("Free", "FREE")
+            .replace("Entree", "Entr\u00E8e");
+        return formatedTitle;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public static String formatDetails(String details)
+    {
+        String terms = "TikTok Terms and Conditions:\nwww.tiktok.com/terms";
+        String formatedDetails = String.format("%s\n\n%s", details, terms)
+            .replace("entree", "entr\u00E8e")
+            .replace("Entree", "Entr\u00E8e");
+        return formatedDetails;
+    }
+
+    //-------------------------------------------------------------------------
     public static boolean isExpired(Date time)
     {
         return time.before(new Date());

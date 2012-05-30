@@ -43,7 +43,6 @@ import com.google.android.maps.OverlayItem;
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
 import com.tiktok.consumerapp.map.ItemizedOverlay;
 import com.tiktok.consumerapp.utilities.ShareUtilities;
-import com.tiktok.consumerapp.utilities.TextUtilities;
 import com.tiktok.consumerapp.utilities.UIUtilities;
 
 //-----------------------------------------------------------------------------
@@ -385,7 +384,7 @@ public class CouponActivity extends MapActivity
 
         // title
         TextView title = (TextView)findViewById(R.id.title);
-        title.setText(TextUtilities.capitalizeWords(coupon.title()));
+        title.setText(coupon.formattedTitle());
 
         // gradient
         LinearLayout linearLayout   = (LinearLayout)findViewById(R.id.gradient);
@@ -401,9 +400,8 @@ public class CouponActivity extends MapActivity
         address.setText(merchant.address());
 
         // details
-        String terms = "TikTok Terms and Conditions:\nwww.tiktok.com/terms";
         TextView details = (TextView)findViewById(R.id.details);
-        details.setText(String.format("%s\n\n%s", coupon.details(), terms));
+        details.setText(coupon.formattedDetails());
 
         // barcode
         Button barcode = (Button)findViewById(R.id.barcode);
@@ -594,7 +592,7 @@ public class CouponActivity extends MapActivity
     {
         // setup share message
         String city      = mCoupon.merchant().getCity().toLowerCase();
-        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String formatted = mCoupon.formattedTitle();
         String deal      = String.format("I just got %s from %s! #FREEisBETTER #%s",
                                          formatted, mCoupon.merchant().name(), city);
 
@@ -632,7 +630,7 @@ public class CouponActivity extends MapActivity
     private void shareFacebook()
     {
         // format the post description
-        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String formatted = mCoupon.formattedTitle();
         String deal      = String.format("%s at %s! - " +
                                          "I just scored this awesome deal with my " +
                                          "TikTok app. Sad you missed it? Don't be " +
@@ -682,7 +680,7 @@ public class CouponActivity extends MapActivity
     public void shareSMS()
     {
         String merchant  = mCoupon.merchant().name();
-        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String formatted = mCoupon.formattedTitle();
         String deal      = String.format("%s at %s", formatted, merchant);
         String body      = String.format("TikTok: %s! www.tiktok.com", deal);
 
@@ -702,7 +700,7 @@ public class CouponActivity extends MapActivity
     {
         // present the email controller
         String merchant  = mCoupon.merchant().name();
-        String formatted = TextUtilities.capitalizeWords(mCoupon.title());
+        String formatted = mCoupon.formattedTitle();
         String subject   = String.format("TikTok: Checkout this amazing deal for %s!", merchant);
         String body      = String.format("<h3>TikTok</h3>" +
                                          "<b>%s</b> at <b>%s</b>" +

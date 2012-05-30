@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.util.Log;
 
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
-import com.tiktok.consumerapp.utilities.TextUtilities;
 import com.tiktok.consumerapp.utilities.UIUtilities;
 
 //-----------------------------------------------------------------------------
@@ -93,7 +92,7 @@ public final class CouponAdapter extends CursorAdapter
 
         // set merchant / title / expires at
         viewHolder.merchant.setText(merchant.name().toUpperCase());
-        viewHolder.title.setText(TextUtilities.capitalizeWords(title));
+        viewHolder.title.setText(Coupon.formatTitle(title));
         viewHolder.expiresTime.setText(Coupon.getExpirationTime(endTime));
 
         // add formating to subtitle view
