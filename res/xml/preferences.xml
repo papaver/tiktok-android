@@ -9,6 +9,9 @@
   <EditTextPreference android:title="Email"
                       android:key="TTS_email"
                       android:summary="What your email?" />
+  <EditTextPreference android:title="Twitter Handle"
+                      android:key="TTS_twh"
+                      android:summary="What your Twitter handle?" />
   <ListPreference     android:title="Gender"
                       android:key="TTS_gender"
                       android:summary="Select your gender for better deals!"

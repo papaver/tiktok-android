@@ -46,6 +46,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public static final String kDomain                 = "com.tiktok.comsumerapp.preferences";
     public static final String kTagName                = "TTS_name";
     public static final String kTagEmail               = "TTS_email";
+    public static final String kTagTwitterHandle       = "TTS_twh";
     public static final String kTagGender              = "TTS_gender";
     public static final String kTagBirthday            = "TTS_birthday";
     public static final String kTagHome                = "TTS_home";
@@ -146,6 +147,34 @@ public final class Settings implements OnSharedPreferenceChangeListener
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("email", email);
+        api.updateSettings(settings);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public String twitterHandle()
+    {
+        return mPreferences.getString(kTagTwitterHandle, "");
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void setTwitterHandle(String handle)
+    {
+        mEditor.putString(kTagTwitterHandle, handle);
+        mEditor.commit();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void syncTwitterHandle()
+    {
+        String handle = twitterHandle();
+        if (handle.equals("")) return;
+
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("twh", handle);
         api.updateSettings(settings);
     }
 
@@ -404,6 +433,8 @@ public final class Settings implements OnSharedPreferenceChangeListener
             syncName();
         } else if (key.equals(kTagEmail)) {
             syncEmail();
+        } else if (key.equals(kTagTwitterHandle)) {
+            syncTwitterHandle();
         } else if (key.equals(kTagGender)) {
             syncGender();
         } else if (key.equals(kTagBirthday)) {

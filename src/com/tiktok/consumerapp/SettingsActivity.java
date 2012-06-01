@@ -75,6 +75,13 @@ public class SettingsActivity extends    PreferenceActivity
             textPreference.setSummary(mSettings.email());
         }
 
+        // twitter handle
+        if (!mSettings.twitterHandle().equals("")) {
+            EditTextPreference textPreference =
+                (EditTextPreference)getPreferenceScreen().findPreference(Settings.kTagTwitterHandle);
+            textPreference.setSummary(mSettings.twitterHandle());
+        }
+
         // gender
         if (!mSettings.gender().equals("")) {
             ListPreference textPreference =
@@ -271,7 +278,8 @@ public class SettingsActivity extends    PreferenceActivity
         Log.i(kLogTag, String.format("Updated setting %s", key));
 
         // update summary for text fields
-        if (key.equals(Settings.kTagName) || key.equals(Settings.kTagEmail)) {
+        if (key.equals(Settings.kTagName) || key.equals(Settings.kTagEmail) ||
+            key.equals(Settings.kTagTwitterHandle)) {
             EditTextPreference textPreference =
                 (EditTextPreference)getPreferenceScreen().findPreference(key);
             textPreference.setSummary(sharedPreferences.getString(key, ""));
