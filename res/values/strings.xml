@@ -9,12 +9,16 @@
     <string name="tab_map">Deals Map</string>
     <string name="tab_karma">Karma</string>
     <string name="tab_settings">Settings</string>
+    <string name="tab_cities">Cities</string>
     <string name="coupon_view">Deal</string>
     <string name="merchant_view">Merchant</string>
     <string name="location_picker_view">Location Picker</string>
 
     <!-- Karma -->
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
+
+    <!-- Cities -->
+    <string name="cities_sync_fail">Failed to sync city data. Try again later.</string>
 
     <!-- Coupons -->
     <string name="coupon_sync_fail">Failed to sync deals. Try again.</string>

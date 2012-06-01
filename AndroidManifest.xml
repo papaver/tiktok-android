@@ -76,6 +76,12 @@
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
 
+        <!-- Cities Activity -->
+        <activity
+            android:label="@string/tab_cities"
+            android:name=".CitiesActivity"
+            android:screenOrientation="portrait" />
+
         <!-- Coupon Activity -->
         <activity
             android:label="@string/coupon_view"

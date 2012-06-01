@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -32,6 +33,7 @@ import android.os.Handler;
 import android.location.Location;
 import android.util.Log;
 
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -484,7 +486,7 @@ public final class TikTokApi
             new DownloadHandler() {
                 public void onSuccess(final Object data) {
 
-                    // parse out the consumerId
+                    // parse out the karma points
                     Map<String, Integer> karma = null;
                     TikTokApiResponse response   = (TikTokApiResponse)data;
                     if (response.isOkay()) {
@@ -520,6 +522,54 @@ public final class TikTokApi
                 public void onSuccess(final Object data) {
                     postSuccess(data);
                 }
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            });
+
+        runOnThread(downloader);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Syncs the city list.
+     */
+    public void syncCities()
+    {
+        // construct route to retrieve karma points
+        String url = String.format("%s/cities", getApiUrl());
+
+        // query the server
+        HttpGet request = new HttpGet(url);
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+
+                    // parse out the city data
+                    Map<String, List<String>> cities = null;
+                    TikTokApiResponse response  = (TikTokApiResponse)data;
+                    if (response.isOkay()) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode cityNodes  = mapper.convertValue(
+                            response.getResults(),
+                            new TypeReference<JsonNode>() {});
+
+                        // pull out city names
+                        cities = new HashMap<String, List<String>>();
+                        for (String key : new String[] { "live", "beta", "soon" }) {
+                            List<String> cityList = new LinkedList<String>();
+                            for (JsonNode city : cityNodes.get(key)) {
+                                cityList.add(city.get("name").getTextValue());
+                            }
+                            cities.put(key, cityList);
+                        }
+                    }
+
+                    // run handler
+                    postSuccess(cities);
+                }
+
                 public void onError(Throwable error) {
                     postError(error);
                 }

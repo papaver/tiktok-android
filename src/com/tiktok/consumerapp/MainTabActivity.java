@@ -31,6 +31,7 @@ public class MainTabActivity extends TabActivity
     private static final String kTagCouponMap  = "map";
     private static final String kTagKarma      = "karma";
     private static final String kTagSettings   = "settings";
+    private static final String kTagCities     = "cities";
 
     //-------------------------------------------------------------------------
     // activity events
@@ -163,6 +164,13 @@ public class MainTabActivity extends TabActivity
         intent = new Intent().setClass(this, SettingsActivity.class);
         spec   = tabHost.newTabSpec(kTagSettings)
                         .setIndicator("Settings", res.getDrawable(R.drawable.icon_tab_settings))
+                        .setContent(intent);
+        tabHost.addTab(spec);
+
+        // setup city tab
+        intent = new Intent().setClass(this, CitiesActivity.class);
+        spec   = tabHost.newTabSpec(kTagCities)
+                        .setIndicator("Cities", res.getDrawable(R.drawable.icon_tab_cities))
                         .setContent(intent);
         tabHost.addTab(spec);
 
