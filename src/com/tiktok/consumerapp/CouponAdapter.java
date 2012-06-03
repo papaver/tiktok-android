@@ -80,6 +80,7 @@ public final class CouponAdapter extends CursorAdapter
         final String iconUrl        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
         final boolean isSoldOut     = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsSoldOut)) == 1;
         final boolean wasRedeemed   = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyWasRedeemed)) == 1;
+        final boolean isRedeemable  = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsRedeemable)) == 1;
 
         // query merchant from cursor
         final Merchant merchant = adapter.fetchMerchant(merchantId);
@@ -110,6 +111,8 @@ public final class CouponAdapter extends CursorAdapter
             viewHolder.sash.setImageResource(R.drawable.redeemedsash);
         } else if (isSoldOut) {
             viewHolder.sash.setImageResource(R.drawable.soldoutsash);
+        } else if (!isRedeemable) {
+            viewHolder.sash.setImageResource(R.drawable.infosash);
         } else {
             viewHolder.sash.setVisibility(View.GONE);
         }

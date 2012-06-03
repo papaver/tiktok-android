@@ -41,19 +41,21 @@ public final class Coupon
         @JsonProperty("expiry_time_in_tvsec") final long endTime,
         @JsonProperty("barcode_number")       final String barcode,
         @JsonProperty("redeemed")             final boolean wasRedeemed,
+        @JsonProperty("is_redeemable")        final boolean isRedeemable,
         @JsonProperty("merchant")             final Merchant merchant)
     {
-        mId          = id;
-        mTitle       = title;
-        mDetails     = details;
-        mIconId      = iconId;
-        mIconUrl     = iconUrl;
-        mStartTime   = startTime;
-        mEndTime     = endTime;
-        mBarcode     = barcode;
-        mWasRedeemed = wasRedeemed;
-        mIsSoldOut   = false;
-        mMerchant    = merchant;
+        mId           = id;
+        mTitle        = title;
+        mDetails      = details;
+        mIconId       = iconId;
+        mIconUrl      = iconUrl;
+        mStartTime    = startTime;
+        mEndTime      = endTime;
+        mBarcode      = barcode;
+        mIsSoldOut    = false;
+        mWasRedeemed  = wasRedeemed;
+        mIsRedeemable = isRedeemable;
+        mMerchant     = merchant;
     }
 
     //-------------------------------------------------------------------------
@@ -69,19 +71,21 @@ public final class Coupon
         String barcode,
         boolean isSoldOut,
         boolean wasRedeemed,
+        boolean isRedeemable,
         Merchant merchant)
     {
-        mId          = id;
-        mTitle       = title;
-        mDetails     = details;
-        mIconId      = iconId;
-        mIconUrl     = iconUrl;
-        mStartTime   = startTime;
-        mEndTime     = endTime;
-        mBarcode     = barcode;
-        mIsSoldOut   = isSoldOut;
-        mWasRedeemed = wasRedeemed;
-        mMerchant    = merchant;
+        mId           = id;
+        mTitle        = title;
+        mDetails      = details;
+        mIconId       = iconId;
+        mIconUrl      = iconUrl;
+        mStartTime    = startTime;
+        mEndTime      = endTime;
+        mBarcode      = barcode;
+        mIsSoldOut    = isSoldOut;
+        mWasRedeemed  = wasRedeemed;
+        mIsRedeemable = isRedeemable;
+        mMerchant     = merchant;
     }
 
     //-------------------------------------------------------------------------
@@ -249,6 +253,16 @@ public final class Coupon
     //-------------------------------------------------------------------------
 
     /**
+     * @return Returns weather or not coupon is redeemedable.
+     */
+    public boolean isRedeemable()
+    {
+        return mIsRedeemable;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Returns merchant who owns this coupon.
      */
     public Merchant merchant()
@@ -395,18 +409,19 @@ public final class Coupon
     {
         String newLine = System.getProperty("line.separator");
         String string  =
-            "Coupon {"      + newLine +
-            "  id: "        + Long.toString(id()) + newLine +
-            "  title: "     + title() + newLine +
-            "  details: "   + details() + newLine +
-            "  iconId: "    + Integer.toString(iconId()) + newLine +
-            "  iconUrl: "   + iconUrl() + newLine +
-            "  startTime: " + startTime().toString() + newLine +
-            "  endTime: "   + endTime().toString() + newLine +
-            "  barcode: "   + barcode() + newLine +
-            "  isSoldOut: " + Boolean.toString(isSoldOut()) + newLine +
-            "  redeemed: "  + Boolean.toString(wasRedeemed()) + newLine +
-            "  merchant: "  + merchant().toString() + newLine +
+            "Coupon {"          + newLine +
+            "  id: "            + Long.toString(id()) + newLine +
+            "  title: "         + title() + newLine +
+            "  details: "       + details() + newLine +
+            "  iconId: "        + Integer.toString(iconId()) + newLine +
+            "  iconUrl: "       + iconUrl() + newLine +
+            "  startTime: "     + startTime().toString() + newLine +
+            "  endTime: "       + endTime().toString() + newLine +
+            "  barcode: "       + barcode() + newLine +
+            "  isSoldOut: "     + Boolean.toString(isSoldOut()) + newLine +
+            "  redeemed: "      + Boolean.toString(wasRedeemed()) + newLine +
+            "  is_redeemable: " + Boolean.toString(isRedeemable()) + newLine +
+            "  merchant: "      + merchant().toString() + newLine +
             "}";
         return string;
     }
@@ -425,6 +440,7 @@ public final class Coupon
     private final String   mBarcode;
     private       boolean  mIsSoldOut;
     private       boolean  mWasRedeemed;
+    private final boolean  mIsRedeemable;
     private final Merchant mMerchant;
 
 }

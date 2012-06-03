@@ -72,7 +72,8 @@ public class CouponActivity extends MapActivity
         kDefault,
         kExpired,
         kSoldOut,
-        kActive
+        kActive,
+        kInfo,
     }
 
     //-------------------------------------------------------------------------
@@ -529,6 +530,7 @@ public class CouponActivity extends MapActivity
         state             = coupon.isSoldOut() ? CouponState.kSoldOut : state;
         state             = Coupon.isExpired(coupon.endTime()) ? CouponState.kExpired : state;
         state             = coupon.wasRedeemed() ? CouponState.kActive : state;
+        state             = !coupon.isRedeemable() ? CouponState.kInfo : state;
         return state;
     }
 
@@ -545,7 +547,7 @@ public class CouponActivity extends MapActivity
         findViewById(R.id.coupon).startAnimation(alpha);
 
         // update coupon banner
-        if (!coupon.wasRedeemed()) {
+        if (!coupon.wasRedeemed() && coupon.isRedeemable()) {
             updateBanner(CouponState.kExpired);
         }
     }
@@ -558,11 +560,13 @@ public class CouponActivity extends MapActivity
         View expired  = findViewById(R.id.banner_expired);
         View soldout  = findViewById(R.id.banner_soldout);
         View redeemed = findViewById(R.id.banner_redeemed);
+        View info     = findViewById(R.id.banner_info);
 
         redeem.setVisibility(View.GONE);
         expired.setVisibility(View.GONE);
         soldout.setVisibility(View.GONE);
         redeemed.setVisibility(View.GONE);
+        info.setVisibility(View.GONE);
 
         switch (state)
         {
@@ -580,6 +584,10 @@ public class CouponActivity extends MapActivity
 
             case kActive:
                 redeemed.setVisibility(View.VISIBLE);
+                break;
+
+            case kInfo:
+                info.setVisibility(View.VISIBLE);
                 break;
         }
     }

@@ -277,6 +277,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <!-- Info -->
+        <ImageView
+            android:id="@+id/banner_info"
+            android:src="@drawable/infobanner"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            android:layout_gravity="bottom|center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <!-- Redeemed -->
         <FrameLayout
             android:id="@+id/banner_redeemed"

@@ -33,20 +33,29 @@ public class CouponTable
     /**
      * Runs if table version has changed and the database needs to be upgraded.
      */
-    public static void onUpgrade(SQLiteDatabase database, 
+    public static void onUpgrade(SQLiteDatabase database,
                                  int oldVersion, int newVersion)
     {
         // this is obviously the worst implementation ever
 
         Log.w(CouponTable.class.getName(), String.format(
-            "Upgrading database from version %d to %d " +
-            "which will destroy all data.", oldVersion, newVersion));
+            "Upgrading database from version %d to %d ", oldVersion, newVersion));
 
-        // drop the table 
-        dropTable(database);
+        // v1 to v2
+        if (oldVersion == 1) {
+            onUpgradev1Tov2(database);
+            ++oldVersion;
+        }
+    }
 
-        // create the new table
-        onCreate(database);
+    //-------------------------------------------------------------------------
+
+    public static void onUpgradev1Tov2(SQLiteDatabase database)
+    {
+        String alterSQL =
+            "alter table " + sName +
+            " add column " + sKeyIsRedeemable + " integer not null default 1";
+        database.execSQL(alterSQL);
     }
 
     //-------------------------------------------------------------------------
@@ -56,7 +65,7 @@ public class CouponTable
      */
     private static String getCreateSQL()
     {
-        String createSQL = 
+        String createSQL =
             "create table "  + sName + "("                            +
             sKeyRowId        + " integer primary key autoincrement, " +
             sKeyId           + " integer not null,                  " +
@@ -69,6 +78,7 @@ public class CouponTable
             sKeyBarcode      + " text    not null,                  " +
             sKeyIsSoldOut    + " integer not null default 0,        " +
             sKeyWasRedeemed  + " integer not null,                  " +
+            sKeyIsRedeemable + " integer not null default 1,        " +
             sKeyMerchant     + " integer not null                   "
                              + String.format(" references %s(%s)", MerchantTable.sName, MerchantTable.sKeyId)
                              + " on delete cascade                  " + ");";
@@ -92,8 +102,8 @@ public class CouponTable
      */
     public static String getTableDropSQL(String tableName)
     {
-        String tableDropSQL = 
-            String.format("drop table if exists %s", tableName); 
+        String tableDropSQL =
+            String.format("drop table if exists %s", tableName);
         return tableDropSQL;
     }
 
@@ -105,53 +115,8 @@ public class CouponTable
      */
     public static Coupon fetch(SQLiteDatabase database, long id) throws SQLException
     {
-        String rows[] = new String[] {
-            sKeyRowId,
-            sKeyId,
-            sKeyTitle,
-            sKeyDetails,
-            sKeyIconId,
-            sKeyIconUrl,
-            sKeyStartTime,
-            sKeyEndTime,
-            sKeyBarcode,
-            sKeyIsSoldOut,
-            sKeyWasRedeemed,
-            sKeyMerchant,
-        };
-
         String equalsSQL = String.format("%s = %d", sKeyId, id);
-        Cursor cursor    = database.query(true, sName, rows, equalsSQL,
-            null, null, null, null, null);
-
-        // create a coupon from the cursor
-        if (cursor != null) {
-            cursor.moveToFirst();
-
-            // grab merchant
-            long merchantId   = cursor.getLong(cursor.getColumnIndex(sKeyMerchant));
-            Merchant merchant = MerchantTable.fetch(database, merchantId);
-
-            // can't have coupons without merchants!
-            if (merchant != null) {
-                Coupon coupon = new Coupon(
-                    cursor.getLong(cursor.getColumnIndex(sKeyId)),
-                    cursor.getString(cursor.getColumnIndex(sKeyTitle)),
-                    cursor.getString(cursor.getColumnIndex(sKeyDetails)),
-                    cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
-                    cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
-                    cursor.getLong(cursor.getColumnIndex(sKeyStartTime)),
-                    cursor.getLong(cursor.getColumnIndex(sKeyEndTime)),
-                    cursor.getString(cursor.getColumnIndex(sKeyBarcode)),
-                    cursor.getInt(cursor.getColumnIndex(sKeyIsSoldOut)) == 1,
-                    cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
-                    merchant
-                );
-                return coupon;
-            }
-        }
-
-        return null;
+        return runFetch(database, equalsSQL);
     }
 
     //-------------------------------------------------------------------------
@@ -161,6 +126,14 @@ public class CouponTable
      * @returns Cursor positioned at the requested coupon.
      */
     public static Coupon fetchByRowId(SQLiteDatabase database, long id) throws SQLException
+    {
+        String equalsSQL = String.format("%s = %d", sKeyRowId, id);
+        return runFetch(database, equalsSQL);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public static Coupon runFetch(SQLiteDatabase database, String sql) throws SQLException
     {
         String rows[] = new String[] {
             sKeyRowId,
@@ -174,11 +147,12 @@ public class CouponTable
             sKeyBarcode,
             sKeyIsSoldOut,
             sKeyWasRedeemed,
+            sKeyIsRedeemable,
             sKeyMerchant,
         };
 
-        String equalsSQL = String.format("%s = %d", sKeyRowId, id);
-        Cursor cursor    = database.query(true, sName, rows, equalsSQL,
+        // setup cursor
+        Cursor cursor = database.query(true, sName, rows, sql,
             null, null, null, null, null);
 
         // create a coupon from the cursor
@@ -202,6 +176,7 @@ public class CouponTable
                     cursor.getString(cursor.getColumnIndex(sKeyBarcode)),
                     cursor.getInt(cursor.getColumnIndex(sKeyIsSoldOut)) == 1,
                     cursor.getInt(cursor.getColumnIndex(sKeyWasRedeemed)) == 1,
+                    cursor.getInt(cursor.getColumnIndex(sKeyIsRedeemable)) == 1,
                     merchant
                 );
                 return coupon;
@@ -215,18 +190,19 @@ public class CouponTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName           = "Coupon";
-    public static String sKeyRowId       = "_id";
-    public static String sKeyId          = "coupon_id";
-    public static String sKeyTitle       = "title";
-    public static String sKeyDetails     = "details";
-    public static String sKeyIconId      = "icon_id";
-    public static String sKeyIconUrl     = "icon_url";
-    public static String sKeyStartTime   = "start_time";
-    public static String sKeyEndTime     = "end_time";
-    public static String sKeyBarcode     = "barcode";
-    public static String sKeyWasRedeemed = "was_redeemed";
-    public static String sKeyIsSoldOut   = "is_sold_out";
-    public static String sKeyMerchant    = "merchant";
+    public static String sName            = "Coupon";
+    public static String sKeyRowId        = "_id";
+    public static String sKeyId           = "coupon_id";
+    public static String sKeyTitle        = "title";
+    public static String sKeyDetails      = "details";
+    public static String sKeyIconId       = "icon_id";
+    public static String sKeyIconUrl      = "icon_url";
+    public static String sKeyStartTime    = "start_time";
+    public static String sKeyEndTime      = "end_time";
+    public static String sKeyBarcode      = "barcode";
+    public static String sKeyWasRedeemed  = "was_redeemed";
+    public static String sKeyIsRedeemable = "is_redeemable";
+    public static String sKeyIsSoldOut    = "is_sold_out";
+    public static String sKeyMerchant     = "merchant";
 
 }

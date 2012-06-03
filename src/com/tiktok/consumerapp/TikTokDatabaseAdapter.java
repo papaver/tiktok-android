@@ -74,10 +74,11 @@ public class TikTokDatabaseAdapter
                              int iconId, String iconUrl,
                              long startTime, long endTime, String barcode,
                              boolean isSoldOut, boolean wasRedeemed,
-                             Merchant merchant)
+                             boolean isRedeemable, Merchant merchant)
     {
         Coupon coupon = new Coupon(id, title, details, iconId, iconUrl,
-            startTime, endTime, barcode, isSoldOut, wasRedeemed, merchant);
+            startTime, endTime, barcode, isSoldOut, wasRedeemed, isRedeemable,
+            merchant);
         return createCoupon(coupon);
     }
 
@@ -119,10 +120,11 @@ public class TikTokDatabaseAdapter
                                 int iconId, String iconUrl,
                                 long startTime, long endTime, String barcode,
                                 boolean isSoldOut, boolean wasRedeemed,
-                                Merchant merchant)
+                                boolean isRedeemable, Merchant merchant)
     {
         Coupon coupon = new Coupon(id, title, details, iconId, iconUrl,
-            startTime, endTime, barcode, isSoldOut, wasRedeemed, merchant);
+            startTime, endTime, barcode, isSoldOut, wasRedeemed, isRedeemable,
+            merchant);
         return updateCoupon(coupon);
     }
 
@@ -207,6 +209,7 @@ public class TikTokDatabaseAdapter
             CouponTable.sKeyBarcode,
             CouponTable.sKeyIsSoldOut,
             CouponTable.sKeyWasRedeemed,
+            CouponTable.sKeyIsRedeemable,
             CouponTable.sKeyMerchant,
         };
 
@@ -341,17 +344,18 @@ public class TikTokDatabaseAdapter
     private ContentValues createContentValues(Coupon coupon)
     {
         ContentValues values = new ContentValues();
-        values.put(CouponTable.sKeyId,          coupon.id());
-        values.put(CouponTable.sKeyTitle,       coupon.title());
-        values.put(CouponTable.sKeyDetails,     coupon.details());
-        values.put(CouponTable.sKeyIconId,      coupon.iconId());
-        values.put(CouponTable.sKeyIconUrl,     coupon.iconUrl());
-        values.put(CouponTable.sKeyStartTime,   coupon.startTimeRaw());
-        values.put(CouponTable.sKeyEndTime,     coupon.endTimeRaw());
-        values.put(CouponTable.sKeyBarcode,     coupon.barcode());
-        values.put(CouponTable.sKeyIsSoldOut,   coupon.isSoldOut());
-        values.put(CouponTable.sKeyWasRedeemed, coupon.wasRedeemed());
-        values.put(CouponTable.sKeyMerchant,    coupon.merchant().id());
+        values.put(CouponTable.sKeyId,           coupon.id());
+        values.put(CouponTable.sKeyTitle,        coupon.title());
+        values.put(CouponTable.sKeyDetails,      coupon.details());
+        values.put(CouponTable.sKeyIconId,       coupon.iconId());
+        values.put(CouponTable.sKeyIconUrl,      coupon.iconUrl());
+        values.put(CouponTable.sKeyStartTime,    coupon.startTimeRaw());
+        values.put(CouponTable.sKeyEndTime,      coupon.endTimeRaw());
+        values.put(CouponTable.sKeyBarcode,      coupon.barcode());
+        values.put(CouponTable.sKeyIsSoldOut,    coupon.isSoldOut());
+        values.put(CouponTable.sKeyWasRedeemed,  coupon.wasRedeemed());
+        values.put(CouponTable.sKeyIsRedeemable, coupon.isRedeemable());
+        values.put(CouponTable.sKeyMerchant,     coupon.merchant().id());
         return values;
     }
 

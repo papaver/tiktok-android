@@ -72,6 +72,6 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     //-------------------------------------------------------------------------
 
     private static final String sDatabaseName    = "TikTokData";
-    private static final int    sDatabaseVersion = 1;
+    private static final int    sDatabaseVersion = 2;
 
 }
