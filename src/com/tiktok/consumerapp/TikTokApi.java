@@ -582,8 +582,12 @@ public final class TikTokApi
 
     public void cancel()
     {
-        if (mDownloader != null) mDownloader.interrupt();
-        if (mThread != null) mThread.interrupt();
+        new Thread(new Runnable() {
+            public void run() {
+                if (mDownloader != null) mDownloader.interrupt();
+                if (mThread != null) mThread.interrupt();
+            }
+        }).start();
         mHandler = null;
     }
 
