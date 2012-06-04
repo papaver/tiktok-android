@@ -198,7 +198,11 @@ public final class Merchant
 
     public String getCity()
     {
-        return mAddress.split(", ")[1];
+        try {
+            return mAddress.split(", ")[1];
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     //-------------------------------------------------------------------------
