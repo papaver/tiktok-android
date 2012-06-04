@@ -12,8 +12,11 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.TabHost;
 import android.util.Log;
+
+import com.ijsbrandslob.appirater.Appirater;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -50,6 +53,10 @@ public class MainTabActivity extends TabActivity
 
         // setup tabs in tab view
         setupTabs();
+
+        // create appirater instance
+        mAppirater = new Appirater(this, new Handler());
+        mAppirater.appLaunched(true);
     }
 
     //-------------------------------------------------------------------------
@@ -73,6 +80,7 @@ public class MainTabActivity extends TabActivity
     protected void onResume()
     {
         super.onResume();
+        mAppirater.appEnteredForeground(false);
     }
 
     //-------------------------------------------------------------------------
@@ -177,4 +185,10 @@ public class MainTabActivity extends TabActivity
         // set the current tab
         tabHost.setCurrentTabByTag(kTagCouponList);
     }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+
+    Appirater mAppirater;
 }
