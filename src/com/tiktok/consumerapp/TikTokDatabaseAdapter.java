@@ -11,6 +11,8 @@ package com.tiktok.consumerapp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -104,10 +106,10 @@ public class TikTokDatabaseAdapter
                                double latitude, double longitude,
                                String phone, String category, String details,
                                int iconId, String iconUrl,
-                               String webUrl)
+                               String webUrl, long lastUpdated)
     {
         Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
-            category, details, iconId, iconUrl, webUrl);
+            category, details, iconId, iconUrl, webUrl, lastUpdated);
         return createMerchant(merchant);
     }
 
@@ -149,10 +151,10 @@ public class TikTokDatabaseAdapter
                                   double latitude, double longitude,
                                   String phone, String category, String details,
                                   int iconId, String iconUrl,
-                                  String webUrl)
+                                  String webUrl, long lastUpdated)
     {
         Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
-            category, details, iconId, iconUrl, webUrl);
+            category, details, iconId, iconUrl, webUrl, lastUpdated);
         return updateMerchant(merchant);
     }
 
@@ -240,7 +242,8 @@ public class TikTokDatabaseAdapter
             MerchantTable.sKeyDetails,
             MerchantTable.sKeyIconId,
             MerchantTable.sKeyIconUrl,
-            MerchantTable.sKeyWebsiteUrl
+            MerchantTable.sKeyWebsiteUrl,
+            MerchantTable.sKeyLastUpdated
         };
         return mDatabase.query(MerchantTable.sName, rows, null, null, null, null, null);
     }
@@ -280,10 +283,11 @@ public class TikTokDatabaseAdapter
      * Fetch all the merchants from the database.
      * @returns Cursor over all the coupons.
      */
-    public List<Long> fetchAllMerchantIds()
+    public Map<Long, Date> fetchAllMerchantIds()
     {
         String rows[] = new String[] {
             MerchantTable.sKeyId,
+            MerchantTable.sKeyLastUpdated,
         };
 
         // grab the data from the database
@@ -291,10 +295,10 @@ public class TikTokDatabaseAdapter
             null, null, null, null, null);
         cursor.moveToFirst();
 
-        // create a list of ids
-        List<Long> ids = new ArrayList<Long>();
+        // create a hash of ids and update times
+        Map<Long, Date> ids = new HashMap<Long, Date>();
         for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
-            ids.add(cursor.getLong(0));
+            ids.put(cursor.getLong(0), new Date(cursor.getLong(1) * 1000));
         }
 
         // cleanup
@@ -367,17 +371,18 @@ public class TikTokDatabaseAdapter
     private ContentValues createContentValues(Merchant merchant)
     {
         ContentValues values = new ContentValues();
-        values.put(MerchantTable.sKeyId,         merchant.id());
-        values.put(MerchantTable.sKeyName,       merchant.name());
-        values.put(MerchantTable.sKeyAddress,    merchant.address());
-        values.put(MerchantTable.sKeyLatitude,   merchant.latitude());
-        values.put(MerchantTable.sKeyLongitude,  merchant.longitude());
-        values.put(MerchantTable.sKeyPhone,      merchant.phone());
-        values.put(MerchantTable.sKeyCategory,   merchant.category());
-        values.put(MerchantTable.sKeyDetails,    merchant.details());
-        values.put(MerchantTable.sKeyIconId,     merchant.iconId());
-        values.put(MerchantTable.sKeyIconUrl,    merchant.iconUrl());
-        values.put(MerchantTable.sKeyWebsiteUrl, merchant.websiteUrl());
+        values.put(MerchantTable.sKeyId,          merchant.id());
+        values.put(MerchantTable.sKeyName,        merchant.name());
+        values.put(MerchantTable.sKeyAddress,     merchant.address());
+        values.put(MerchantTable.sKeyLatitude,    merchant.latitude());
+        values.put(MerchantTable.sKeyLongitude,   merchant.longitude());
+        values.put(MerchantTable.sKeyPhone,       merchant.phone());
+        values.put(MerchantTable.sKeyCategory,    merchant.category());
+        values.put(MerchantTable.sKeyDetails,     merchant.details());
+        values.put(MerchantTable.sKeyIconId,      merchant.iconId());
+        values.put(MerchantTable.sKeyIconUrl,     merchant.iconUrl());
+        values.put(MerchantTable.sKeyWebsiteUrl,  merchant.websiteUrl());
+        values.put(MerchantTable.sKeyLastUpdated, merchant.lastUpdatedRaw());
         return values;
     }
 

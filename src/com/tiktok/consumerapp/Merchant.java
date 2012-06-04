@@ -8,6 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -35,19 +37,21 @@ public final class Merchant
         @JsonProperty("description")  final String details,
         @JsonProperty("icon_uid")     final int iconId,
         @JsonProperty("icon_url")     final String iconUrl,
-        @JsonProperty("web_url")      final String websiteUrl)
+        @JsonProperty("web_url")      final String websiteUrl,
+        @JsonProperty("last_update")  final long lastUpdated)
     {
-        mId         = id;
-        mName       = name;
-        mAddress    = address;
-        mLatitude   = latitude;
-        mLongitude  = longitude;
-        mPhone      = phone;
-        mCategory   = category;
-        mDetails    = details;
-        mIconId     = iconId;
-        mIconUrl    = iconUrl;
-        mWebsiteUrl = websiteUrl;
+        mId          = id;
+        mName        = name;
+        mAddress     = address;
+        mLatitude    = latitude;
+        mLongitude   = longitude;
+        mPhone       = phone;
+        mCategory    = category;
+        mDetails     = details;
+        mIconId      = iconId;
+        mIconUrl     = iconUrl;
+        mWebsiteUrl  = websiteUrl;
+        mLastUpdated = lastUpdated;
     }
 
     //-------------------------------------------------------------------------
@@ -172,6 +176,26 @@ public final class Merchant
 
     //-------------------------------------------------------------------------
 
+    /**
+     * @return Returns date merchant data was last updated.
+     */
+    public long lastUpdatedRaw()
+    {
+        return mLastUpdated;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns date merchant data was last updated.
+     */
+    public Date lastUpdated()
+    {
+        return new Date(mLastUpdated * 1000);
+    }
+
+    //-------------------------------------------------------------------------
+
     public String getCity()
     {
         return mAddress.split(", ")[1];
@@ -186,18 +210,19 @@ public final class Merchant
     {
         String newLine = System.getProperty("line.separator");
         String string  =
-            "Merchant {"     + newLine +
-            "  id: "         + Long.toString(id()) + newLine +
-            "  name: "       + name() + newLine +
-            "  address: "    + address() + newLine +
-            "  latitude: "   + Double.toString(latitude()) + newLine +
-            "  longitude: "  + Double.toString(longitude()) + newLine +
-            "  phone: "      + phone() + newLine +
-            "  category: "   + category() + newLine +
-            "  details: "    + details() + newLine +
-            "  iconId: "     + Integer.toString(iconId()) + newLine +
-            "  iconUrl: "    + iconUrl() + newLine +
-            "  websiteUrl: " + websiteUrl() + newLine +
+            "Merchant {"      + newLine +
+            "  id: "          + Long.toString(id()) + newLine +
+            "  name: "        + name() + newLine +
+            "  address: "     + address() + newLine +
+            "  latitude: "    + Double.toString(latitude()) + newLine +
+            "  longitude: "   + Double.toString(longitude()) + newLine +
+            "  phone: "       + phone() + newLine +
+            "  category: "    + category() + newLine +
+            "  details: "     + details() + newLine +
+            "  iconId: "      + Integer.toString(iconId()) + newLine +
+            "  iconUrl: "     + iconUrl() + newLine +
+            "  websiteUrl: "  + websiteUrl() + newLine +
+            "  lastUpdated: " + lastUpdated().toString() + newLine +
             "}";
         return string;
     }
@@ -217,4 +242,6 @@ public final class Merchant
     private final int    mIconId;
     private final String mIconUrl;
     private final String mWebsiteUrl;
+    private final long   mLastUpdated;
+
 }

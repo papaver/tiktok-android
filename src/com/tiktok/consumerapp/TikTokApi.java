@@ -720,14 +720,23 @@ public final class TikTokApi
         if (Thread.currentThread().isInterrupted()) return;
 
         // add only new coupons to the database
-        List<Long> couponIds   = adapter.fetchAllCouponIds();
-        List<Long> merchantIds = adapter.fetchAllMerchantIds();
+        List<Long> couponIds        = adapter.fetchAllCouponIds();
+        Map<Long, Date> merchantIds = adapter.fetchAllMerchantIds();
         for (final Coupon coupon : coupons) {
 
-            if (!merchantIds.contains(coupon.merchant().id())) {
+            if (!merchantIds.keySet().contains(coupon.merchant().id())) {
                 adapter.createMerchant(coupon.merchant());
+                merchantIds.put(coupon.merchant().id(), coupon.merchant().lastUpdated());
                 Log.i(kLogTag, String.format(
                     "Added merchant to db: %s", coupon.merchant().name()));
+            } else {
+                Date lastUpdated = merchantIds.get(coupon.merchant().id());
+                if (lastUpdated.compareTo(coupon.merchant().lastUpdated()) < 0) {
+                    adapter.updateMerchant(coupon.merchant());
+                    merchantIds.put(coupon.merchant().id(), coupon.merchant().lastUpdated());
+                    Log.i(kLogTag, String.format(
+                        "Updated merchant in db: %s", coupon.merchant().name()));
+                }
             }
 
             if (!couponIds.contains(coupon.id())) {

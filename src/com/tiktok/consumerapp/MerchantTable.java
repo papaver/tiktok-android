@@ -39,14 +39,23 @@ public class MerchantTable
         // this is obviously the worst implementation ever
 
         Log.w(MerchantTable.class.getName(), String.format(
-            "Upgrading database from version %d to %d " +
-            "which will destroy all data.", oldVersion, newVersion));
+            "Upgrading database from version %d to %d ", oldVersion, newVersion));
 
-        // drop the table
-        dropTable(database);
+        // v1 to v2
+        if (oldVersion == 1) {
+            onUpgradev1Tov2(database);
+            ++oldVersion;
+        }
+    }
 
-        // create the new table
-        onCreate(database);
+    //-------------------------------------------------------------------------
+
+    public static void onUpgradev1Tov2(SQLiteDatabase database)
+    {
+        String alterSQL =
+            "alter table " + sName +
+            " add column " + sKeyLastUpdated + " integer not null default 0";
+        database.execSQL(alterSQL);
     }
 
     //-------------------------------------------------------------------------
@@ -71,7 +80,8 @@ public class MerchantTable
             sKeyDetails     + " text    not null,                  " +
             sKeyIconId      + " integer not null,                  " +
             sKeyIconUrl     + " text    not null,                  " +
-            sKeyWebsiteUrl  + " text    not null                   " + ");";
+            sKeyWebsiteUrl  + " text    not null,                  " +
+            sKeyLastUpdated + " integer not null default 0         " + ");";
         return createSQL;
     }
 
@@ -117,7 +127,8 @@ public class MerchantTable
             sKeyDetails,
             sKeyIconId,
             sKeyIconUrl,
-            sKeyWebsiteUrl
+            sKeyWebsiteUrl,
+            sKeyLastUpdated
         };
 
         String equalsSQL = String.format("%s = '%d'", sKeyId, id);
@@ -139,7 +150,8 @@ public class MerchantTable
                 cursor.getString(cursor.getColumnIndex(sKeyDetails)),
                 cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
                 cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
-                cursor.getString(cursor.getColumnIndex(sKeyWebsiteUrl))
+                cursor.getString(cursor.getColumnIndex(sKeyWebsiteUrl)),
+                cursor.getLong(cursor.getColumnIndex(sKeyLastUpdated))
             );
             return merchant;
         }
@@ -151,18 +163,19 @@ public class MerchantTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName          = "Merchant";
-    public static String sKeyRowId      = "_id";
-    public static String sKeyId         = "merchant_id";
-    public static String sKeyName       = "name";
-    public static String sKeyAddress    = "address";
-    public static String sKeyLatitude   = "latitude";
-    public static String sKeyLongitude  = "longitude";
-    public static String sKeyPhone      = "phone";
-    public static String sKeyCategory   = "category";
-    public static String sKeyDetails    = "details";
-    public static String sKeyIconId     = "icon_id";
-    public static String sKeyIconUrl    = "icon_url";
-    public static String sKeyWebsiteUrl = "website_url";
+    public static String sName           = "Merchant";
+    public static String sKeyRowId       = "_id";
+    public static String sKeyId          = "merchant_id";
+    public static String sKeyName        = "name";
+    public static String sKeyAddress     = "address";
+    public static String sKeyLatitude    = "latitude";
+    public static String sKeyLongitude   = "longitude";
+    public static String sKeyPhone       = "phone";
+    public static String sKeyCategory    = "category";
+    public static String sKeyDetails     = "details";
+    public static String sKeyIconId      = "icon_id";
+    public static String sKeyIconUrl     = "icon_url";
+    public static String sKeyWebsiteUrl  = "website_url";
+    public static String sKeyLastUpdated = "last_updated";
 
 }
