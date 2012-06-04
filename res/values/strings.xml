@@ -3,6 +3,9 @@
 
     <string name="app_name">TikTok</string>
 
+    <!-- Device Sspport -->
+    <string name="google_maps_api_key">0xwxb_DAfECWYdmrqOYRwjKmfyvkvhvs7pIiL0g</string>
+
     <!-- Activity Titles -->
     <string name="tabs_name">TikTok</string>
     <string name="tab_list">Deals List</string>
