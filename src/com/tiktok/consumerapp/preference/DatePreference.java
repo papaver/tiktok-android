@@ -82,7 +82,7 @@ public class DatePreference extends DialogPreference
     public Calendar getDate()
     {
         try {
-            Date date         = formatter().parse(defaultValue());
+            Date date         = formatter().parse(this.dateString);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             return calendar;
