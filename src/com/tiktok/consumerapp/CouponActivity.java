@@ -25,11 +25,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -366,6 +368,33 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
+
+    public void OnClickValidateMerchantPin(View view)
+    {
+        Analytics.passCheckpoint("Merchant Pin");
+
+        // inflate layout
+        LayoutInflater inflator =
+            (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View alertView = inflator.inflate(R.layout.merchant_pin, null);
+
+        // create dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(alertView);
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Validate", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                EditText input = (EditText)alertView.findViewById(R.id.input);
+                validateMerchantPin(input.getText().toString());
+            }
+        });
+
+        // show dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    //-------------------------------------------------------------------------
     // MapsActivity
     //-------------------------------------------------------------------------
 
@@ -590,6 +619,56 @@ public class CouponActivity extends MapActivity
                 info.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void validateMerchantPin(String merchantPin)
+    {
+        // setup progress dialog
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Validating...");
+        progressDialog.show();
+
+        // redeem the coupon with the server
+        final Context context = this;
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
+
+            public void onSuccess(Object data) {
+                TikTokApiResponse response = (TikTokApiResponse)data;
+
+                // cancel dialog
+                progressDialog.cancel();
+
+                // verify merchant pin validation succeeded
+                String message = null;
+                String status  = response.getStatus();
+                if (status.equals(TikTokApi.kTikTokApiStatusOkay)) {
+                    message = getString(R.string.merchant_pin_success);
+                } else {
+                    message = response.getError();
+                }
+
+                // show message
+                String title = getString(R.string.merchant_pin);
+                Utilities.displaySimpleAlert(context, title, message);
+            }
+
+            public void onError(Throwable error) {
+                Log.e(kLogTag, "merchant pin validation failed...", error);
+
+                // cancel dialog
+                progressDialog.cancel();
+
+                // alert user of a problem
+                String title   = getString(R.string.merchant_pin);
+                String message = getString(R.string.merchant_pin_fail);
+                Utilities.displaySimpleAlert(context, title, message);
+            }
+        });
+
+        // run the query
+        api.validateMerchantPin(mCoupon.id(), merchantPin);
     }
 
     //-------------------------------------------------------------------------

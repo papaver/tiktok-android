@@ -580,6 +580,46 @@ public final class TikTokApi
 
     //-------------------------------------------------------------------------
 
+    /**
+     * @return Validates redeemed deal with merchant pin.
+     */
+    public void validateMerchantPin(long couponId, String merchantPin)
+    {
+        // construct route to update coupon attribute
+        String url = String.format("%s/consumers/%s/coupons/%d",
+            getApiUrl(), utilities().getConsumerId(), couponId);
+
+        // setup put request for desired attribute
+        HttpPut request = new HttpPut(url);
+
+        // add attribute to request
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>(1);
+        pairs.add(new BasicNameValuePair("merchant_redeem", "1"));
+        pairs.add(new BasicNameValuePair("merchant_pin", merchantPin));
+
+        // add data to entity
+        try {
+            request.setEntity(new UrlEncodedFormEntity(pairs));
+        } catch (Exception e) {
+        }
+
+        // query the server
+        Downloader downloader = new Downloader(request, TikTokApiMultiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+                    TikTokApiMultiResponse response = (TikTokApiMultiResponse)data;
+                    postSuccess(response.getResponse("merchant_redeem"));
+                }
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            });
+
+        runOnThread(downloader);
+    }
+
+    //-------------------------------------------------------------------------
+
     public void cancel()
     {
         new Thread(new Runnable() {

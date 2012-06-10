@@ -61,4 +61,9 @@
     <string name="device_no_sms">Sending SMS is not supported on this device.</string>
     <string name="device_no_email">Sending Email is not supported on this device.</string>
 
+    <!-- Merchant Pin -->
+    <string name="merchant_pin">Merchant Pin</string>
+    <string name="merchant_pin_success">Deal successfully validated! Thank you for using TikTok!</string>
+    <string name="merchant_pin_fail">Failed to validate merchant pin with the server.  Try again.</string>
+
 </resources>

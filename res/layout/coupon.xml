@@ -291,6 +291,7 @@
         <FrameLayout
             android:id="@+id/banner_redeemed"
             android:visibility="gone"
+            android:onClick="OnClickValidateMerchantPin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
