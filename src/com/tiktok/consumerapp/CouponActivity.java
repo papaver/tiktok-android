@@ -680,7 +680,7 @@ public class CouponActivity extends MapActivity
         // setup share message
         String city      = mCoupon.merchant().getCity().toLowerCase();
         String formatted = mCoupon.formattedTitle();
-        String deal      = String.format("I just got %s from %s! #FREEisBETTER #%s",
+        String deal      = String.format("I just got %s from %s! @TikTok #FREEisBETTER #%s",
                                          formatted, mCoupon.merchant().name(), city);
 
         // setup share callback
