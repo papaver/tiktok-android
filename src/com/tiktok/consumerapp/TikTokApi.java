@@ -494,6 +494,11 @@ public final class TikTokApi
                         karma = mapper.convertValue(
                             response.getResults(),
                             new TypeReference<Map<String, Integer>>() {});
+
+                        // total both referrals
+                        int referral = karma.get("referral");
+                        int merchant = karma.get("merchant_referral");
+                        karma.put("referral", referral + merchant);
                     }
 
                     // run handler
