@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Iterator;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class KarmaActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-        syncPoints();
+        syncPoints(null);
     }
 
     //-------------------------------------------------------------------------
@@ -113,7 +114,9 @@ public class KarmaActivity extends Activity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         if (item.getItemId() == R.id.refresh) {
-            syncPoints();
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Syncing Points...");
+            syncPoints(progressDialog);
         }
         return true;
     }
@@ -132,18 +135,25 @@ public class KarmaActivity extends Activity
 
     //-------------------------------------------------------------------------
 
-    private void syncPoints()
+    private void syncPoints(final ProgressDialog progressDialog)
     {
+        // manage progress dialog
+        if (progressDialog != null) progressDialog.show();
+
         // grab the point count from the server
         TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
-            @SuppressWarnings("unchecked")
+
             public void onSuccess(Object data) {
+                if (progressDialog != null) progressDialog.cancel();
+                @SuppressWarnings("unchecked")
                 Map<String, Integer> points = (Map<String, Integer>)data;
-                if (points != null) {
-                    updatePoints(points);
-                }
+                if (points != null) updatePoints(points);
             }
-            public void onError(Throwable error) {}
+
+            public void onError(Throwable error) {
+                if (progressDialog != null) progressDialog.cancel();
+            }
+
         });
 
         // run query
