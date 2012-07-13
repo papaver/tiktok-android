@@ -199,7 +199,7 @@ public final class Merchant
     public String getCity()
     {
         try {
-            return mAddress.split(", ")[1];
+            return mAddress.split(", ")[1].replace(" ", "");
         } catch (Exception e) {
             return "";
         }
