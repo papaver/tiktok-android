@@ -38,20 +38,22 @@ public final class Merchant
         @JsonProperty("icon_uid")     final int iconId,
         @JsonProperty("icon_url")     final String iconUrl,
         @JsonProperty("web_url")      final String websiteUrl,
+        @JsonProperty("tw_handle")    final String twitterHandle,
         @JsonProperty("last_update")  final long lastUpdated)
     {
-        mId          = id;
-        mName        = name;
-        mAddress     = address;
-        mLatitude    = latitude;
-        mLongitude   = longitude;
-        mPhone       = phone;
-        mCategory    = category;
-        mDetails     = details;
-        mIconId      = iconId;
-        mIconUrl     = iconUrl;
-        mWebsiteUrl  = websiteUrl;
-        mLastUpdated = lastUpdated;
+        mId            = id;
+        mName          = name;
+        mAddress       = address;
+        mLatitude      = latitude;
+        mLongitude     = longitude;
+        mPhone         = phone;
+        mCategory      = category;
+        mDetails       = details;
+        mIconId        = iconId;
+        mIconUrl       = iconUrl;
+        mWebsiteUrl    = websiteUrl;
+        mTwitterHandle = twitterHandle;
+        mLastUpdated   = lastUpdated;
     }
 
     //-------------------------------------------------------------------------
@@ -167,6 +169,16 @@ public final class Merchant
     //-------------------------------------------------------------------------
 
     /**
+     * @return Twitter hande of the merchant.
+     */
+    public String twitterHandle()
+    {
+        return mTwitterHandle;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Returns icon data representing icon's id and url for download.
      */
     public IconManager.IconData iconData()
@@ -214,19 +226,20 @@ public final class Merchant
     {
         String newLine = System.getProperty("line.separator");
         String string  =
-            "Merchant {"      + newLine +
-            "  id: "          + Long.toString(id()) + newLine +
-            "  name: "        + name() + newLine +
-            "  address: "     + address() + newLine +
-            "  latitude: "    + Double.toString(latitude()) + newLine +
-            "  longitude: "   + Double.toString(longitude()) + newLine +
-            "  phone: "       + phone() + newLine +
-            "  category: "    + category() + newLine +
-            "  details: "     + details() + newLine +
-            "  iconId: "      + Integer.toString(iconId()) + newLine +
-            "  iconUrl: "     + iconUrl() + newLine +
-            "  websiteUrl: "  + websiteUrl() + newLine +
-            "  lastUpdated: " + lastUpdated().toString() + newLine +
+            "Merchant {"        + newLine +
+            "  id: "            + Long.toString(id()) + newLine +
+            "  name: "          + name() + newLine +
+            "  address: "       + address() + newLine +
+            "  latitude: "      + Double.toString(latitude()) + newLine +
+            "  longitude: "     + Double.toString(longitude()) + newLine +
+            "  phone: "         + phone() + newLine +
+            "  category: "      + category() + newLine +
+            "  details: "       + details() + newLine +
+            "  iconId: "        + Integer.toString(iconId()) + newLine +
+            "  iconUrl: "       + iconUrl() + newLine +
+            "  websiteUrl: "    + websiteUrl() + newLine +
+            "  twitterHandle: " + twitterHandle() + newLine +
+            "  lastUpdated: "   + lastUpdated().toString() + newLine +
             "}";
         return string;
     }
@@ -246,6 +259,7 @@ public final class Merchant
     private final int    mIconId;
     private final String mIconUrl;
     private final String mWebsiteUrl;
+    private final String mTwitterHandle;
     private final long   mLastUpdated;
 
 }

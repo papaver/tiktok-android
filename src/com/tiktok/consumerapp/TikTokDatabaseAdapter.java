@@ -106,10 +106,10 @@ public class TikTokDatabaseAdapter
                                double latitude, double longitude,
                                String phone, String category, String details,
                                int iconId, String iconUrl,
-                               String webUrl, long lastUpdated)
+                               String webUrl, String twHandle, long lastUpdated)
     {
         Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
-            category, details, iconId, iconUrl, webUrl, lastUpdated);
+            category, details, iconId, iconUrl, webUrl, twHandle, lastUpdated);
         return createMerchant(merchant);
     }
 
@@ -151,10 +151,10 @@ public class TikTokDatabaseAdapter
                                   double latitude, double longitude,
                                   String phone, String category, String details,
                                   int iconId, String iconUrl,
-                                  String webUrl, long lastUpdated)
+                                  String webUrl, String twHandle, long lastUpdated)
     {
         Merchant merchant = new Merchant(id, name, address, latitude, longitude, phone,
-            category, details, iconId, iconUrl, webUrl, lastUpdated);
+            category, details, iconId, iconUrl, webUrl, twHandle, lastUpdated);
         return updateMerchant(merchant);
     }
 
@@ -243,6 +243,7 @@ public class TikTokDatabaseAdapter
             MerchantTable.sKeyIconId,
             MerchantTable.sKeyIconUrl,
             MerchantTable.sKeyWebsiteUrl,
+            MerchantTable.sKeyTwitterHandle,
             MerchantTable.sKeyLastUpdated
         };
         return mDatabase.query(MerchantTable.sName, rows, null, null, null, null, null);
@@ -371,18 +372,19 @@ public class TikTokDatabaseAdapter
     private ContentValues createContentValues(Merchant merchant)
     {
         ContentValues values = new ContentValues();
-        values.put(MerchantTable.sKeyId,          merchant.id());
-        values.put(MerchantTable.sKeyName,        merchant.name());
-        values.put(MerchantTable.sKeyAddress,     merchant.address());
-        values.put(MerchantTable.sKeyLatitude,    merchant.latitude());
-        values.put(MerchantTable.sKeyLongitude,   merchant.longitude());
-        values.put(MerchantTable.sKeyPhone,       merchant.phone());
-        values.put(MerchantTable.sKeyCategory,    merchant.category());
-        values.put(MerchantTable.sKeyDetails,     merchant.details());
-        values.put(MerchantTable.sKeyIconId,      merchant.iconId());
-        values.put(MerchantTable.sKeyIconUrl,     merchant.iconUrl());
-        values.put(MerchantTable.sKeyWebsiteUrl,  merchant.websiteUrl());
-        values.put(MerchantTable.sKeyLastUpdated, merchant.lastUpdatedRaw());
+        values.put(MerchantTable.sKeyId,            merchant.id());
+        values.put(MerchantTable.sKeyName,          merchant.name());
+        values.put(MerchantTable.sKeyAddress,       merchant.address());
+        values.put(MerchantTable.sKeyLatitude,      merchant.latitude());
+        values.put(MerchantTable.sKeyLongitude,     merchant.longitude());
+        values.put(MerchantTable.sKeyPhone,         merchant.phone());
+        values.put(MerchantTable.sKeyCategory,      merchant.category());
+        values.put(MerchantTable.sKeyDetails,       merchant.details());
+        values.put(MerchantTable.sKeyIconId,        merchant.iconId());
+        values.put(MerchantTable.sKeyIconUrl,       merchant.iconUrl());
+        values.put(MerchantTable.sKeyWebsiteUrl,    merchant.websiteUrl());
+        values.put(MerchantTable.sKeyTwitterHandle, merchant.twitterHandle());
+        values.put(MerchantTable.sKeyLastUpdated,   merchant.lastUpdatedRaw());
         return values;
     }
 

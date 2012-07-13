@@ -36,7 +36,8 @@ public class MerchantTable
     public static void onUpgrade(SQLiteDatabase database,
                                  int oldVersion, int newVersion)
     {
-        // this is obviously the worst implementation ever
+        // nothing to do if the versions match
+        if (oldVersion == newVersion) return;
 
         Log.w(MerchantTable.class.getName(), String.format(
             "Upgrading database from version %d to %d ", oldVersion, newVersion));
@@ -44,8 +45,14 @@ public class MerchantTable
         // v1 to v2
         if (oldVersion == 1) {
             onUpgradev1Tov2(database);
-            ++oldVersion;
+
+        // v2 to v3
+        } else if (oldVersion == 2) {
+            onUpgradev2Tov3(database);
         }
+
+        // keep upgrading till versions match
+        onUpgrade(database, oldVersion + 1, newVersion);
     }
 
     //-------------------------------------------------------------------------
@@ -60,6 +67,16 @@ public class MerchantTable
 
     //-------------------------------------------------------------------------
 
+    public static void onUpgradev2Tov3(SQLiteDatabase database)
+    {
+        String alterSQL =
+            "alter table " + sName +
+            " add column " + sKeyTwitterHandle + " text not null default ''";
+        database.execSQL(alterSQL);
+    }
+
+    //-------------------------------------------------------------------------
+
     /**
      * @return SQL statement used to create the database table.
      */
@@ -68,20 +85,21 @@ public class MerchantTable
         // [moiz] category should be no null once category string is available
         //   in the json
         String createSQL =
-            "create table " + sName + "("                            +
-            sKeyRowId       + " integer primary key autoincrement, " +
-            sKeyId          + " integer not null,                  " +
-            sKeyName        + " text    not null,                  " +
-            sKeyAddress     + " text    not null,                  " +
-            sKeyLatitude    + " real    not null,                  " +
-            sKeyLongitude   + " real    not null,                  " +
-            sKeyPhone       + " text    not null,                  " +
-            sKeyCategory    + " text    ,                          " +
-            sKeyDetails     + " text    not null,                  " +
-            sKeyIconId      + " integer not null,                  " +
-            sKeyIconUrl     + " text    not null,                  " +
-            sKeyWebsiteUrl  + " text    not null,                  " +
-            sKeyLastUpdated + " integer not null default 0         " + ");";
+            "create table "   + sName + "("                            +
+            sKeyRowId         + " integer primary key autoincrement, " +
+            sKeyId            + " integer not null,                  " +
+            sKeyName          + " text    not null,                  " +
+            sKeyAddress       + " text    not null,                  " +
+            sKeyLatitude      + " real    not null,                  " +
+            sKeyLongitude     + " real    not null,                  " +
+            sKeyPhone         + " text    not null,                  " +
+            sKeyCategory      + " text    ,                          " +
+            sKeyDetails       + " text    not null,                  " +
+            sKeyIconId        + " integer not null,                  " +
+            sKeyIconUrl       + " text    not null,                  " +
+            sKeyWebsiteUrl    + " text    not null,                  " +
+            sKeyTwitterHandle + " text    not null default ''        " +
+            sKeyLastUpdated   + " integer not null default 0         " + ");";
         return createSQL;
     }
 
@@ -128,6 +146,7 @@ public class MerchantTable
             sKeyIconId,
             sKeyIconUrl,
             sKeyWebsiteUrl,
+            sKeyTwitterHandle,
             sKeyLastUpdated
         };
 
@@ -151,6 +170,7 @@ public class MerchantTable
                 cursor.getInt(cursor.getColumnIndex(sKeyIconId)),
                 cursor.getString(cursor.getColumnIndex(sKeyIconUrl)),
                 cursor.getString(cursor.getColumnIndex(sKeyWebsiteUrl)),
+                cursor.getString(cursor.getColumnIndex(sKeyTwitterHandle)),
                 cursor.getLong(cursor.getColumnIndex(sKeyLastUpdated))
             );
             return merchant;
@@ -163,19 +183,20 @@ public class MerchantTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName           = "Merchant";
-    public static String sKeyRowId       = "_id";
-    public static String sKeyId          = "merchant_id";
-    public static String sKeyName        = "name";
-    public static String sKeyAddress     = "address";
-    public static String sKeyLatitude    = "latitude";
-    public static String sKeyLongitude   = "longitude";
-    public static String sKeyPhone       = "phone";
-    public static String sKeyCategory    = "category";
-    public static String sKeyDetails     = "details";
-    public static String sKeyIconId      = "icon_id";
-    public static String sKeyIconUrl     = "icon_url";
-    public static String sKeyWebsiteUrl  = "website_url";
-    public static String sKeyLastUpdated = "last_updated";
+    public static String sName             = "Merchant";
+    public static String sKeyRowId         = "_id";
+    public static String sKeyId            = "merchant_id";
+    public static String sKeyName          = "name";
+    public static String sKeyAddress       = "address";
+    public static String sKeyLatitude      = "latitude";
+    public static String sKeyLongitude     = "longitude";
+    public static String sKeyPhone         = "phone";
+    public static String sKeyCategory      = "category";
+    public static String sKeyDetails       = "details";
+    public static String sKeyIconId        = "icon_id";
+    public static String sKeyIconUrl       = "icon_url";
+    public static String sKeyWebsiteUrl    = "website_url";
+    public static String sKeyTwitterHandle = "tw_handle";
+    public static String sKeyLastUpdated   = "last_updated";
 
 }

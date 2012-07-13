@@ -678,10 +678,14 @@ public class CouponActivity extends MapActivity
     private void shareTwitter()
     {
         // setup share message
-        String city      = mCoupon.merchant().getCity().toLowerCase();
-        String formatted = mCoupon.formattedTitle();
-        String deal      = String.format("I just got %s from %s! @TikTok #FREEisBETTER #%s",
-                                         formatted, mCoupon.merchant().name(), city);
+        Merchant merchant = mCoupon.merchant();
+        String handle     = merchant.twitterHandle().equals("") ?
+                            merchant.name() :
+                            merchant.twitterHandle();
+        String city       = merchant.getCity().toLowerCase();
+        String formatted  = mCoupon.formattedTitle();
+        String deal       = String.format("I just got %s from %s! @TikTok #FREEisBETTER #%s",
+                                          formatted, handle, city);
 
         // setup share callback
         final Handler handler      = new Handler();
@@ -691,7 +695,7 @@ public class CouponActivity extends MapActivity
             public void onSuccess(Object object) {
                 Analytics.passCheckpoint("Deal Tweeted");
                 String message = getString(R.string.twitter_deal_post);
-                Toast.makeText(activity, message, 1000).show();
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
 
                 // let server know of share
                 TikTokApi api = new TikTokApi(activity, handler, null);
@@ -701,7 +705,7 @@ public class CouponActivity extends MapActivity
             public void onError(Throwable error) {
                 Log.e(kLogTag, "Failed to tweet deal", error);
                 String message = getString(R.string.twitter_deal_post_fail);
-                Toast.makeText(activity, message, 1000).show();
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
             }
 
             public void onCancel() {}
@@ -741,7 +745,7 @@ public class CouponActivity extends MapActivity
             public void onSuccess(Bundle values) {
                 Analytics.passCheckpoint("Deal Facebooked");
                 String message = getString(R.string.facebook_deal_post);
-                Toast.makeText(activity, message, 1000).show();
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
 
                 // let server know of share
                 TikTokApi api = new TikTokApi(activity, handler, null);
@@ -751,7 +755,7 @@ public class CouponActivity extends MapActivity
             public void onError(Throwable error) {
                 Log.e(kLogTag, "Failed to post deal.", error);
                 String message = getString(R.string.facebook_deal_post_fail);
-                Toast.makeText(activity, message, 1000).show();
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
             }
 
             public void onCancel() {}
