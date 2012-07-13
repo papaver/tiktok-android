@@ -8,10 +8,14 @@
                       android:summary="Whats your name?" />
   <EditTextPreference android:title="Email"
                       android:key="TTS_email"
-                      android:summary="What your email?" />
+                      android:summary="Whats your email?" />
   <EditTextPreference android:title="Twitter Handle"
                       android:key="TTS_twh"
-                      android:summary="What your Twitter handle?" />
+                      android:summary="Whats your Twitter handle?" />
+  <EditTextPreference android:title="Phone"
+                      android:key="TTS_phone"
+                      android:summary="Whats your Phone #?"
+                      android:inputType="phone" />
   <ListPreference     android:title="Gender"
                       android:key="TTS_gender"
                       android:summary="Select your gender for better deals!"

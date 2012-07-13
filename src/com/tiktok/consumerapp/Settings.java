@@ -47,6 +47,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public static final String kTagName                = "TTS_name";
     public static final String kTagEmail               = "TTS_email";
     public static final String kTagTwitterHandle       = "TTS_twh";
+    public static final String kTagPhone               = "TTS_phone";
     public static final String kTagGender              = "TTS_gender";
     public static final String kTagBirthday            = "TTS_birthday";
     public static final String kTagHome                = "TTS_home";
@@ -175,6 +176,34 @@ public final class Settings implements OnSharedPreferenceChangeListener
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
         settings.put("twh", handle);
+        api.updateSettings(settings);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public String phone()
+    {
+        return mPreferences.getString(kTagPhone, "");
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void setPhone(String phone)
+    {
+        mEditor.putString(kTagPhone, phone);
+        mEditor.commit();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void syncPhone()
+    {
+        String phone = phone();
+        if (phone.equals("")) return;
+
+        TikTokApi api = new TikTokApi(mContext, new Handler(), null);
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("phone", phone);
         api.updateSettings(settings);
     }
 
@@ -435,6 +464,8 @@ public final class Settings implements OnSharedPreferenceChangeListener
             syncEmail();
         } else if (key.equals(kTagTwitterHandle)) {
             syncTwitterHandle();
+        } else if (key.equals(kTagPhone)) {
+            syncPhone();
         } else if (key.equals(kTagGender)) {
             syncGender();
         } else if (key.equals(kTagBirthday)) {
