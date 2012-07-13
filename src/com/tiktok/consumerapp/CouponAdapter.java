@@ -208,6 +208,9 @@ public final class CouponAdapter extends CursorAdapter
             viewHolder.icon.setImageResource(R.drawable.activity_indicator);
             viewHolder.icon.startAnimation(UIUtilities.getActivityIndicatorAnimation());
 
+            // set tag to track view
+            viewHolder.icon.setTag(iconUrl);
+
             // download icon from server
             mIconManager.requestImage(iconData, new IconManager.CompletionHandler() {
 
@@ -215,14 +218,21 @@ public final class CouponAdapter extends CursorAdapter
                     Log.i(kLogTag, String.format("Downloaded icon: %s", iconUrl));
                     viewHolder.icon.post(new Runnable() {
                         public void run() {
-                            viewHolder.icon.setImageBitmap(drawable.getBitmap());
-                            viewHolder.icon.clearAnimation();
+                            String tag = (String)viewHolder.icon.getTag();
+                            if (viewHolder.icon.isShown() && iconUrl.equals(tag)) {
+                                viewHolder.icon.setImageBitmap(drawable.getBitmap());
+                                viewHolder.icon.clearAnimation();
+                            }
                         }
                     });
                 }
 
                 public void onFailure() {
                     Log.e(kLogTag, String.format("Failed to download icon: %s", iconUrl));
+                    String tag = (String)viewHolder.icon.getTag();
+                    if (viewHolder.icon.isShown() && iconUrl.equals(tag)) {
+                        setupIcon(viewHolder, iconId, iconUrl);
+                    }
                 }
             });
         }
