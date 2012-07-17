@@ -8,20 +8,27 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class LocationTracker implements LocationListener
+public class LocationTracker extends Service implements LocationListener
 {
     //-------------------------------------------------------------------------
     // statics
@@ -35,20 +42,48 @@ public class LocationTracker implements LocationListener
 
     public static LocationTracker getInstance(Context context)
     {
-        if (sTracker == null) {
-            sTracker = new LocationTracker(context.getApplicationContext());
-        }
-        return sTracker;
+       return null;
     }
 
     //-------------------------------------------------------------------------
-    // constructors
+    // Service
     //-------------------------------------------------------------------------
 
-    private LocationTracker(Context context)
+    @Override
+    public IBinder onBind(Intent intent)
     {
-        mContext           = context;
-        mHandler           = new Handler();
+        return null;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public void onCreate()
+    {
+        startLocationTracking();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public void onDestroy()
+    {
+        stopLocationTracking();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public void onStart(Intent intent, int startid)
+    {
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int start_id)
+    {
+        return START_STICKY;
     }
 
     //-------------------------------------------------------------------------
@@ -57,7 +92,7 @@ public class LocationTracker implements LocationListener
 
     public void onLocationChanged(Location location)
     {
-        Log.i(kLogTag, String.format(
+        log(String.format(
             "Location Changed: %f / %f",
             location.getLatitude(), location.getLongitude()));
 
@@ -71,21 +106,21 @@ public class LocationTracker implements LocationListener
 
     public void onStatusChanged(String provider, int status, Bundle extra)
     {
-        Log.i(kLogTag, String.format("Status Changed: %s - %d", provider, status));
+        log(String.format("Status Changed: %s - %d", provider, status));
     }
 
     //-------------------------------------------------------------------------
 
     public void onProviderEnabled(String provider)
     {
-        Log.i(kLogTag, String.format("Provider enabled: %s", provider));
+        log(String.format("Provider enabled: %s", provider));
     }
 
     //-------------------------------------------------------------------------
 
     public void onProviderDisabled(String provider)
     {
-        Log.i(kLogTag, String.format("Provider disabled: %s", provider));
+        log(String.format("Provider disabled: %s", provider));
     }
 
     //-------------------------------------------------------------------------
@@ -96,7 +131,7 @@ public class LocationTracker implements LocationListener
     {
         // grab the global location manager instance
         LocationManager locationManager =
-            (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+            (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
         // setup minimum time (ms) and distance (m) between updates
         long minTime      = 60 * 60 * 1000;
@@ -108,7 +143,7 @@ public class LocationTracker implements LocationListener
         // set coarse provider
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String coarseProvider = locationManager.getBestProvider(criteria, true);
-        Log.i(kLogTag, String.format("Coarse Provider: %s", coarseProvider));
+        log(String.format("Coarse Provider: %s", coarseProvider));
         if (coarseProvider != null) {
             locationManager.requestLocationUpdates(
                 coarseProvider, minTime, minDistance, this);
@@ -117,7 +152,7 @@ public class LocationTracker implements LocationListener
         // set fine provider
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String fineProvider = locationManager.getBestProvider(criteria, true);
-        Log.i(kLogTag, String.format("Fine Provider: %s", fineProvider));
+        log(String.format("Fine Provider: %s", fineProvider));
         if ((fineProvider != null) && !fineProvider.equals(coarseProvider)) {
             locationManager.requestLocationUpdates(
                 fineProvider, minTime, minDistance, this);
@@ -141,7 +176,7 @@ public class LocationTracker implements LocationListener
     {
         // grab the global location manager instance
         LocationManager locationManager =
-            (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+            (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
         // unregister the listeners to conserve power
         locationManager.removeUpdates(this);
@@ -166,8 +201,10 @@ public class LocationTracker implements LocationListener
         mLastKnownLocation = location;
 
         // send new location to server
-        TikTokApi api = new TikTokApi(mContext, mHandler, null);
+        TikTokApi api = new TikTokApi(this, mHandler, null);
         api.updateCurrentLocation(location);
+
+        log(String.format("Updated location -> %s", location.toString()));
     }
 
     //-------------------------------------------------------------------------
@@ -233,13 +270,19 @@ public class LocationTracker implements LocationListener
     }
 
     //-------------------------------------------------------------------------
+
+    private void log(String message)
+    {
+        String timeStamp = DateFormat.getDateTimeInstance().format(
+            Calendar.getInstance().getTime());
+        Log.i(kLogTag, String.format("TikTok - %s - %s", timeStamp, message));
+    }
+
+    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
-    private static LocationTracker sTracker;
-
-    private Handler  mHandler;
-    private Context  mContext;
+    private Handler  mHandler = new Handler();
     private Location mLastKnownLocation;
 
 }

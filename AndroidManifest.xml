@@ -119,6 +119,9 @@
             </intent-filter>
         </receiver>
 
+        <!-- Background Location Service -->
+        <service android:enabled="true" android:name=".LocationTracker" />`
+
     </application>
 
 </manifest>

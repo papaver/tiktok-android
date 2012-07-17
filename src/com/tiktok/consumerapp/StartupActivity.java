@@ -252,9 +252,7 @@ public class StartupActivity extends Activity
     private void setupLocationTracking()
     {
         Log.i(kLogTag, "setting up location tracking...");
-
-        LocationTracker tracker = LocationTracker.getInstance(this);
-        tracker.startLocationTracking();
+        startService(new Intent(this, LocationTracker.class));
     }
 
     //-------------------------------------------------------------------------
