@@ -93,7 +93,7 @@ public class MerchantTable
             sKeyLatitude      + " real    not null,                  " +
             sKeyLongitude     + " real    not null,                  " +
             sKeyPhone         + " text    not null,                  " +
-            sKeyCategory      + " text    ,                          " +
+            sKeyCategory      + " text    not null,                  " +
             sKeyDetails       + " text    not null,                  " +
             sKeyIconId        + " integer not null,                  " +
             sKeyIconUrl       + " text    not null,                  " +
