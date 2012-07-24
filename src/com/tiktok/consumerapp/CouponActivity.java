@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -147,7 +148,7 @@ public class CouponActivity extends MapActivity
         adapter.open();
 
         // grab coupon using id
-        mCoupon = adapter.fetchCouponByRowId(id);
+        mCoupon = adapter.fetchCoupon(id);
         setupCouponDetails(mCoupon);
 
         // close
@@ -249,8 +250,13 @@ public class CouponActivity extends MapActivity
     {
         Analytics.passCheckpoint("Deal Map Opened");
 
+        // get current location
+        android.location.Location coordinate = getCurrentLocation();
+        Location location = mCoupon.getClosestLocation(coordinate);
+
+        // open map app
         String merchant = mCoupon.merchant().name();
-        String address  = mCoupon.merchant().address().replace(" ", "+");
+        String address  = location.address().replace(" ", "+");
         String uri      = String.format("geo:0,0?q=%s+%s", merchant, address);
         Intent intent   = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         startActivity(intent);
@@ -261,7 +267,7 @@ public class CouponActivity extends MapActivity
     public void onClickMerchant(View view)
     {
         Intent intent = new Intent(this, MerchantActivity.class);
-        intent.putExtra(MerchantTable.sKeyId, mCoupon.merchant().id());
+        intent.putExtra(CouponTable.sKeyId, mCoupon.id());
         startActivityForResult(intent, 0);
     }
 
@@ -411,6 +417,8 @@ public class CouponActivity extends MapActivity
     private void setupCouponDetails(Coupon coupon)
     {
         Merchant merchant = coupon.merchant();
+        int locationCount = coupon.locations().size();
+        Location location = coupon.locations().get(0);
 
         // title
         TextView title = (TextView)findViewById(R.id.title);
@@ -427,7 +435,9 @@ public class CouponActivity extends MapActivity
 
         // address
         TextView address = (TextView)findViewById(R.id.address);
-        address.setText(merchant.address());
+        address.setText(locationCount > 1 ?
+                String.format("Available at %d locations.", locationCount) :
+                location.address());
 
         // details
         TextView details = (TextView)findViewById(R.id.details);
@@ -500,20 +510,25 @@ public class CouponActivity extends MapActivity
 
     private void setupMap(Merchant merchant)
     {
-        int latitude      = (int)(merchant.latitude() * 1E6);
-        int longitude     = (int)(merchant.longitude() * 1E6);
-        GeoPoint location = new GeoPoint(latitude, longitude);
+        // get current location
+        android.location.Location coordinate = getCurrentLocation();
+        Location location = mCoupon.getClosestLocation(coordinate);
+
+        // setup geo coordinate
+        int latitude      = (int)(location.latitude() * 1E6);
+        int longitude     = (int)(location.longitude() * 1E6);
+        GeoPoint geoPoint = new GeoPoint(latitude, longitude);
 
         // center the map around the location
         MapView mapView             = (MapView)findViewById(R.id.map);
         MapController mapController = mapView.getController();
-        mapController.setCenter(location);
+        mapController.setCenter(geoPoint);
         mapController.setZoom(17);
 
         // add a pin
         List<Overlay> mapOverlays = mapView.getOverlays();
         MapOverlay overlay        = new MapOverlay(mapView);
-        OverlayItem item          = new OverlayItem(location, "", "");
+        OverlayItem item          = new OverlayItem(geoPoint, "", "");
         overlay.addOverlay(item);
         mapOverlays.add(overlay);
     }
@@ -672,17 +687,41 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
+
+    private android.location.Location getCurrentLocation()
+    {
+        // [moiz] LocationServiceRefactor - this is returning crap values
+        //   best thing to do would be to have an instance that is available
+        //   at all times to the apps thats is bound to the location
+        //   service that can be queried for the current location
+        //   this will do for as a substitute
+
+        LocationManager locationManager =
+            (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        android.location.Location coordinate =
+            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (coordinate == null) {
+            coordinate = new android.location.Location("");
+        }
+        return coordinate;
+    }
+
+    //-------------------------------------------------------------------------
     // share functions
     //-------------------------------------------------------------------------
 
     private void shareTwitter()
     {
+        // get current location
+        android.location.Location coordinate = getCurrentLocation();
+        Location location = mCoupon.getClosestLocation(coordinate);
+
         // setup share message
         Merchant merchant = mCoupon.merchant();
         String handle     = merchant.twitterHandle().equals("") ?
                             merchant.name() :
                             merchant.twitterHandle();
-        String city       = merchant.getCity().toLowerCase();
+        String city       = location.getCity().toLowerCase();
         String formatted  = mCoupon.formattedTitle();
         String deal       = String.format("I just got %s from %s! @TikTok #FREEisBETTER #%s",
                                           formatted, handle, city);

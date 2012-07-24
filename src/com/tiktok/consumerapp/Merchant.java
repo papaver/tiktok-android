@@ -27,32 +27,26 @@ public final class Merchant
      */
     @JsonCreator
     public Merchant(
-        @JsonProperty("id")           final long id,
-        @JsonProperty("name")         final String name,
-        @JsonProperty("full_address") final String address,
-        @JsonProperty("latitude")     final double latitude,
-        @JsonProperty("longitude")    final double longitude,
-        @JsonProperty("phone_number") final String phone,
-        @JsonProperty("category")     final String category,
-        @JsonProperty("description")  final String details,
-        @JsonProperty("icon_uid")     final int iconId,
-        @JsonProperty("icon_url")     final String iconUrl,
-        @JsonProperty("web_url")      final String websiteUrl,
-        @JsonProperty("tw_handle")    final String twitterHandle,
-        @JsonProperty("last_update")  final long lastUpdated)
+        @JsonProperty("id")                  final long id,
+        @JsonProperty("name")                final String name,
+        @JsonProperty("category")            final String category,
+        @JsonProperty("description")         final String details,
+        @JsonProperty("icon_uid")            final int iconId,
+        @JsonProperty("icon_url")            final String iconUrl,
+        @JsonProperty("web_url")             final String websiteUrl,
+        @JsonProperty("tw_handle")           final String twitterHandle,
+        @JsonProperty("use_merchant_redeem") final boolean usesPin,
+        @JsonProperty("last_update")         final long lastUpdated)
     {
         mId            = id;
         mName          = name;
-        mAddress       = address;
-        mLatitude      = latitude;
-        mLongitude     = longitude;
-        mPhone         = phone;
         mCategory      = category;
         mDetails       = details;
         mIconId        = iconId;
         mIconUrl       = iconUrl;
         mWebsiteUrl    = websiteUrl;
         mTwitterHandle = twitterHandle;
+        mUsesPin       = usesPin;
         mLastUpdated   = lastUpdated;
     }
 
@@ -74,46 +68,6 @@ public final class Merchant
     public String name()
     {
         return mName;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Address of the merchant.
-     */
-    public String address()
-    {
-        return mAddress;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Latitude of merchants location.
-     */
-    public double latitude()
-    {
-        return mLatitude;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Longitude of merchants location.
-     */
-    public double longitude()
-    {
-        return mLongitude;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * @return Phones number for merchant.
-     */
-    public String phone()
-    {
-        return mPhone;
     }
 
     //-------------------------------------------------------------------------
@@ -179,6 +133,16 @@ public final class Merchant
     //-------------------------------------------------------------------------
 
     /**
+     * @return Weather merchant used redemption pin.
+     */
+    public boolean usesPin()
+    {
+        return mUsesPin;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Returns icon data representing icon's id and url for download.
      */
     public IconManager.IconData iconData()
@@ -207,17 +171,6 @@ public final class Merchant
     }
 
     //-------------------------------------------------------------------------
-
-    public String getCity()
-    {
-        try {
-            return mAddress.split(", ")[1].replace(" ", "");
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    //-------------------------------------------------------------------------
     // methods
     //-------------------------------------------------------------------------
 
@@ -229,16 +182,13 @@ public final class Merchant
             "Merchant {"        + newLine +
             "  id: "            + Long.toString(id()) + newLine +
             "  name: "          + name() + newLine +
-            "  address: "       + address() + newLine +
-            "  latitude: "      + Double.toString(latitude()) + newLine +
-            "  longitude: "     + Double.toString(longitude()) + newLine +
-            "  phone: "         + phone() + newLine +
             "  category: "      + category() + newLine +
             "  details: "       + details() + newLine +
             "  iconId: "        + Integer.toString(iconId()) + newLine +
             "  iconUrl: "       + iconUrl() + newLine +
             "  websiteUrl: "    + websiteUrl() + newLine +
             "  twitterHandle: " + twitterHandle() + newLine +
+            "  usesPin: "       + Boolean.toString(usesPin()) + newLine +
             "  lastUpdated: "   + lastUpdated().toString() + newLine +
             "}";
         return string;
@@ -248,18 +198,15 @@ public final class Merchant
     // fields
     //-------------------------------------------------------------------------
 
-    private final long   mId;
-    private final String mName;
-    private final String mAddress;
-    private final double mLatitude;
-    private final double mLongitude;
-    private final String mPhone;
-    private final String mCategory;
-    private final String mDetails;
-    private final int    mIconId;
-    private final String mIconUrl;
-    private final String mWebsiteUrl;
-    private final String mTwitterHandle;
-    private final long   mLastUpdated;
+    private final long    mId;
+    private final String  mName;
+    private final String  mCategory;
+    private final String  mDetails;
+    private final int     mIconId;
+    private final String  mIconUrl;
+    private final String  mWebsiteUrl;
+    private final String  mTwitterHandle;
+    private final boolean mUsesPin;
+    private final long    mLastUpdated;
 
 }

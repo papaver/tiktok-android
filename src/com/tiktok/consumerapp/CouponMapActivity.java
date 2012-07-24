@@ -86,7 +86,7 @@ public class CouponMapActivity extends MapActivity
 
             // open up coupon details
             Intent intent = new Intent(mContext, CouponActivity.class);
-            intent.putExtra(CouponTable.sKeyId, couponItem.rowId());
+            intent.putExtra(CouponTable.sKeyId, couponItem.id());
             startActivityForResult(intent, 0);
             return true;
         }
@@ -98,23 +98,22 @@ public class CouponMapActivity extends MapActivity
 
     private class CouponOverlayItem extends OverlayItem
     {
-        public CouponOverlayItem(GeoPoint point, String title, String snippet,
-                                 long couponRowId)
+        public CouponOverlayItem(GeoPoint point, String title, String snippet, long id)
         {
             super(point, title, snippet);
-            mRowId = couponRowId;
+            mId = id;
         }
 
-        //-------------------------------------------------------------------------
+        //---------------------------------------------------------------------
 
-        public long rowId()
+        public long id()
         {
-            return mRowId;
+            return mId;
         }
 
-        //-------------------------------------------------------------------------
+        //---------------------------------------------------------------------
 
-        private long mRowId;
+        private long mId;
     }
 
     //-------------------------------------------------------------------------
@@ -319,33 +318,39 @@ public class CouponMapActivity extends MapActivity
 
         // add overlays
         for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
-            long rowId      = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyRowId));
-            long merchantId = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
-            String headline = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
-            Date endTime    = new Date(cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime)) * 1000);
+            long id            = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyId));
+            long merchantId    = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
+            String locationIds = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyLocations));
+            String headline    = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
+            Date endTime       = new Date(cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime)) * 1000);
 
             // only add active coupons
             if (Coupon.isExpired(endTime)) continue;
 
             // query merchant from cursor
-            final Merchant merchant = mDatabaseAdapter.fetchMerchant(merchantId);
+            final Merchant merchant        = mDatabaseAdapter.fetchMerchant(merchantId);
+            final List<Location> locations = mDatabaseAdapter.fetchLocations(locationIds);
 
-            // update min/max values
-            minLatitude  = Math.min(minLatitude,  merchant.latitude());
-            maxLatitude  = Math.max(maxLatitude,  merchant.latitude());
-            minLongitude = Math.min(minLongitude, merchant.longitude());
-            maxLongitude = Math.max(maxLongitude, merchant.longitude());
+            // loop through all of the locations
+            for (Location location : locations) {
 
-            // setup geo point
-            int latitude      = (int)(merchant.latitude() * 1E6);
-            int longitude     = (int)(merchant.longitude() * 1E6);
-            GeoPoint location = new GeoPoint(latitude, longitude);
+                // update min/max values
+                minLatitude  = Math.min(minLatitude,  location.latitude());
+                maxLatitude  = Math.max(maxLatitude,  location.latitude());
+                minLongitude = Math.min(minLongitude, location.longitude());
+                maxLongitude = Math.max(maxLongitude, location.longitude());
 
-            // add overlay
-            String title           = merchant.name().toUpperCase();
-            String snippet         = TextUtilities.capitalizeWords(headline);
-            CouponOverlayItem item = new CouponOverlayItem(location, title, snippet, rowId);
-            mOverlay.addOverlay(item);
+                // setup geo point
+                int latitude      = (int)(location.latitude() * 1E6);
+                int longitude     = (int)(location.longitude() * 1E6);
+                GeoPoint geoPoint = new GeoPoint(latitude, longitude);
+
+                // add overlay
+                String title           = merchant.name().toUpperCase();
+                String snippet         = TextUtilities.capitalizeWords(headline);
+                CouponOverlayItem item = new CouponOverlayItem(geoPoint, title, snippet, id);
+                mOverlay.addOverlay(item);
+            }
         }
 
         // calculate center and region
@@ -413,5 +418,6 @@ public class CouponMapActivity extends MapActivity
     private boolean               mPaused = false;
     private GeoPoint              mMapCenter;
     private int                   mMapZoomLevel;
+
 }
 

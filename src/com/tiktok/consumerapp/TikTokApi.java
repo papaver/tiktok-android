@@ -187,9 +187,9 @@ public final class TikTokApi
     public static String getApiUrl()
     {
         if (Debug.kTikTokApiStaging) {
-            return "https://furious-window-5155.herokuapp.com";
+            return "https://furious-window-5155.herokuapp.com/api/v2";
         } else {
-            return "https://www.tiktok.com";
+            return "https://www.tiktok.com/api/v2";
         }
     }
 
@@ -771,25 +771,49 @@ public final class TikTokApi
         // add only new coupons to the database
         List<Long> couponIds        = adapter.fetchAllCouponIds();
         Map<Long, Date> merchantIds = adapter.fetchAllMerchantIds();
+        Map<Long, Date> locationIds = adapter.fetchAllLocationIds();
         for (final Coupon coupon : coupons) {
 
-            if (!merchantIds.keySet().contains(coupon.merchant().id())) {
-                adapter.createMerchant(coupon.merchant());
-                merchantIds.put(coupon.merchant().id(), coupon.merchant().lastUpdated());
+            // create/update merchant in database
+            Merchant merchant = coupon.merchant();
+            if (!merchantIds.keySet().contains(merchant.id())) {
+                adapter.createMerchant(merchant);
+                merchantIds.put(merchant.id(), merchant.lastUpdated());
                 Log.i(kLogTag, String.format(
-                    "Added merchant to db: %s", coupon.merchant().name()));
+                    "Added merchant to db: %s", merchant.name()));
             } else {
-                Date lastUpdated = merchantIds.get(coupon.merchant().id());
-                if (lastUpdated.compareTo(coupon.merchant().lastUpdated()) < 0) {
-                    adapter.updateMerchant(coupon.merchant());
-                    merchantIds.put(coupon.merchant().id(), coupon.merchant().lastUpdated());
+                Date lastUpdated = merchantIds.get(merchant.id());
+                if (lastUpdated.compareTo(merchant.lastUpdated()) < 0) {
+                    adapter.updateMerchant(merchant);
+                    merchantIds.put(merchant.id(), merchant.lastUpdated());
                     Log.i(kLogTag, String.format(
-                        "Updated merchant in db: %s", coupon.merchant().name()));
+                        "Updated merchant in db: %s", merchant.name()));
                 }
             }
 
+            // create/update locations in database
+            for (com.tiktok.consumerapp.Location location : coupon.locations()) {
+                if (!locationIds.keySet().contains(location.id())) {
+                    adapter.createLocation(location);
+                    locationIds.put(location.id(), location.lastUpdated());
+                    Log.i(kLogTag, String.format(
+                        "Added location to db: %s - %s",
+                        location.name(), location.address()));
+                } else {
+                    Date lastUpdated = locationIds.get(location.id());
+                    if (lastUpdated.compareTo(location.lastUpdated()) < 0) {
+                        adapter.updateLocation(location);
+                        locationIds.put(location.id(), location.lastUpdated());
+                        Log.i(kLogTag, String.format(
+                            "Updated location in db: %s - %s",
+                            location.name(), location.address()));
+                    }
+                }
+            }
+
+            // create coupon
             if (!couponIds.contains(coupon.id())) {
-                Log.w(getClass().getSimpleName(), coupon.toString());
+                //Log.w(kLogTag, coupon.toString());
                 adapter.createCoupon(coupon);
                 Log.i(kLogTag, String.format(
                     "Added coupon to db: %s", coupon.title()));

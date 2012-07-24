@@ -61,14 +61,6 @@ public final class CouponAdapter extends CursorAdapter
         // retrieve corresponding ViewHolder, which optimizes lookup efficiency
         final ViewHolder viewHolder = getViewHolder(view);
 
-        // retrieve merchant
-        TikTokDatabaseAdapter adapter = null;
-        try {
-            adapter = new TikTokDatabaseAdapter(context);
-            adapter.open();
-        } catch (Exception e) {
-        }
-
         // grab data from the cursor
         final long merchantId       = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyMerchant));
         final String title          = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
@@ -82,8 +74,16 @@ public final class CouponAdapter extends CursorAdapter
         final boolean wasRedeemed   = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyWasRedeemed)) == 1;
         final boolean isRedeemable  = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsRedeemable)) == 1;
 
-        // query merchant from cursor
-        final Merchant merchant = adapter.fetchMerchant(merchantId);
+        // retrieve merchant
+        Merchant merchant             = null;
+        TikTokDatabaseAdapter adapter = null;
+        try {
+            adapter = new TikTokDatabaseAdapter(context);
+            adapter.open();
+            merchant = adapter.fetchMerchant(merchantId);
+        } finally {
+            adapter.close();
+        }
 
         // reset alpha
         AlphaAnimation alpha = new AlphaAnimation(1.0f, 1.0f);
@@ -122,9 +122,6 @@ public final class CouponAdapter extends CursorAdapter
 
         // set icon image
         setupIcon(viewHolder, iconId, iconUrl);
-
-        // cleanup
-        adapter.close();
     }
 
     //-------------------------------------------------------------------------

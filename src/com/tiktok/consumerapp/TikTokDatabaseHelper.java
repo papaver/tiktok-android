@@ -33,7 +33,7 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     //-------------------------------------------------------------------------
     // constructor
     //-------------------------------------------------------------------------
-    
+
     public TikTokDatabaseHelper(Context context)
     {
         super(context, sDatabaseName, null, sDatabaseVersion);
@@ -49,6 +49,7 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase database)
     {
+        LocationTable.onCreate(database);
         MerchantTable.onCreate(database);
         CouponTable.onCreate(database);
     }
@@ -60,9 +61,10 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
      * is increased.
      */
     @Override
-    public void onUpgrade(SQLiteDatabase database, 
+    public void onUpgrade(SQLiteDatabase database,
                           int oldVersion, int newVersion)
     {
+        LocationTable.onUpgrade(database, oldVersion, newVersion);
         MerchantTable.onUpgrade(database, oldVersion, newVersion);
         CouponTable.onUpgrade(database, oldVersion, newVersion);
     }

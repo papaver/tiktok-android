@@ -55,27 +55,33 @@ public class MerchantActivity extends Activity
 
         // grab merchant id from intent
         Long id = (savedInstanceState == null) ? null :
-            (Long)savedInstanceState.getSerializable(MerchantTable.sKeyId);
+            (Long)savedInstanceState.getSerializable(CouponTable.sKeyId);
         if (id == null) {
             Bundle extras = getIntent().getExtras();
-            id = extras != null ? extras.getLong(MerchantTable.sKeyId) : null;
+            id = extras != null ? extras.getLong(CouponTable.sKeyId) : null;
         }
 
         // can't be here without a valid coupon id
-        if (id == null) {
-            finish();
-        }
+        if (id == null) finish();
 
         // retrieve the coupon from the database
-        TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
-        adapter.open();
+        TikTokDatabaseAdapter adapter = null;
+        try {
 
-        // grab coupon using id
-        mMerchant = adapter.fetchMerchant(id);
-        setupMerchantDetails(mMerchant);
+            adapter = new TikTokDatabaseAdapter(this);
+            adapter.open();
 
-        // close
-        adapter.close();
+            // grab coupon using id
+            mCoupon = adapter.fetchCoupon(id);
+            setupMerchantDetails(mCoupon);
+
+        // cleanup
+        } finally {
+            adapter.close();
+        }
+
+        // if something failed close the activity
+        if (mCoupon == null) finish();
     }
 
     //-------------------------------------------------------------------------
@@ -138,18 +144,31 @@ public class MerchantActivity extends Activity
     // helper functions
     //-------------------------------------------------------------------------
 
-    public void setupMerchantDetails(final Merchant merchant)
+    public void setupMerchantDetails(final Coupon coupon)
     {
+        Merchant merchant         = coupon.merchant();
+        Location location         = coupon.locations().get(0);
+        boolean multipleLocations = coupon.locations().size() > 1;
+
         // name
         TextView name = (TextView)findViewById(R.id.name);
         name.setText(merchant.name().toUpperCase());
 
         // address
-        setupAddress(merchant);
+        if (multipleLocations) {
+            TextView addressView = (TextView)findViewById(R.id.address);
+            addressView.setText("Multiple locations,\nsee below.");
+        } else {
+            setupAddress(location.address());
+        }
 
         // phone
         TextView phone = (TextView)findViewById(R.id.phone);
-        phone.setText(merchant.phone());
+        if (multipleLocations) {
+            phone.setText("");
+        } else {
+            phone.setText(location.phone());
+        }
 
         // category
         TextView category = (TextView)findViewById(R.id.category);
@@ -174,17 +193,17 @@ public class MerchantActivity extends Activity
 
     //-------------------------------------------------------------------------
 
-    private void setupAddress(final Merchant merchant)
+    private void setupAddress(final String address)
     {
-        TextView address    = (TextView)findViewById(R.id.address);
-        String splitAddress = TextUtils.join("\n", merchant.address().split(", ", 2));
-        address.setText(splitAddress);
+        TextView addressView = (TextView)findViewById(R.id.address);
+        String splitAddress  = TextUtils.join("\n", address.split(", ", 2));
+        addressView.setText(splitAddress);
 
         // [moiz] fucking canadain addresses aren't recognized?!
-        if (address.getUrls().length == 0) {
+        if (addressView.getUrls().length == 0) {
 
             // reset the link mask so we can use custom links
-            address.setAutoLinkMask(0);
+            addressView.setAutoLinkMask(0);
 
             // transform the address to be url compliant
             TransformFilter filter = new TransformFilter() {
@@ -199,7 +218,7 @@ public class MerchantActivity extends Activity
             // linkify the address
             String scheme   = "geo:0,0?q=";
             Pattern pattern = Pattern.compile("(.+)", Pattern.DOTALL);
-            Linkify.addLinks(address, pattern, scheme, null, filter);
+            Linkify.addLinks(addressView, pattern, scheme, null, filter);
         }
     }
 
@@ -252,7 +271,7 @@ public class MerchantActivity extends Activity
     // fields
     //-------------------------------------------------------------------------
 
-    private Merchant    mMerchant;
+    private Coupon      mCoupon;
     private IconManager mIconManager;
 }
 

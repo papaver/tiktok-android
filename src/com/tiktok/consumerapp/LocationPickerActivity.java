@@ -366,6 +366,8 @@ public class LocationPickerActivity extends MapActivity
 
     private void centerMapToCurrentLocation()
     {
+/*
+        // [moiz] LocationServiceRefactor
         LocationTracker tracker  = LocationTracker.getInstance(this);
         Location currentLocation = tracker.currentLocation();
         if (currentLocation != null) {
@@ -373,6 +375,7 @@ public class LocationPickerActivity extends MapActivity
             double longitude = currentLocation.getLongitude();
             centerMap(latitude, longitude);
         }
+*/
     }
 
     //-------------------------------------------------------------------------

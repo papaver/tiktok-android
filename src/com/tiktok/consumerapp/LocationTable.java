@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// MerchantTable
+// LocationTable
 //-----------------------------------------------------------------------------
 
 package com.tiktok.consumerapp;
@@ -22,7 +22,7 @@ import android.util.Log;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class MerchantTable
+public class LocationTable
 {
 
     //-------------------------------------------------------------------------
@@ -48,22 +48,8 @@ public class MerchantTable
         // nothing to do if the versions match
         if (oldVersion == newVersion) return;
 
-        Log.w(MerchantTable.class.getName(), String.format(
+        Log.w(LocationTable.class.getName(), String.format(
             "Upgrading database from version %d to %d ", oldVersion, newVersion));
-
-        // v1 to v2
-        if (oldVersion == 1) {
-            onUpgradev1Tov2(database);
-
-        // v2 to v3
-        } else if (oldVersion == 2) {
-            onUpgradev2Tov3(database);
-
-        // v3 to v4
-        } else if (oldVersion == 3) {
-            dropTable(database);
-            onCreate(database);
-        }
 
         // keep upgrading till versions match
         onUpgrade(database, oldVersion + 1, newVersion);
@@ -76,7 +62,7 @@ public class MerchantTable
      */
     public static void dropTable(SQLiteDatabase database)
     {
-        database.execSQL(getTableDropSQL());
+        database.execSQL(getDropSQL());
     }
 
     //-------------------------------------------------------------------------
@@ -84,24 +70,22 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Fetch merchant/s from the database.
-     * @returns Cursor with all columns in the merchant table.
+     * Fetch location/s from the database.
+     * @returns Cursor object with all columns in location table.
      */
     public static Cursor query(SQLiteDatabase database, String selection) throws SQLException
     {
         String columns[] = new String[] {
             sKeyId,
             sKeyName,
-            sKeyCategory,
-            sKeyDetails,
-            sKeyIconId,
-            sKeyIconUrl,
-            sKeyWebsiteUrl,
-            sKeyTwitterHandle,
-            sKeyUsesPin,
+            sKeyAddress,
+            sKeyLatitude,
+            sKeyLongitude,
+            sKeyPhone,
             sKeyLastUpdated
         };
 
+        // attemp to fetch the location from the database
         Cursor cursor = database.query(true, sName, columns, selection,
             null, null, null, null, null);
         cursor.moveToFirst();
@@ -111,7 +95,7 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Fetch single merchant by id.
+     * Fetch single location by id.
      */
     public static Cursor fetchById(SQLiteDatabase database, long id) throws SQLException
     {
@@ -122,8 +106,19 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Fetch all the merchants from the database.
-     * @returns Cursor over all the coupons.
+     * Fetch multiple locations by thier ids.
+     */
+    public static Cursor fetchByIds(SQLiteDatabase database, String ids) throws SQLException
+    {
+        String selection = String.format("%s in (%s)", sKeyId, ids);
+        return query(database, selection);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Fetch all the location ids from the database.
+     * @returns Hash mapping ids to thier last updated time.
      */
     public static Map<Long, Date> fetchIds(SQLiteDatabase database)
     {
@@ -137,12 +132,12 @@ public class MerchantTable
 
         try {
 
-            // grab the data from the database
+            // query database for location data
             cursor = database.query(sName, columns,
                 null, null, null, null, null);
             cursor.moveToFirst();
 
-            // create a hash of ids and update times
+            // copy data out of cursor into hash
             ids = new HashMap<Long, Date>();
             for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
                 ids.put(cursor.getLong(0), new Date(cursor.getLong(1) * 1000));
@@ -161,8 +156,8 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Create a new merchant.
-     * @returns The id for the new merchant that is created, otherwise a -1.
+     * Create a new location.
+     * @returns The id for the new location that is created, otherwise a -1.
      */
     public static long create(SQLiteDatabase database, ContentValues values)
     {
@@ -172,7 +167,7 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Updates an existing merchant.
+     * Updates an existing location.
      */
     public static boolean update(SQLiteDatabase database, long id, ContentValues values)
     {
@@ -183,7 +178,7 @@ public class MerchantTable
     //-------------------------------------------------------------------------
 
     /**
-     * Deletes an existing merchant.
+     * Deletes an existing location.
      */
     public static boolean delete(SQLiteDatabase database, long id)
     {
@@ -201,38 +196,15 @@ public class MerchantTable
     private static String getCreateSQL()
     {
         String createSQL =
-            "create table "   + sName + "("                       +
-            sKeyId            + " integer primary key not null, " +
-            sKeyName          + " text    not null,             " +
-            sKeyCategory      + " text    not null,             " +
-            sKeyDetails       + " text    not null,             " +
-            sKeyIconId        + " integer not null,             " +
-            sKeyIconUrl       + " text    not null,             " +
-            sKeyWebsiteUrl    + " text    not null,             " +
-            sKeyTwitterHandle + " text    not null,             " +
-            sKeyUsesPin       + " integer not null,             " +
-            sKeyLastUpdated   + " integer not null default 0    " + ");";
+            "create table " + sName + "("                       +
+            sKeyId          + " integer primary key not null, " +
+            sKeyName        + " text    not null,             " +
+            sKeyAddress     + " text    not null,             " +
+            sKeyLatitude    + " real    not null,             " +
+            sKeyLongitude   + " real    not null,             " +
+            sKeyPhone       + " text    not null,             " +
+            sKeyLastUpdated + " integer not null default 0    " + ");";
         return createSQL;
-    }
-
-    //-------------------------------------------------------------------------
-
-    public static void onUpgradev1Tov2(SQLiteDatabase database)
-    {
-        String alterSQL =
-            "alter table " + sName +
-            " add column " + sKeyLastUpdated + " integer not null default 0";
-        database.execSQL(alterSQL);
-    }
-
-    //-------------------------------------------------------------------------
-
-    public static void onUpgradev2Tov3(SQLiteDatabase database)
-    {
-        String alterSQL =
-            "alter table " + sName +
-            " add column " + sKeyTwitterHandle + " text not null default ''";
-        database.execSQL(alterSQL);
     }
 
     //-------------------------------------------------------------------------
@@ -240,7 +212,7 @@ public class MerchantTable
     /**
      * @return SQL statement used to drop a table if it exists.
      */
-    public static String getTableDropSQL()
+    private static String getDropSQL()
     {
         String tableDropSQL =
             String.format("drop table if exists %s", sName);
@@ -251,16 +223,13 @@ public class MerchantTable
     // fields
     //-------------------------------------------------------------------------
 
-    public static String sName             = "Merchant";
+    public static String sName             = "Location";
     public static String sKeyId            = "_id";
     public static String sKeyName          = "name";
-    public static String sKeyCategory      = "category";
-    public static String sKeyDetails       = "details";
-    public static String sKeyIconId        = "icon_id";
-    public static String sKeyIconUrl       = "icon_url";
-    public static String sKeyWebsiteUrl    = "website_url";
-    public static String sKeyTwitterHandle = "tw_handle";
-    public static String sKeyUsesPin       = "uses_pin";
+    public static String sKeyAddress       = "address";
+    public static String sKeyLatitude      = "latitude";
+    public static String sKeyLongitude     = "longitude";
+    public static String sKeyPhone         = "phone";
     public static String sKeyLastUpdated   = "last_updated";
 
 }

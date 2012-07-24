@@ -8,7 +8,9 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.lang.Double;
 import java.util.Date;
+import java.util.List;
 
 import android.graphics.Color;
 
@@ -17,6 +19,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.tiktok.consumerapp.utilities.ColorUtilities;
+import com.tiktok.consumerapp.utilities.LocationUtilities;
 import com.tiktok.consumerapp.utilities.TextUtilities;
 
 //-----------------------------------------------------------------------------
@@ -42,7 +45,8 @@ public final class Coupon
         @JsonProperty("barcode_number")       final String barcode,
         @JsonProperty("redeemed")             final boolean wasRedeemed,
         @JsonProperty("is_redeemable")        final boolean isRedeemable,
-        @JsonProperty("merchant")             final Merchant merchant)
+        @JsonProperty("merchant")             final Merchant merchant,
+        @JsonProperty("locations")            final List<Location> locations)
     {
         mId           = id;
         mTitle        = title;
@@ -56,6 +60,7 @@ public final class Coupon
         mWasRedeemed  = wasRedeemed;
         mIsRedeemable = isRedeemable;
         mMerchant     = merchant;
+        mLocations    = locations;
     }
 
     //-------------------------------------------------------------------------
@@ -72,6 +77,7 @@ public final class Coupon
         boolean isSoldOut,
         boolean wasRedeemed,
         boolean isRedeemable,
+        List<Location> locations,
         Merchant merchant)
     {
         mId           = id;
@@ -85,6 +91,7 @@ public final class Coupon
         mIsSoldOut    = isSoldOut;
         mWasRedeemed  = wasRedeemed;
         mIsRedeemable = isRedeemable;
+        mLocations    = locations;
         mMerchant     = merchant;
     }
 
@@ -273,6 +280,55 @@ public final class Coupon
     //-------------------------------------------------------------------------
 
     /**
+     * @return Returns locations this coupon is valid at.
+     */
+    public List<Location> locations()
+    {
+        return mLocations;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public Location getClosestLocation(android.location.Location coordinate)
+    {
+        // early out if only one location
+        if (mLocations.size() == 1) {
+            return mLocations.get(0);
+        }
+
+        // loop through all the locations and find the closest
+        double minDistance   = Double.MAX_VALUE;
+        Location minLocation = null;
+        for (Location location : mLocations) {
+            double distance =
+                LocationUtilities.distanceBetweenLocations(
+                    location.getCoordinate(), coordinate);
+            if (distance < minDistance) {
+                minDistance = distance;
+                minLocation = location;
+            }
+        }
+
+        return minLocation;
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Returns comma delimited string of location ids.
+     */
+    public String locationIdsStr()
+    {
+        String ids = "";
+        for (Location location : mLocations) {
+            ids += Long.toString(location.id()) + ",";
+        }
+        return ids.replaceAll(",$", "");
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
      * @return Returns icon data representing icon's id and url for download.
      */
     public IconManager.IconData iconData()
@@ -304,6 +360,7 @@ public final class Coupon
     }
 
     //-------------------------------------------------------------------------
+
     public static boolean isExpired(Date time)
     {
         return time.before(new Date());
@@ -404,6 +461,19 @@ public final class Coupon
     // methods
     //-------------------------------------------------------------------------
 
+    public String locationsStr()
+    {
+        String newLine = System.getProperty("line.separator");
+        String string  = "{" + newLine;
+        for (Location location : locations()) {
+            string += location.toString() + newLine;
+        }
+        string += "}";
+        return string;
+    }
+
+    //-------------------------------------------------------------------------
+
     @Override
     public String toString()
     {
@@ -422,6 +492,7 @@ public final class Coupon
             "  redeemed: "      + Boolean.toString(wasRedeemed()) + newLine +
             "  is_redeemable: " + Boolean.toString(isRedeemable()) + newLine +
             "  merchant: "      + merchant().toString() + newLine +
+            "  locations: "     + locationsStr() + newLine +
             "}";
         return string;
     }
@@ -430,17 +501,18 @@ public final class Coupon
     // fields
     //-------------------------------------------------------------------------
 
-    private final long     mId;
-    private final String   mTitle;
-    private final String   mDetails;
-    private final int      mIconId;
-    private final String   mIconUrl;
-    private final long     mStartTime;
-    private final long     mEndTime;
-    private final String   mBarcode;
-    private       boolean  mIsSoldOut;
-    private       boolean  mWasRedeemed;
-    private final boolean  mIsRedeemable;
-    private final Merchant mMerchant;
+    private final long           mId;
+    private final String         mTitle;
+    private final String         mDetails;
+    private final int            mIconId;
+    private final String         mIconUrl;
+    private final long           mStartTime;
+    private final long           mEndTime;
+    private final String         mBarcode;
+    private       boolean        mIsSoldOut;
+    private       boolean        mWasRedeemed;
+    private final boolean        mIsRedeemable;
+    private final List<Location> mLocations;
+    private final Merchant       mMerchant;
 
 }
