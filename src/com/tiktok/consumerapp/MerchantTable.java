@@ -98,7 +98,7 @@ public class MerchantTable
             sKeyIconId        + " integer not null,                  " +
             sKeyIconUrl       + " text    not null,                  " +
             sKeyWebsiteUrl    + " text    not null,                  " +
-            sKeyTwitterHandle + " text    not null default ''        " +
+            sKeyTwitterHandle + " text    not null default '',       " +
             sKeyLastUpdated   + " integer not null default 0         " + ");";
         return createSQL;
     }
