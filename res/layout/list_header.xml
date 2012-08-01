@@ -6,4 +6,8 @@
     android:paddingTop="2dip"
     android:paddingBottom="2dip"
     android:paddingLeft="5dip"
+    android:shadowDy="1"
+    android:shadowRadius="1"
+    android:shadowColor="#023F87"
+    android:background="@drawable/blue_gradient"
     style="?android:attr/listSeparatorTextViewStyle" />

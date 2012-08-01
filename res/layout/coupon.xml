@@ -292,7 +292,7 @@
             android:id="@+id/banner_redeemed"
             android:visibility="gone"
             android:onClick="OnClickValidateMerchantPin"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
             <ImageView
@@ -312,6 +312,11 @@
                         android:layout_height="fill_parent"
                         android:layout_weight="8" />
 
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="8" />
+
                     <Button
                         android:id="@+id/barcode"
                         android:text="0123456"
@@ -325,14 +330,9 @@
                         android:shadowColor="#000000"
                         android:clickable="false"
                         android:layout_weight="1"
-                        android:layout_gravity="bottom|center"
+                        android:layout_gravity="right|center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="8" />
 
             </LinearLayout>
 

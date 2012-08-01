@@ -10,7 +10,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-        <!-- android:background="@drawable/cellbackground" > -->
 
         <FrameLayout
             android:layout_width="106dip"
@@ -27,7 +26,6 @@
                 android:padding="5dip" >
 
                 <FrameLayout
-                    android:id="@+id/coupon_gradient"
                     android:layout_width="96dip"
                     android:layout_height="64dip"
                     android:background="#ffffff"
@@ -108,7 +106,8 @@
     <ImageView
         android:id="@+id/coupon_sash"
         android:src="@drawable/redeemedsash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="65dip"
+        android:layout_height="65dip"
+        android:padding="2dip" />
 
 </FrameLayout>
