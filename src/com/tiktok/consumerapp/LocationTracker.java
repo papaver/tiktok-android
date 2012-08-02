@@ -18,6 +18,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Handler;
@@ -36,12 +37,20 @@ public class LocationTracker extends Service implements LocationListener
     private static final String kLogTag = "LocationTracker";
 
     //-------------------------------------------------------------------------
-    // get instance
+    // Service Binder
     //-------------------------------------------------------------------------
 
-    public static LocationTracker getInstance(Context context)
+    /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class LocationTrackerBinder extends Binder
     {
-       return null;
+        LocationTracker getService()
+        {
+            return LocationTracker.this;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -51,7 +60,7 @@ public class LocationTracker extends Service implements LocationListener
     @Override
     public IBinder onBind(Intent intent)
     {
-        return null;
+        return mBinder;
     }
 
     //-------------------------------------------------------------------------
@@ -281,7 +290,12 @@ public class LocationTracker extends Service implements LocationListener
     // fields
     //-------------------------------------------------------------------------
 
-    private Handler  mHandler = new Handler();
+    /*
+     * This is the object that receives interactions from clients.
+     */
+    private final IBinder mBinder = new LocationTrackerBinder();
+
+    private final Handler mHandler = new Handler();
     private Location mLastKnownLocation;
 
 }

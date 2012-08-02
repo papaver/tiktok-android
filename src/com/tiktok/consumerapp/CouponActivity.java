@@ -20,7 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -690,20 +689,17 @@ public class CouponActivity extends MapActivity
 
     private android.location.Location getCurrentLocation()
     {
-        // [moiz] LocationServiceRefactor - this is returning crap values
-        //   best thing to do would be to have an instance that is available
-        //   at all times to the apps thats is bound to the location
-        //   service that can be queried for the current location
-        //   this will do for as a substitute
-
-        LocationManager locationManager =
-            (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        android.location.Location coordinate =
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (coordinate == null) {
-            coordinate = new android.location.Location("");
+        // attempt to get current location
+        if (mLocation == null) {
+            LocationTrackerManager manager = LocationTrackerManager.getInstance(this);
+            mLocation = manager.currentLocation();
         }
-        return coordinate;
+
+        if (mLocation != null) {
+            return mLocation;
+        } else {
+            return new android.location.Location("");
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -857,8 +853,9 @@ public class CouponActivity extends MapActivity
     // fields
     //-------------------------------------------------------------------------
 
-    private Coupon      mCoupon;
-    private IconManager mIconManager;
-    private Handler     mHandler = new Handler();
+    private Coupon                    mCoupon;
+    private IconManager               mIconManager;
+    private Handler                   mHandler = new Handler();
+    private android.location.Location mLocation;
 }
 
