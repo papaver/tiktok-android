@@ -376,6 +376,9 @@ public class CouponActivity extends MapActivity
 
     public void OnClickValidateMerchantPin(View view)
     {
+        // only valid for merchants that use the pin
+        if (!mCoupon.merchant().usesPin()) return;
+
         Analytics.passCheckpoint("Merchant Pin");
 
         // inflate layout
