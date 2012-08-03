@@ -48,25 +48,12 @@ public class MerchantTable
         // nothing to do if the versions match
         if (oldVersion == newVersion) return;
 
-        Log.w(MerchantTable.class.getName(), String.format(
+        Log.i(MerchantTable.class.getName(), String.format(
             "Upgrading database from version %d to %d ", oldVersion, newVersion));
 
-        // v1 to v2
-        if (oldVersion == 1) {
-            onUpgradev1Tov2(database);
-
-        // v2 to v3
-        } else if (oldVersion == 2) {
-            onUpgradev2Tov3(database);
-
-        // v3 to v4
-        } else if (oldVersion == 3) {
-            dropTable(database);
-            onCreate(database);
-        }
-
-        // keep upgrading till versions match
-        onUpgrade(database, oldVersion + 1, newVersion);
+        // throw data away and recreate the table
+        dropTable(database);
+        onCreate(database);
     }
 
     //-------------------------------------------------------------------------

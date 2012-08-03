@@ -44,16 +44,15 @@ public class CouponTable
     public static void onUpgrade(SQLiteDatabase database,
                                  int oldVersion, int newVersion)
     {
-        // this is obviously the worst implementation ever
+        // nothing to do if the versions match
+        if (oldVersion == newVersion) return;
 
-        Log.w(CouponTable.class.getName(), String.format(
+        Log.i(CouponTable.class.getName(), String.format(
             "Upgrading database from version %d to %d ", oldVersion, newVersion));
 
-        // v1 to v2
-        if (oldVersion == 1) {
-            onUpgradev1Tov2(database);
-            ++oldVersion;
-        }
+        // throw data away and recreate the table
+        dropTable(database);
+        onCreate(database);
     }
 
     //-------------------------------------------------------------------------

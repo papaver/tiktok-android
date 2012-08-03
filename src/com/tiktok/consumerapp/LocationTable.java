@@ -48,11 +48,12 @@ public class LocationTable
         // nothing to do if the versions match
         if (oldVersion == newVersion) return;
 
-        Log.w(LocationTable.class.getName(), String.format(
+        Log.i(LocationTable.class.getName(), String.format(
             "Upgrading database from version %d to %d ", oldVersion, newVersion));
 
-        // keep upgrading till versions match
-        onUpgrade(database, oldVersion + 1, newVersion);
+        // throw data away and recreate the table
+        dropTable(database);
+        onCreate(database);
     }
 
     //-------------------------------------------------------------------------

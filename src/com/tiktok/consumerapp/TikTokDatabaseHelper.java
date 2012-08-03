@@ -64,9 +64,9 @@ public class TikTokDatabaseHelper extends SQLiteOpenHelper
     public void onUpgrade(SQLiteDatabase database,
                           int oldVersion, int newVersion)
     {
-        LocationTable.onUpgrade(database, oldVersion, newVersion);
-        MerchantTable.onUpgrade(database, oldVersion, newVersion);
         CouponTable.onUpgrade(database, oldVersion, newVersion);
+        MerchantTable.onUpgrade(database, oldVersion, newVersion);
+        LocationTable.onUpgrade(database, oldVersion, newVersion);
     }
 
     //-------------------------------------------------------------------------
