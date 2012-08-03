@@ -117,6 +117,13 @@
                 <!-- Icon / Map End-->
                 </LinearLayout>
 
+                <!-- Location Table -->
+                <ExpandableListView
+                    android:id="@+id/locationlist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:groupIndicator="@drawable/group_indicator" />
+
                 <!-- Details -->
                 <LinearLayout
                     android:layout_width="match_parent"

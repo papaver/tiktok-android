@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginLeft="5dip"
+    android:gravity="center|fill_vertical"
+    android:orientation="vertical"
+    android:padding="1dip" >
+
+    <!-- Name -->
+    <TextView
+        android:id="@+id/name"
+        android:text="LOCATION NAME"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- Address -->
+    <TextView android:id="@+id/address"
+        android:text="123 Street Address,\nCity, ST, Zipcode"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textSize="12sp"
+        android:autoLink="map"
+        android:lines="2"
+        android:paddingTop="1dip" />
+
+    <!-- Phone -->
+    <TextView android:id="@+id/phone"
+        android:text="555-555-5555"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:autoLink="phone"
+        android:paddingTop="1dip" />
+
+</LinearLayout>
