@@ -10,6 +10,9 @@ package com.tiktok.consumerapp;
 
 import java.util.Date;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -48,6 +51,22 @@ public final class Merchant
         mTwitterHandle = twitterHandle;
         mUsesPin       = usesPin;
         mLastUpdated   = lastUpdated;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public Merchant(Cursor cursor)
+    {
+        mId            = cursor.getLong(cursor.getColumnIndex(MerchantTable.sKeyId));
+        mName          = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyName));
+        mCategory      = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyCategory));
+        mDetails       = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyDetails));
+        mIconId        = cursor.getInt(cursor.getColumnIndex(MerchantTable.sKeyIconId));
+        mIconUrl       = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyIconUrl));
+        mWebsiteUrl    = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyWebsiteUrl));
+        mTwitterHandle = cursor.getString(cursor.getColumnIndex(MerchantTable.sKeyTwitterHandle));
+        mUsesPin       = cursor.getInt(cursor.getColumnIndex(MerchantTable.sKeyUsesPin)) == 1;
+        mLastUpdated   = cursor.getLong(cursor.getColumnIndex(MerchantTable.sKeyLastUpdated));
     }
 
     //-------------------------------------------------------------------------
@@ -172,6 +191,27 @@ public final class Merchant
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    /**
+     * @returns Mapping between database columns and values.
+     */
+    public ContentValues contentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(MerchantTable.sKeyId,            id());
+        values.put(MerchantTable.sKeyName,          name());
+        values.put(MerchantTable.sKeyCategory,      category());
+        values.put(MerchantTable.sKeyDetails,       details());
+        values.put(MerchantTable.sKeyIconId,        iconId());
+        values.put(MerchantTable.sKeyIconUrl,       iconUrl());
+        values.put(MerchantTable.sKeyWebsiteUrl,    websiteUrl());
+        values.put(MerchantTable.sKeyTwitterHandle, twitterHandle());
+        values.put(MerchantTable.sKeyUsesPin,       usesPin());
+        values.put(MerchantTable.sKeyLastUpdated,   lastUpdatedRaw());
+        return values;
+    }
+
     //-------------------------------------------------------------------------
 
     @Override

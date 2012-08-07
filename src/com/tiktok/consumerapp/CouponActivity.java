@@ -144,14 +144,10 @@ public class CouponActivity extends MapActivity
 
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
-        adapter.open();
 
         // grab coupon using id
         mCoupon = adapter.fetchCoupon(id);
         setupCouponDetails(mCoupon);
-
-        // close
-        adapter.close();
 
         // setup coupon depending on status
         if (!Coupon.isExpired(mCoupon.endTime())) {
@@ -332,9 +328,7 @@ public class CouponActivity extends MapActivity
                     // redeem the coupon
                     mCoupon.redeem();
                     TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
-                    adapter.open();
                     adapter.updateCoupon(mCoupon);
-                    adapter.close();
 
                     // update the banner
                     updateBanner(CouponState.kActive);

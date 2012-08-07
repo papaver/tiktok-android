@@ -8,13 +8,10 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 //-----------------------------------------------------------------------------
@@ -23,6 +20,17 @@ import android.util.Log;
 
 public class CouponTable
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    public static final Uri kContentUri =
+        Uri.parse("content://" + Constants.kAuthority + "/coupons");
+
+    public static final String kContentType =
+        "com.tiktok.cursor.dir/com.tiktok.coupon";
+    public static final String kContentTypeItem =
+        "com.tiktok.cursor.item/com.tiktok.coupon";
 
     //-------------------------------------------------------------------------
     // table management
@@ -66,92 +74,14 @@ public class CouponTable
     }
 
     //-------------------------------------------------------------------------
-    // query methods
-    //-------------------------------------------------------------------------
-
-    public static Cursor query(SQLiteDatabase database, String selection,
-                               String orderBy) throws SQLException
-    {
-        String columns[] = new String[] {
-            sKeyId,
-            sKeyTitle,
-            sKeyDetails,
-            sKeyIconId,
-            sKeyIconUrl,
-            sKeyStartTime,
-            sKeyEndTime,
-            sKeyBarcode,
-            sKeyIsSoldOut,
-            sKeyWasRedeemed,
-            sKeyIsRedeemable,
-            sKeyLocations,
-            sKeyMerchant,
-        };
-
-        // setup cursor
-        Cursor cursor = database.query(true, sName, columns, selection,
-            null, null, null, orderBy, null);
-        cursor.moveToFirst();
-        return cursor;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Fetch coupon from the database.
-     * @returns Cursor positioned at the requested coupon.
-     */
-    public static Cursor fetchById(SQLiteDatabase database, long id) throws SQLException
-    {
-        String selection = String.format("%s = %d", sKeyId, id);
-        return query(database, selection, null);
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Fetch all the coupons from the database.
-     * @returns Cursor over all the coupons.
-     */
-    public static List<Long> fetchIds(SQLiteDatabase database)
-    {
-        String columns[] = new String[] {
-            sKeyId,
-        };
-
-        Cursor cursor  = null;
-        List<Long> ids = null;
-
-        try {
-
-            // grab the data from the database
-            cursor = database.query(sName, columns,
-                null, null, null, null, null);
-            cursor.moveToFirst();
-
-            // create a list of ids
-            ids = new ArrayList<Long>();
-            for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
-                ids.add(cursor.getLong(0));
-            }
-
-        // cleanup
-        } finally {
-            if (cursor != null) cursor.close();
-        }
-
-        return ids;
-    }
-
-    //-------------------------------------------------------------------------
     // entity management
     //-------------------------------------------------------------------------
 
     /**
      * Create a new coupon.
-     * @returns The id for the new merchant that is created, otherwise a -1.
+     * @returns The id for the new coupon that is created, otherwise a -1.
      */
-    public static long create(SQLiteDatabase database, ContentValues values)
+    public static long insert(SQLiteDatabase database, ContentValues values)
     {
         return database.insert(sName, null, values);
     }
@@ -161,10 +91,22 @@ public class CouponTable
     /**
      * Updates an existing coupon.
      */
-    public static boolean update(SQLiteDatabase database, long id, ContentValues values)
+    public static int update(SQLiteDatabase database, ContentValues values,
+                             String where, String[] whereArgs)
     {
-        String whereClause = String.format("%s = %d", sKeyId, id);
-        return database.update(sName, values, whereClause, null) > 0;
+        return database.update(sName, values, where, whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Updates an existing coupon.
+     */
+    public static int updateById(SQLiteDatabase database, String id,
+                                 ContentValues values,
+                                 String where, String[] whereArgs)
+    {
+        return update(database, values, appendWhereId(id, where), whereArgs);
     }
 
     //-------------------------------------------------------------------------
@@ -172,10 +114,33 @@ public class CouponTable
     /**
      * Deletes an existing coupon.
      */
-    public static boolean delete(SQLiteDatabase database, long id)
+    public static int delete(SQLiteDatabase database,
+                             String where, String[] whereArgs)
     {
-        String whereClause = String.format("%s = %d", sKeyId, id);
-        return database.delete(sName, whereClause, null) > 0;
+        return database.delete(sName, where, whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Deletes an existing coupon.
+     */
+    public static int deleteById(SQLiteDatabase database,
+                                 String id, String where, String[] whereArgs)
+    {
+        return delete(database, appendWhereId(id, where), whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+    // helper functions
+    //-------------------------------------------------------------------------
+
+    private static String appendWhereId(String id, String where)
+    {
+        String whereId = String.format("%s = %s", sKeyId, id);
+        return !TextUtils.isEmpty(where) ?
+            String.format("%s AND (%s)", whereId, where) :
+            whereId;
     }
 
     //-------------------------------------------------------------------------
@@ -247,5 +212,23 @@ public class CouponTable
     public static String sKeyIsSoldOut    = "is_sold_out";
     public static String sKeyLocations    = "locations";
     public static String sKeyMerchant     = "merchant";
+
+    //-------------------------------------------------------------------------
+
+    public static String sFullProjection[] = new String[] {
+        sKeyId,
+        sKeyTitle,
+        sKeyDetails,
+        sKeyIconId,
+        sKeyIconUrl,
+        sKeyStartTime,
+        sKeyEndTime,
+        sKeyBarcode,
+        sKeyIsSoldOut,
+        sKeyWasRedeemed,
+        sKeyIsRedeemable,
+        sKeyLocations,
+        sKeyMerchant,
+    };
 
 }

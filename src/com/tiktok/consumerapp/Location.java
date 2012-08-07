@@ -10,6 +10,9 @@ package com.tiktok.consumerapp;
 
 import java.util.Date;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -42,6 +45,19 @@ public final class Location
         mLongitude   = longitude;
         mPhone       = phone;
         mLastUpdated = lastUpdated;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public Location(Cursor cursor)
+    {
+        mId          = cursor.getLong(cursor.getColumnIndex(LocationTable.sKeyId));
+        mName        = cursor.getString(cursor.getColumnIndex(LocationTable.sKeyName));
+        mAddress     = cursor.getString(cursor.getColumnIndex(LocationTable.sKeyAddress));
+        mLatitude    = cursor.getDouble(cursor.getColumnIndex(LocationTable.sKeyLatitude));
+        mLongitude   = cursor.getDouble(cursor.getColumnIndex(LocationTable.sKeyLongitude));
+        mPhone       = cursor.getString(cursor.getColumnIndex(LocationTable.sKeyPhone));
+        mLastUpdated = cursor.getLong(cursor.getColumnIndex(LocationTable.sKeyLastUpdated));
     }
 
     //-------------------------------------------------------------------------
@@ -147,6 +163,24 @@ public final class Location
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    /**
+     * @returns Mapping between database columns and values.
+     */
+    public ContentValues contentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(LocationTable.sKeyId,          id());
+        values.put(LocationTable.sKeyName,        name());
+        values.put(LocationTable.sKeyAddress,     address());
+        values.put(LocationTable.sKeyLatitude,    latitude());
+        values.put(LocationTable.sKeyLongitude,   longitude());
+        values.put(LocationTable.sKeyPhone,       phone());
+        values.put(LocationTable.sKeyLastUpdated, lastUpdatedRaw());
+        return values;
+    }
+
     //-------------------------------------------------------------------------
 
     @Override

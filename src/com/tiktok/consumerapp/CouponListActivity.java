@@ -66,7 +66,6 @@ public class CouponListActivity extends ListActivity
 
         // open up the database
         mDatabaseAdapter = new TikTokDatabaseAdapter(this);
-        mDatabaseAdapter.open();
 
         // fill the listview with data
         mCursor = mDatabaseAdapter.fetchAllCoupons();
@@ -140,7 +139,6 @@ public class CouponListActivity extends ListActivity
     {
         super.onDestroy();
         cleanupIntentFilter();
-        if (mDatabaseAdapter != null) mDatabaseAdapter.close();
         if (mSyncApi != null) mSyncApi.cancel();
     }
 

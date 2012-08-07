@@ -12,6 +12,8 @@ import java.lang.Double;
 import java.util.Date;
 import java.util.List;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Color;
 
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -65,32 +67,19 @@ public final class Coupon
 
     //-------------------------------------------------------------------------
 
-    public Coupon(
-        long id,
-        String title,
-        String details,
-        int iconId,
-        String iconUrl,
-        long startTime,
-        long endTime,
-        String barcode,
-        boolean isSoldOut,
-        boolean wasRedeemed,
-        boolean isRedeemable,
-        List<Location> locations,
-        Merchant merchant)
+    public Coupon(Cursor cursor, List<Location> locations, Merchant merchant)
     {
-        mId           = id;
-        mTitle        = title;
-        mDetails      = details;
-        mIconId       = iconId;
-        mIconUrl      = iconUrl;
-        mStartTime    = startTime;
-        mEndTime      = endTime;
-        mBarcode      = barcode;
-        mIsSoldOut    = isSoldOut;
-        mWasRedeemed  = wasRedeemed;
-        mIsRedeemable = isRedeemable;
+        mId           = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyId));
+        mTitle        = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyTitle));
+        mDetails      = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyDetails));
+        mIconId       = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIconId));
+        mIconUrl      = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyIconUrl));
+        mStartTime    = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyStartTime));
+        mEndTime      = cursor.getLong(cursor.getColumnIndex(CouponTable.sKeyEndTime));
+        mBarcode      = cursor.getString(cursor.getColumnIndex(CouponTable.sKeyBarcode));
+        mIsSoldOut    = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsSoldOut)) == 1;
+        mWasRedeemed  = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyWasRedeemed)) == 1;
+        mIsRedeemable = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsRedeemable)) == 1;
         mLocations    = locations;
         mMerchant     = merchant;
     }
@@ -459,6 +448,30 @@ public final class Coupon
 
     //-------------------------------------------------------------------------
     // methods
+    //-------------------------------------------------------------------------
+
+    /**
+     * @returns Mapping between database columns and values.
+     */
+    public ContentValues contentValues()
+    {
+        ContentValues values = new ContentValues();
+        values.put(CouponTable.sKeyId,           id());
+        values.put(CouponTable.sKeyTitle,        title());
+        values.put(CouponTable.sKeyDetails,      details());
+        values.put(CouponTable.sKeyIconId,       iconId());
+        values.put(CouponTable.sKeyIconUrl,      iconUrl());
+        values.put(CouponTable.sKeyStartTime,    startTimeRaw());
+        values.put(CouponTable.sKeyEndTime,      endTimeRaw());
+        values.put(CouponTable.sKeyBarcode,      barcode());
+        values.put(CouponTable.sKeyIsSoldOut,    isSoldOut());
+        values.put(CouponTable.sKeyWasRedeemed,  wasRedeemed());
+        values.put(CouponTable.sKeyIsRedeemable, isRedeemable());
+        values.put(CouponTable.sKeyLocations,    locationIdsStr());
+        values.put(CouponTable.sKeyMerchant,     merchant().id());
+        return values;
+    }
+
     //-------------------------------------------------------------------------
 
     public String locationsStr()

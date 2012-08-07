@@ -19,6 +19,7 @@ public final class Constants
     // statics
     //-------------------------------------------------------------------------
 
+    public static final String kAuthority               = "com.tiktok.consumerapp.provider";
     public static final String kPushNotificationAccount = "tiktokoffers@gmail.com";
     public static final String kFlurryApiKey            = "J88FCCBJXIBWMRE55UN6";
     public static final String kFlurryApiDevKey         = "DYVTRQV7BHTXEEZHBXA2";

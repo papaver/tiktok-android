@@ -737,7 +737,6 @@ public final class TikTokApi
 
             // open up a database connection
             TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(mContext);
-            adapter.open();
 
             // repack the data for easier processing
             Map<CouponKey, Object> data = repackCouponData(response);
@@ -753,9 +752,6 @@ public final class TikTokApi
             // update sold out coupons
             Long[] soldOut = (Long[])data.get(TikTokApi.CouponKey.kSoldOut);
             processSoldOut(soldOut, adapter);
-
-            // cleanup
-            adapter.close();
         }
 
         // run handler

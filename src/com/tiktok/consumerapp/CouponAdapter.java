@@ -75,14 +75,11 @@ public final class CouponAdapter extends CursorAdapter
         final boolean isRedeemable  = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsRedeemable)) == 1;
 
         // retrieve merchant
-        Merchant merchant             = null;
-        TikTokDatabaseAdapter adapter = null;
+        Merchant merchant = null;
         try {
-            adapter = new TikTokDatabaseAdapter(context);
-            adapter.open();
+            TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
             merchant = adapter.fetchMerchant(merchantId);
         } finally {
-            adapter.close();
         }
 
         // reset alpha

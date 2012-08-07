@@ -154,7 +154,6 @@ public class CouponMapActivity extends MapActivity
 
         // open up database connection
         mDatabaseAdapter = new TikTokDatabaseAdapter(this);
-        mDatabaseAdapter.open();
 
         // fill the map with data
         mCursor = mDatabaseAdapter.fetchAllCoupons();
@@ -239,7 +238,6 @@ public class CouponMapActivity extends MapActivity
     {
         super.onDestroy();
         cleanupIntentFilter();
-        if (mDatabaseAdapter != null) mDatabaseAdapter.close();
     }
 
     //-------------------------------------------------------------------------

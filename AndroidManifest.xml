@@ -122,6 +122,10 @@
         <!-- Background Location Service -->
         <service android:enabled="true" android:name=".LocationTracker" />`
 
+        <!-- Content Provider -->
+        <provider android:name="TikTokProvider"
+                  android:authorities="com.tiktok.consumerapp.provider" />
+
     </application>
 
 </manifest>

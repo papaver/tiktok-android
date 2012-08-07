@@ -71,19 +71,14 @@ public class MerchantActivity extends Activity
         if (id == null) finish();
 
         // retrieve the coupon from the database
-        TikTokDatabaseAdapter adapter = null;
+        TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
         try {
-
-            adapter = new TikTokDatabaseAdapter(this);
-            adapter.open();
 
             // grab coupon using id
             mCoupon = adapter.fetchCoupon(id);
             setupMerchantDetails(mCoupon);
 
-        // cleanup
         } finally {
-            adapter.close();
         }
 
         // if something failed close the activity

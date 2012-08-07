@@ -8,14 +8,10 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 //-----------------------------------------------------------------------------
@@ -24,6 +20,17 @@ import android.util.Log;
 
 public class MerchantTable
 {
+    //-------------------------------------------------------------------------
+    // statics
+    //-------------------------------------------------------------------------
+
+    public static final Uri kContentUri =
+        Uri.parse("content://" + Constants.kAuthority + "/merchants");
+
+    public static final String kContentType =
+        "com.tiktok.cursor.dir/com.tiktok.merchant";
+    public static final String kContentTypeItem =
+        "com.tiktok.cursor.item/com.tiktok.merchant";
 
     //-------------------------------------------------------------------------
     // table management
@@ -67,83 +74,6 @@ public class MerchantTable
     }
 
     //-------------------------------------------------------------------------
-    // query methods
-    //-------------------------------------------------------------------------
-
-    /**
-     * Fetch merchant/s from the database.
-     * @returns Cursor with all columns in the merchant table.
-     */
-    public static Cursor query(SQLiteDatabase database, String selection) throws SQLException
-    {
-        String columns[] = new String[] {
-            sKeyId,
-            sKeyName,
-            sKeyCategory,
-            sKeyDetails,
-            sKeyIconId,
-            sKeyIconUrl,
-            sKeyWebsiteUrl,
-            sKeyTwitterHandle,
-            sKeyUsesPin,
-            sKeyLastUpdated
-        };
-
-        Cursor cursor = database.query(true, sName, columns, selection,
-            null, null, null, null, null);
-        cursor.moveToFirst();
-        return cursor;
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Fetch single merchant by id.
-     */
-    public static Cursor fetchById(SQLiteDatabase database, long id) throws SQLException
-    {
-        String selection = String.format("%s = %d", sKeyId, id);
-        return query(database, selection);
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * Fetch all the merchants from the database.
-     * @returns Cursor over all the coupons.
-     */
-    public static Map<Long, Date> fetchIds(SQLiteDatabase database)
-    {
-        String columns[] = new String[] {
-            sKeyId,
-            sKeyLastUpdated,
-        };
-
-        Cursor cursor       = null;
-        Map<Long, Date> ids = null;
-
-        try {
-
-            // grab the data from the database
-            cursor = database.query(sName, columns,
-                null, null, null, null, null);
-            cursor.moveToFirst();
-
-            // create a hash of ids and update times
-            ids = new HashMap<Long, Date>();
-            for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
-                ids.put(cursor.getLong(0), new Date(cursor.getLong(1) * 1000));
-            }
-
-        // cleanup
-        } finally {
-            if (cursor != null) cursor.close();
-        }
-
-        return ids;
-    }
-
-    //-------------------------------------------------------------------------
     // entity management
     //-------------------------------------------------------------------------
 
@@ -151,7 +81,7 @@ public class MerchantTable
      * Create a new merchant.
      * @returns The id for the new merchant that is created, otherwise a -1.
      */
-    public static long create(SQLiteDatabase database, ContentValues values)
+    public static long insert(SQLiteDatabase database, ContentValues values)
     {
         return database.insert(sName, null, values);
     }
@@ -161,10 +91,22 @@ public class MerchantTable
     /**
      * Updates an existing merchant.
      */
-    public static boolean update(SQLiteDatabase database, long id, ContentValues values)
+    public static int update(SQLiteDatabase database, ContentValues values,
+                             String where, String[] whereArgs)
     {
-        String whereClause = String.format("%s = %d", sKeyId, id);
-        return database.update(sName, values, whereClause, null) > 0;
+        return database.update(sName, values, where, whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Updates an existing merchant.
+     */
+    public static int updateById(SQLiteDatabase database, String id,
+                                 ContentValues values,
+                                 String where, String[] whereArgs)
+    {
+        return update(database, values, appendWhereId(id, where), whereArgs);
     }
 
     //-------------------------------------------------------------------------
@@ -172,10 +114,33 @@ public class MerchantTable
     /**
      * Deletes an existing merchant.
      */
-    public static boolean delete(SQLiteDatabase database, long id)
+    public static int delete(SQLiteDatabase database,
+                             String where, String[] whereArgs)
     {
-        String whereClause = String.format("%s = %d", sKeyId, id);
-        return database.delete(sName, whereClause, null) > 0;
+        return database.delete(sName, where, whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * Deletes an existing merchant.
+     */
+    public static int deleteById(SQLiteDatabase database,
+                                 String id, String where, String[] whereArgs)
+    {
+        return delete(database, appendWhereId(id, where), whereArgs);
+    }
+
+    //-------------------------------------------------------------------------
+    // helper functions
+    //-------------------------------------------------------------------------
+
+    private static String appendWhereId(String id, String where)
+    {
+        String whereId = String.format("%s = %s", sKeyId, id);
+        return !TextUtils.isEmpty(where) ?
+            String.format("%s AND (%s)", whereId, where) :
+            whereId;
     }
 
     //-------------------------------------------------------------------------
@@ -249,5 +214,20 @@ public class MerchantTable
     public static String sKeyTwitterHandle = "tw_handle";
     public static String sKeyUsesPin       = "uses_pin";
     public static String sKeyLastUpdated   = "last_updated";
+
+    //-------------------------------------------------------------------------
+
+    public static String sFullProjection[] = new String[] {
+        sKeyId,
+        sKeyName,
+        sKeyCategory,
+        sKeyDetails,
+        sKeyIconId,
+        sKeyIconUrl,
+        sKeyWebsiteUrl,
+        sKeyTwitterHandle,
+        sKeyUsesPin,
+        sKeyLastUpdated
+    };
 
 }
