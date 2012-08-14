@@ -4,7 +4,7 @@
     android:versionCode="10"
     android:versionName="1.09" >
 
-    <uses-sdk android:minSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="16" />
 
     <permission android:name="com.tiktok.consumerapp.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="com.tiktok.consumerapp.permission.C2D_MESSAGE" />
@@ -18,7 +18,8 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Sherlock" >
 
         <!-- External Libraries -->
         <uses-library android:name="com.google.android.maps" />
@@ -27,7 +28,6 @@
         <activity
             android:label="@string/app_name"
             android:name=".StartupActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,7 +40,6 @@
             android:name=".MainTabActivity"
             android:label="@string/tabs_name"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait" />
 
         <!-- Coupons List Activity -->
@@ -86,21 +85,18 @@
         <activity
             android:label="@string/coupon_view"
             android:name=".CouponActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait" />
 
         <!-- Merchant Activity -->
         <activity
             android:label="@string/merchant_view"
             android:name=".MerchantActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait" />
 
         <!-- Location Picker Activity -->
         <activity
             android:label="@string/location_picker_view"
             android:name=".LocationPickerActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait" />
 
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->
