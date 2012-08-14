@@ -8,13 +8,16 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import android.app.TabActivity;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.TabHost;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragment;
 
 import com.ijsbrandslob.appirater.Appirater;
 
@@ -22,7 +25,7 @@ import com.ijsbrandslob.appirater.Appirater;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class MainTabActivity extends TabActivity
+public class MainTabActivity extends SherlockActivity
 {
     //-------------------------------------------------------------------------
     // statics
@@ -50,6 +53,10 @@ public class MainTabActivity extends TabActivity
 
         // load content from xml
         setContentView(R.layout.main);
+
+        // set the action bar defaults
+        ActionBar bar = getSupportActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // setup tabs in tab view
         setupTabs();
@@ -140,50 +147,51 @@ public class MainTabActivity extends TabActivity
      */
     private void setupTabs()
     {
-        // grab resources
-        Resources res   = getResources();
-        TabHost tabHost = getTabHost();
-
-        Intent intent;
-        TabHost.TabSpec spec;
+        ActionBar bar = getSupportActionBar();
+        ActionBar.Tab tab;
 
         // setup deals list tab
-        intent = new Intent().setClass(this, CouponListActivity.class);
-        spec   = tabHost.newTabSpec(kTagCouponList)
-                        .setIndicator("Deals", res.getDrawable(R.drawable.icon_tab_couponlist))
-                        .setContent(intent);
-        tabHost.addTab(spec);
+        tab = bar.newTab()
+                 .setTag(kTagCouponList)
+                 .setText("Deals")
+                 //.setIcon(R.drawable.icon_tab_couponlist)
+                 .setTabListener(new TabListener</* CouponListActivity */ FragmentTabStub>(this, kTagCouponList, FragmentTabStub.class));
+        bar.addTab(tab);
 
         // setup deals map tab
-        intent = new Intent().setClass(this, CouponMapActivity.class);
-        spec   = tabHost.newTabSpec(kTagCouponMap)
-                        .setIndicator("Map", res.getDrawable(R.drawable.icon_tab_couponmap))
-                        .setContent(intent);
-        tabHost.addTab(spec);
+        tab = bar.newTab()
+                 .setTag(kTagCouponMap)
+                 .setText("Map")
+                 //.setIcon(R.drawable.icon_tab_couponmap)
+                 .setTabListener(new TabListener</* CouponMapActivity */ FragmentTabStub>(this, kTagCouponMap, FragmentTabStub.class));
+        bar.addTab(tab);
 
         // setup karma tab
-        intent = new Intent().setClass(this, KarmaActivity.class);
-        spec   = tabHost.newTabSpec(kTagKarma)
-                        .setIndicator("Karma", res.getDrawable(R.drawable.icon_tab_karma))
-                        .setContent(intent);
-        tabHost.addTab(spec);
+        tab = bar.newTab()
+                 .setTag(kTagKarma)
+                 .setText("Karma")
+                 //.setIcon(R.drawable.icon_tab_karma)
+                 .setTabListener(new TabListener</* KarmaActivity */ FragmentTabStub>(this, kTagKarma, FragmentTabStub.class));
+        bar.addTab(tab);
 
         // setup settings tab
-        intent = new Intent().setClass(this, SettingsActivity.class);
-        spec   = tabHost.newTabSpec(kTagSettings)
-                        .setIndicator("Settings", res.getDrawable(R.drawable.icon_tab_settings))
-                        .setContent(intent);
-        tabHost.addTab(spec);
+        tab = bar.newTab()
+                 .setTag(kTagSettings)
+                 .setText("Settings")
+                 //.setIcon(R.drawable.icon_tab_settings)
+                 .setTabListener(new TabListener</* SettingsActivity */ FragmentTabStub>(this, kTagSettings, FragmentTabStub.class));
+        bar.addTab(tab);
 
         // setup city tab
-        intent = new Intent().setClass(this, CitiesActivity.class);
-        spec   = tabHost.newTabSpec(kTagCities)
-                        .setIndicator("Cities", res.getDrawable(R.drawable.icon_tab_cities))
-                        .setContent(intent);
-        tabHost.addTab(spec);
+        tab = bar.newTab()
+                 .setTag(kTagCities)
+                 .setText("Cities")
+                 //.setIcon(R.drawable.icon_tab_cities)
+                 .setTabListener(new TabListener</* CitiesActivity */ FragmentTabStub>(this, kTagCities, FragmentTabStub.class));
+        bar.addTab(tab);
 
-        // set the current tab
-        tabHost.setCurrentTabByTag(kTagCouponList);
+        // select tab
+        bar.setSelectedNavigationItem(0);
     }
 
     //-------------------------------------------------------------------------
@@ -191,4 +199,64 @@ public class MainTabActivity extends TabActivity
     //-------------------------------------------------------------------------
 
     Appirater mAppirater;
+}
+
+//-----------------------------------------------------------------------------
+// TabListener
+//-----------------------------------------------------------------------------
+
+final class TabListener<T extends SherlockFragment> implements ActionBar.TabListener
+{
+
+    public TabListener(SherlockActivity activity, String tag, Class<T> cls)
+    {
+        mActivity = activity;
+        mTag      = tag;
+        mClass    = cls;
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction transaction)
+    {
+        // nothing to do without a transaction manager
+        if (transaction == null) return;
+
+        // add/attach the fragment to the activity
+        if (mFragment == null) {
+            mFragment = SherlockFragment.instantiate(mActivity, mClass.getName());
+            transaction.add(R.id.content, mFragment, mTag);
+        } else {
+            transaction.attach(mFragment);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction transaction)
+    {
+        // nothing to do without a transaction manager
+        if (transaction == null) return;
+
+        // detach the fragment to the activity
+        if (mFragment != null) {
+            transaction.detach(mFragment);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction transaction)
+    {
+    }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+
+    private       Fragment         mFragment;
+    private final SherlockActivity mActivity;
+    private final String           mTag;
+    private final Class<T>         mClass;
+
 }
