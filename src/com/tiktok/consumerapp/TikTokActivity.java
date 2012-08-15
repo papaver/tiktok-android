@@ -8,12 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -153,16 +149,4 @@ final class TikTokTabListener implements ActionBar.TabListener
 
 }
 
-//-----------------------------------------------------------------------------
-// FragmentTabStub
-//-----------------------------------------------------------------------------
-
-final class FragmentTabStub extends SherlockFragment
-{
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        return inflater.inflate(R.layout.fragment_stub, container, false);
-    }
-}
 

@@ -19,6 +19,7 @@
 
     <!-- Karma -->
     <string name="karma_copy">Share Deals, Earn Karma, Be Rewarded for Your Loyalty! Tap Here for Details.</string>
+    <string name="karma_sync_fail">Failed to sync karma. Try again later.</string>
 
     <!-- Cities -->
     <string name="cities_sync_fail">Failed to sync city data. Try again later.</string>

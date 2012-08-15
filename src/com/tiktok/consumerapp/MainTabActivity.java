@@ -16,8 +16,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import com.ijsbrandslob.appirater.Appirater;
 
@@ -25,7 +25,7 @@ import com.ijsbrandslob.appirater.Appirater;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class MainTabActivity extends SherlockActivity
+public class MainTabActivity extends SherlockFragmentActivity
 {
     //-------------------------------------------------------------------------
     // statics
@@ -171,7 +171,7 @@ public class MainTabActivity extends SherlockActivity
                  .setTag(kTagKarma)
                  .setText("Karma")
                  //.setIcon(R.drawable.icon_tab_karma)
-                 .setTabListener(new TabListener</* KarmaActivity */ FragmentTabStub>(this, kTagKarma, FragmentTabStub.class));
+                 .setTabListener(new TabListener<KarmaFragment>(this, kTagKarma, KarmaFragment.class));
         bar.addTab(tab);
 
         // setup settings tab
@@ -208,7 +208,7 @@ public class MainTabActivity extends SherlockActivity
 final class TabListener<T extends SherlockFragment> implements ActionBar.TabListener
 {
 
-    public TabListener(SherlockActivity activity, String tag, Class<T> cls)
+    public TabListener(SherlockFragmentActivity activity, String tag, Class<T> cls)
     {
         mActivity = activity;
         mTag      = tag;
@@ -221,6 +221,9 @@ final class TabListener<T extends SherlockFragment> implements ActionBar.TabList
     {
         // nothing to do without a transaction manager
         if (transaction == null) return;
+
+        // use existing fragment if possible
+        mFragment = mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
 
         // add/attach the fragment to the activity
         if (mFragment == null) {
@@ -254,9 +257,9 @@ final class TabListener<T extends SherlockFragment> implements ActionBar.TabList
     // fields
     //-------------------------------------------------------------------------
 
-    private       Fragment         mFragment;
-    private final SherlockActivity mActivity;
-    private final String           mTag;
-    private final Class<T>         mClass;
+    private       Fragment                 mFragment;
+    private final SherlockFragmentActivity mActivity;
+    private final String                   mTag;
+    private final Class<T>                 mClass;
 
 }
