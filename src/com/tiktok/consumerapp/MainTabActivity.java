@@ -187,7 +187,7 @@ public class MainTabActivity extends SherlockFragmentActivity
                  .setTag(kTagCities)
                  .setText("Cities")
                  //.setIcon(R.drawable.icon_tab_cities)
-                 .setTabListener(new TabListener</* CitiesActivity */ FragmentTabStub>(this, kTagCities, FragmentTabStub.class));
+                 .setTabListener(new TabListener<CitiesFragment>(this, kTagCities, CitiesFragment.class));
         bar.addTab(tab);
 
         // select tab
@@ -205,7 +205,7 @@ public class MainTabActivity extends SherlockFragmentActivity
 // TabListener
 //-----------------------------------------------------------------------------
 
-final class TabListener<T extends SherlockFragment> implements ActionBar.TabListener
+final class TabListener<T extends Fragment> implements ActionBar.TabListener
 {
 
     public TabListener(SherlockFragmentActivity activity, String tag, Class<T> cls)
