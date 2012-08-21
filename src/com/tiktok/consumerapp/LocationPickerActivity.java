@@ -24,9 +24,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
-import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockMapActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuInflater;
 
 import org.codehaus.jackson.JsonNode;
 
@@ -34,7 +39,7 @@ import org.codehaus.jackson.JsonNode;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class LocationPickerActivity extends MapActivity
+public class LocationPickerActivity extends SherlockMapActivity
 {
     //-------------------------------------------------------------------------
     // static
@@ -58,6 +63,10 @@ public class LocationPickerActivity extends MapActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.location_picker);
+
+        // set title
+        ActionBar bar = getSupportActionBar();
+        bar.setTitle("Set Location");
 
         // add zoom controls
         MapView mapView = (MapView)findViewById(R.id.map_view);
@@ -141,6 +150,28 @@ public class LocationPickerActivity extends MapActivity
     protected void onDestroy()
     {
         super.onDestroy();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflator = getSupportMenuInflater();
+        inflator.inflate(R.menu.location_picker, menu);
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.user_location) {
+            centerMapToCurrentLocation();
+        }
+        return true;
     }
 
     //-------------------------------------------------------------------------

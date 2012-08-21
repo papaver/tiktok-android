@@ -1,53 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <CheckBoxPreference android:title="Facebook Connect"
-                      android:key="TTS_fb"
-                      android:summary="Log into Facebook to receive customized deals!" />
-  <EditTextPreference android:title="Name"
-                      android:key="TTS_name"
-                      android:summary="Whats your name?" />
-  <EditTextPreference android:title="Email"
-                      android:key="TTS_email"
-                      android:summary="Whats your email?" />
-  <EditTextPreference android:title="Twitter Handle"
-                      android:key="TTS_twh"
-                      android:summary="Whats your Twitter handle?" />
-  <EditTextPreference android:title="Phone"
-                      android:key="TTS_phone"
-                      android:summary="Whats your Phone #?"
-                      android:inputType="phone" />
-  <ListPreference     android:title="Gender"
-                      android:key="TTS_gender"
-                      android:summary="Select your gender for better deals!"
-                      android:defaultValue=""
-                      android:entries="@array/gender_entries"
-                      android:entryValues="@array/gender_values" />
-  <com.tiktok.consumerapp.preference.DatePreference
-                      android:title="Date of Birth"
-                      android:key="TTS_birthday"
-                      android:summary="Set your birthday for special deals!"
-                      android:defaultValue="1970.01.01" />
-  <Preference         android:title="Home Location"
-                      android:key="TTS_home"
-                      android:summary="Get better deals around your home!" />
-  <Preference         android:title="Work Location"
-                      android:key="TTS_work"
-                      android:summary="Get better deals around your work!" />
-  <PreferenceScreen   android:title="Notifications">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
+
+    <!-- Facebook Connect -->
     <CheckBoxPreference
-                      android:title="Notifications"
-                      android:key="TTS_notifications"
-                      android:defaultValue="true"
-                      android:summary="Configure notifications."/>
-    <CheckBoxPreference
-                      android:title="Sound"
-                      android:key="TTS_notifications_sound"
-                      android:defaultValue="true"
-                      android:summary="Configure notification sound."/>
-    <CheckBoxPreference
-                      android:title="Vibration"
-                      android:key="TTS_notifications_vibrate"
-                      android:defaultValue="true"
-                      android:summary="Configure notification vibration."/>
-  </PreferenceScreen>
+        android:title="Facebook Connect"
+        android:key="TTS_fb"
+        android:summary="Log into Facebook to receive customized deals!" />
+
+    <!-- User Information -->
+    <PreferenceCategory
+        android:title="User Information"
+        android:layout="@layout/preference_header" >
+
+        <!-- Name -->
+        <EditTextPreference
+            android:title="Name"
+            android:key="TTS_name"
+            android:summary="Whats your name?" />
+
+        <!-- Email -->
+        <EditTextPreference
+            android:title="Email"
+            android:key="TTS_email"
+            android:summary="Whats your email?" />
+
+        <!-- Twitter Handle -->
+        <EditTextPreference
+            android:title="Twitter Handle"
+            android:key="TTS_twh"
+            android:summary="Whats your Twitter handle?" />
+
+        <!-- Phone Number -->
+        <EditTextPreference
+            android:title="Phone"
+            android:key="TTS_phone"
+            android:summary="Whats your Phone #?"
+            android:inputType="phone" />
+
+    </PreferenceCategory>
+
+    <!-- Attributes -->
+    <PreferenceCategory
+        android:title="Attributes"
+        android:layout="@layout/preference_header" >
+
+        <!-- Gender -->
+        <ListPreference
+            android:title="Gender"
+            android:key="TTS_gender"
+            android:summary="Select your gender for better deals!"
+            android:defaultValue=""
+            android:entries="@array/gender_entries"
+            android:entryValues="@array/gender_values" />
+
+        <!-- Birthday -->
+        <com.tiktok.consumerapp.preference.DatePreference
+            android:title="Date of Birth"
+            android:key="TTS_birthday"
+            android:summary="Set your birthday for special deals!"
+            android:defaultValue="1970.01.01" />
+
+    </PreferenceCategory>
+
+    <!-- Location -->
+    <PreferenceCategory
+        android:title="Location"
+        android:layout="@layout/preference_header" >
+
+        <!-- Home Location -->
+        <Preference
+            android:title="Home Location"
+            android:key="TTS_home"
+            android:summary="Get better deals around your home!" />
+
+        <!-- Work Location -->
+        <Preference
+            android:title="Work Location"
+            android:key="TTS_work"
+            android:summary="Get better deals around your work!" />
+
+    </PreferenceCategory>
+
+    <!-- App Settings -->
+    <PreferenceCategory
+        android:title="Application"
+        android:layout="@layout/preference_header" >
+
+        <!-- Notifications -->
+        <PreferenceScreen
+            android:title="Notifications">
+
+            <!-- Notifications -->
+            <CheckBoxPreference
+                android:title="Notifications"
+                android:key="TTS_notifications"
+                android:defaultValue="true"
+                android:summary="Configure notifications."/>
+
+            <!-- Sound -->
+            <CheckBoxPreference
+                android:title="Sound"
+                android:key="TTS_notifications_sound"
+                android:defaultValue="true"
+                android:summary="Configure notification sound."/>
+
+            <!-- Vibration -->
+            <CheckBoxPreference
+                android:title="Vibration"
+                android:key="TTS_notifications_vibrate"
+                android:defaultValue="true"
+                android:summary="Configure notification vibration."/>
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+
 </PreferenceScreen>

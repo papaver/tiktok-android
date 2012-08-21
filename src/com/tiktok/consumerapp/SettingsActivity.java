@@ -18,17 +18,18 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.PreferenceActivity;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.util.Log;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class SettingsActivity extends    PreferenceActivity
+public class SettingsActivity extends    SherlockPreferenceActivity
                               implements OnSharedPreferenceChangeListener,
                                          OnPreferenceChangeListener
 {

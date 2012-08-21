@@ -18,6 +18,9 @@ import android.util.Log;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.MenuInflater;
 
 import com.ijsbrandslob.appirater.Appirater;
 
@@ -127,6 +130,30 @@ public class MainTabActivity extends SherlockFragmentActivity
     //-------------------------------------------------------------------------
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflator = getSupportMenuInflater();
+        inflator.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
@@ -174,13 +201,19 @@ public class MainTabActivity extends SherlockFragmentActivity
                  .setTabListener(new TabListener<KarmaFragment>(this, kTagKarma, KarmaFragment.class));
         bar.addTab(tab);
 
-        // setup settings tab
+        // [moiz] no v2.0 support for preferences in framgents at this time,
+        //   google you are really pissing me off, wtf do you except devs
+        //   to do for fucks sake.  may be possbile to port the preferences
+        //   to the actionbar sherlock library and use them through there
+        //   but this could turn out to be a major undertaking...
+        /*/ setup settings tab
         tab = bar.newTab()
                  .setTag(kTagSettings)
                  .setText("Settings")
                  //.setIcon(R.drawable.icon_tab_settings)
-                 .setTabListener(new TabListener</* SettingsActivity */ FragmentTabStub>(this, kTagSettings, FragmentTabStub.class));
+                 .setTabListener(new TabListener<SettingsFragment>(this, kTagSettings, SettingsFragment.class));
         bar.addTab(tab);
+        */
 
         // setup city tab
         tab = bar.newTab()

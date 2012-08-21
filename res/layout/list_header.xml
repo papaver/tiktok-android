@@ -6,6 +6,7 @@
     android:paddingTop="2dip"
     android:paddingBottom="2dip"
     android:paddingLeft="5dip"
+    android:textColor="#EEEEEE"
     android:shadowDy="1"
     android:shadowRadius="1"
     android:shadowColor="#023F87"
