@@ -146,9 +146,10 @@ public class MainTabActivity extends SherlockFragmentActivity
         if (item.getItemId() == R.id.settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     //-------------------------------------------------------------------------
@@ -163,6 +164,24 @@ public class MainTabActivity extends SherlockFragmentActivity
         Intent newIntent = new Intent();
         newIntent.setAction("com.tiktok.consumer.app.resync");
         sendBroadcast(newIntent);
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        /* [moiz] fix facebook callback authorization stuff...
+        // [moiz] stupid facebook request code is fucking private... wtf
+        //   should be ok for now since we don't need the activity result
+        //   for anything else right now
+        if (resultCode == Activity.RESULT_OK) {
+            FacebookManager manager = FacebookManager.getInstance(this);
+            manager.facebook().authorizeCallback(requestCode, resultCode, intent);
+        }
+        */
     }
 
     //-------------------------------------------------------------------------
@@ -182,7 +201,7 @@ public class MainTabActivity extends SherlockFragmentActivity
                  .setTag(kTagCouponList)
                  .setText("Deals")
                  //.setIcon(R.drawable.icon_tab_couponlist)
-                 .setTabListener(new TabListener</* CouponListActivity */ FragmentTabStub>(this, kTagCouponList, FragmentTabStub.class));
+                 .setTabListener(new TabListener<CouponListFragment>(this, kTagCouponList, CouponListFragment.class));
         bar.addTab(tab);
 
         // setup deals map tab

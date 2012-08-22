@@ -19,7 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.widget.CursorAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
@@ -47,7 +47,7 @@ public final class CouponAdapter extends CursorAdapter
 
     public CouponAdapter(final Context context, final Cursor cursor)
     {
-        super(context, cursor);
+        super(context, cursor, 0);
         mIconManager = new IconManager(context);
     }
 
