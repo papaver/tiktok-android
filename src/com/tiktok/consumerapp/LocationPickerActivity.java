@@ -64,9 +64,11 @@ public class LocationPickerActivity extends SherlockMapActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.location_picker);
 
-        // set title
+        // set action bar
         ActionBar bar = getSupportActionBar();
         bar.setTitle("Set Location");
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
 
         // add zoom controls
         MapView mapView = (MapView)findViewById(R.id.map_view);
@@ -168,10 +170,17 @@ public class LocationPickerActivity extends SherlockMapActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (item.getItemId() == R.id.user_location) {
-            centerMapToCurrentLocation();
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.user_location:
+                centerMapToCurrentLocation();
+                return true;
+            default:
+                return false;
         }
-        return true;
     }
 
     //-------------------------------------------------------------------------

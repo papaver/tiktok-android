@@ -23,7 +23,9 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.util.Log;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -58,6 +60,12 @@ public class SettingsActivity extends    SherlockPreferenceActivity
         addPreferencesFromResource(R.xml.preferences);
 
         final Context context = this;
+
+        // setup action bar
+        ActionBar bar = getSupportActionBar();
+        bar.setTitle("Settings");
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
 
         // update the summaries
         mSettings = new Settings(this, true);
@@ -211,6 +219,21 @@ public class SettingsActivity extends    SherlockPreferenceActivity
     {
         super.onDestroy();
         mSettings.close();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     //-------------------------------------------------------------------------
