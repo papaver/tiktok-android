@@ -10,7 +10,6 @@ package com.tiktok.consumerapp;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -28,6 +27,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
 import com.tiktok.consumerapp.utilities.ColorUtilities;
 import com.tiktok.consumerapp.utilities.UIUtilities;
@@ -36,7 +39,7 @@ import com.tiktok.consumerapp.utilities.UIUtilities;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class MerchantActivity extends Activity
+public class MerchantActivity extends SherlockActivity
 {
     //-------------------------------------------------------------------------
     // statics
@@ -57,7 +60,14 @@ public class MerchantActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.merchant);
 
+        // checkpoint marker
         Analytics.passCheckpoint("Merchant");
+
+        // setup action bar
+        ActionBar bar = getSupportActionBar();
+        bar.setTitle("Merchant");
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
 
         // grab merchant id from intent
         Long id = (savedInstanceState == null) ? null :
@@ -72,17 +82,8 @@ public class MerchantActivity extends Activity
 
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
-        try {
-
-            // grab coupon using id
-            mCoupon = adapter.fetchCoupon(id);
-            setupMerchantDetails(mCoupon);
-
-        } finally {
-        }
-
-        // if something failed close the activity
-        if (mCoupon == null) finish();
+        mCoupon = adapter.fetchCoupon(id);
+        setupMerchantDetails(mCoupon);
     }
 
     //-------------------------------------------------------------------------
@@ -139,6 +140,21 @@ public class MerchantActivity extends Activity
     {
         super.onDestroy();
         if (mIconManager != null) mIconManager.clearAllRequests();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -307,7 +323,8 @@ public class MerchantActivity extends Activity
                 }
 
                 public void onFailure() {
-                    Log.e(kLogTag, String.format("Failed to download icon: %s", iconData.url));
+                    Log.e(kLogTag, String.format(
+                        "Failed to download icon: %s", iconData.url));
                 }
 
             });
