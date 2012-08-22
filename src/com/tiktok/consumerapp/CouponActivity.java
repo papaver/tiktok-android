@@ -35,6 +35,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockMapActivity;
+import com.actionbarsherlock.view.MenuItem;
+
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -51,7 +55,7 @@ import com.tiktok.consumerapp.utilities.UIUtilities;
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class CouponActivity extends MapActivity
+public class CouponActivity extends SherlockMapActivity
 {
     //-------------------------------------------------------------------------
     // statics
@@ -127,7 +131,14 @@ public class CouponActivity extends MapActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.coupon);
 
+        // checkpoint marker
         Analytics.passCheckpoint("Deal");
+
+        // setup action bar
+        ActionBar bar = getSupportActionBar();
+        bar.setTitle("Deal");
+        bar.setHomeButtonEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
 
         // grab coupon id from intent
         Long id = (savedInstanceState == null) ? null :
@@ -138,14 +149,10 @@ public class CouponActivity extends MapActivity
         }
 
         // can't be here without a valid coupon id
-        if (id == null) {
-            finish();
-        }
+        if (id == null) finish();
 
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
-
-        // grab coupon using id
         mCoupon = adapter.fetchCoupon(id);
         setupCouponDetails(mCoupon);
 
@@ -213,7 +220,22 @@ public class CouponActivity extends MapActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        if (mIconManager != null)  mIconManager.clearAllRequests();
+        if (mIconManager != null) mIconManager.clearAllRequests();
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return false;
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -238,7 +260,7 @@ public class CouponActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
-    // Events
+    // events
     //-------------------------------------------------------------------------
 
     public void onClickMap(View view)
@@ -332,14 +354,6 @@ public class CouponActivity extends MapActivity
 
                     // update the banner
                     updateBanner(CouponState.kActive);
-
-                    // set result
-                    setResult(kResultRedeemed);
-
-                    // broadcast intent
-                    Intent intent = new Intent();
-                    intent.setAction("com.tiktok.consumer.app.redeemed");
-                    sendBroadcast(intent);
 
                 // alert user of a problem
                 } else if (status.equals(TikTokApi.kTikTokApiStatusForbidden)) {
@@ -495,7 +509,8 @@ public class CouponActivity extends MapActivity
                 }
 
                 public void onFailure() {
-                    Log.e(kLogTag, String.format("Failed to download icon: %s", iconData.url));
+                    Log.e(kLogTag, String.format(
+                        "Failed to download icon: %s", iconData.url));
                 }
 
             });
@@ -716,8 +731,8 @@ public class CouponActivity extends MapActivity
                             merchant.twitterHandle();
         String city       = location.getCity().toLowerCase();
         String formatted  = mCoupon.formattedTitle();
-        String deal       = String.format("I just got %s from %s! @TikTok #FREEisBETTER #%s",
-                                          formatted, handle, city);
+        String deal       = String.format(
+            "I just got %s from %s! @TikTok #FREEisBETTER #%s", formatted, handle, city);
 
         // setup share callback
         final Handler handler      = new Handler();
@@ -754,12 +769,13 @@ public class CouponActivity extends MapActivity
     {
         // format the post description
         String formatted = mCoupon.formattedTitle();
-        String deal      = String.format("%s at %s! - " +
-                                         "I just scored this awesome deal with my " +
-                                         "TikTok app. Sad you missed it? Don't be " +
-                                         "a square... download the app and start " +
-                                         "getting your own deals right now.",
-                                         formatted, mCoupon.merchant().name());
+        String deal      = String.format(
+            "%s at %s! - " +
+            "I just scored this awesome deal with my " +
+            "TikTok app. Sad you missed it? Don't be " +
+            "a square... download the app and start " +
+            "getting your own deals right now.",
+            formatted, mCoupon.merchant().name());
 
         // package up the params
         Bundle params = new Bundle();
@@ -824,17 +840,19 @@ public class CouponActivity extends MapActivity
         // present the email controller
         String merchant  = mCoupon.merchant().name();
         String formatted = mCoupon.formattedTitle();
-        String subject   = String.format("TikTok: Checkout this amazing deal for %s!", merchant);
-        String body      = String.format("<h3>TikTok</h3>" +
-                                         "<b>%s</b> at <b>%s</b>" +
-                                         "<br><br>" +
-                                         "I just scored this awesome deal with my " +
-                                         "TikTok app. Sad you missed it? Don't be " +
-                                         "a square... download the app and start " +
-                                         "getting your own deals right now." +
-                                         "<br><br>" +
-                                         "<a href='http://www.tiktok.com'>Get your deal on!</a>",
-                                         formatted, merchant);
+        String subject   = String.format(
+            "TikTok: Checkout this amazing deal for %s!", merchant);
+        String body      = String.format(
+            "<h3>TikTok</h3>" +
+            "<b>%s</b> at <b>%s</b>" +
+            "<br><br>" +
+            "I just scored this awesome deal with my " +
+            "TikTok app. Sad you missed it? Don't be " +
+            "a square... download the app and start " +
+            "getting your own deals right now." +
+            "<br><br>" +
+            "<a href='http://www.tiktok.com'>Get your deal on!</a>",
+            formatted, merchant);
 
         // present email controller
         try {
