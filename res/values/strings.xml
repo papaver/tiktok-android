@@ -47,6 +47,7 @@
 
     <!-- Promo -->
     <string name="promo">Promotion Code</string>
+    <string name="promo_copy">Enter a TikTok promotional code to win a FREE deal!!</string>
     <string name="promo_success">Congratulations, you have won a FREE deal!</string>
     <string name="promo_fail">Failed to redeem promotion, try again.</string>
     <string name="promo_used">Promotion code can only be redeemed once, try another code.</string>
@@ -64,7 +65,32 @@
 
     <!-- Merchant Pin -->
     <string name="merchant_pin">Merchant Pin</string>
+    <string name="merchant_pin_copy">Enter Merchant Pin number to validate deal!</string>
     <string name="merchant_pin_success">Deal successfully validated! Thank you for using TikTok!</string>
     <string name="merchant_pin_fail">Failed to validate merchant pin with the server.  Try again.</string>
+
+    <!-- Coupon Stubs -->
+    <string name="stub_coupon_title">Buy an Offer, Get Another One Free!</string>
+    <string name="stub_coupon_details">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nTikTok Terms and Conditions:\nwww.tiktok.com/terms</string>
+    <string name="stub_coupon_expires_at">Offer expires at 7:00pm!</string>
+    <string name="stub_coupon_expire_time">00:00:00</string>
+    <string name="stub_coupon_barcode">0123456</string>
+    <string name="stub_merchant_name">MERCHANT NAME</string>
+    <string name="stub_merchant_address">2516 Mathews Ave, Redondo Beach, CA, 90278</string>
+    <string name="stub_merchant_category">Category</string>
+    <string name="stub_merchant_phone">555-555-5555</string>
+    <string name="stub_merchant_url">www.tiktok.com</string>
+    <string name="stub_merchant_details">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</string>
+    <string name="stub_location_name">LOCATION NAME</string>
+    <string name="stub_location_address">123 Street Address,\nCity, ST, Zipcode</string>
+    <string name="stub_location_phone">555-555-5555</string>
+
+    <!-- Karma Screen -->
+    <string name="karma_facebook">Facebook</string>
+    <string name="karma_twitter">Twitter</string>
+    <string name="karma_sms">SMS</string>
+    <string name="karma_email">Email</string>
+    <string name="karma_referrals">Referrals</string>
+    <string name="karma_empty">-</string>
 
 </resources>

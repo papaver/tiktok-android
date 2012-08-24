@@ -22,18 +22,21 @@
                 android:layout_height="25dip"
                 android:padding="1dip"
                 android:scaleType="fitCenter"
+                android:contentDescription="Facebook Icon"
                 android:src="@drawable/icon_facebook" />
 
             <TextView
+                android:id="@+id/fb_title"
                 android:layout_gravity="center_vertical"
-                android:text="Facebook"
+                android:text="@string/karma_facebook"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:textColor="@color/black" />
             <TextView
                 android:id="@+id/fb_points"
                 android:layout_gravity="center_vertical"
-                android:text="-"
+                android:text="@string/karma_empty"
                 android:gravity="right"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
@@ -50,18 +53,21 @@
                 android:layout_height="25dip"
                 android:padding="1dip"
                 android:scaleType="fitCenter"
+                android:contentDescription="Twitter Icon"
                 android:src="@drawable/icon_twitterbird" />
 
             <TextView
+                android:id="@+id/tw_title"
                 android:layout_gravity="center_vertical"
-                android:text="Twitter"
+                android:text="@string/karma_twitter"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:textColor="@color/black" />
             <TextView
                 android:id="@+id/tw_points"
                 android:layout_gravity="center_vertical"
-                android:text="-"
+                android:text="@string/karma_empty"
                 android:gravity="right"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
@@ -78,18 +84,21 @@
                 android:layout_height="25dip"
                 android:padding="1dip"
                 android:scaleType="fitCenter"
+                android:contentDescription="Email Icon"
                 android:src="@drawable/icon_envelope" />
 
             <TextView
+                android:id="@+id/email_title"
                 android:layout_gravity="center_vertical"
-                android:text="Email"
+                android:text="@string/karma_email"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:textColor="@color/black" />
             <TextView
                 android:id="@+id/email_points"
                 android:layout_gravity="center_vertical"
-                android:text="-"
+                android:text="@string/karma_empty"
                 android:gravity="right"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
@@ -106,18 +115,21 @@
                 android:layout_height="25dip"
                 android:padding="1dip"
                 android:scaleType="fitCenter"
+                android:contentDescription="SMS Icon"
                 android:src="@drawable/icon_speechbubble" />
 
             <TextView
+                android:id="@+id/sms_title"
                 android:layout_gravity="center_vertical"
-                android:text="SMS"
+                android:text="@string/karma_sms"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:textColor="@color/black" />
             <TextView
                 android:id="@+id/sms_points"
                 android:layout_gravity="center_vertical"
-                android:text="-"
+                android:text="@string/karma_empty"
                 android:gravity="right"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
@@ -134,18 +146,21 @@
                 android:layout_height="25dip"
                 android:padding="1dip"
                 android:scaleType="fitCenter"
+                android:contentDescription="Referral Icon"
                 android:src="@drawable/icon_badge" />
 
             <TextView
+                android:id="@+id/referral_title"
                 android:layout_gravity="center_vertical"
-                android:text="Referrals"
+                android:text="@string/karma_referrals"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
-                android:textSize="17sp" />
+                android:textSize="17sp"
+                android:textColor="@color/black" />
             <TextView
                 android:id="@+id/referral_points"
                 android:layout_gravity="center_vertical"
-                android:text="-"
+                android:text="@string/karma_empty"
                 android:gravity="right"
                 android:paddingLeft="3dip"
                 android:paddingRight="3dip"
@@ -165,6 +180,7 @@
         android:paddingRight="45dip"
         android:paddingBottom="10dip"
         android:textSize="17sp"
+        android:textStyle="bold"
         android:clickable="true" />
 
     <ImageView

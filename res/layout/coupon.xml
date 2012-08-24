@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
@@ -27,11 +26,12 @@
 
                 <!-- Title -->
                 <TextView android:id="@+id/title"
-                    android:text="Buy an Offer, Get Another One Free!"
+                    android:text="@string/stub_coupon_title"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textSize="20sp"
+                    android:textColor="@color/black"
                     android:lines="2"
                     android:padding="3dip" />
 
@@ -57,12 +57,13 @@
                             android:id="@+id/coupon_gradient"
                             android:layout_width="96dip"
                             android:layout_height="64dip"
-                            android:background="#ffffff"
+                            android:background="@color/white"
                             android:gravity="center" >
 
                             <!-- Icon -->
                             <ImageView
                                 android:id="@+id/icon"
+                                android:contentDescription="Merchant Icon"
                                 android:src="@drawable/icon03"
                                 android:layout_gravity="center"
                                 android:layout_width="64dip"
@@ -74,19 +75,19 @@
                         <!-- Coupon Expire Time -->
                         <TextView
                             android:id="@+id/expire"
-                            android:text="00:00:00"
+                            android:text="@string/stub_coupon_expire_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textStyle="bold"
                             android:textSize="16sp"
-                            android:textColor="#FFFFFF"
+                            android:textColor="@color/white"
                             android:shadowDx=".5"
                             android:shadowDy=".5"
                             android:shadowRadius=".5"
-                            android:shadowColor="#000000"
+                            android:shadowColor="@color/black"
                             android:paddingLeft="2dip"
                             android:paddingRight="2dip"
-                            android:paddingBottom="2dip" />
+                            android:paddingTop="2dip" />
 
                     <!-- Icon Container End -->
                     </LinearLayout>
@@ -128,6 +129,7 @@
                     <ImageView
                         android:id="@+id/twitter"
                         android:src="@drawable/sharetwitter"
+                        android:contentDescription="Twitter Share Button"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -139,6 +141,7 @@
                     <ImageView
                         android:id="@+id/facebook"
                         android:src="@drawable/sharefacebook"
+                        android:contentDescription="Facebook Share Button"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -150,6 +153,7 @@
                     <ImageView
                         android:id="@+id/more"
                         android:src="@drawable/sharemore"
+                        android:contentDescription="More Share Button"
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -190,19 +194,21 @@
                             <!-- Merchant Name -->
                             <TextView
                                 android:id="@+id/merchant"
-                                android:text="MERCHANT NAME"
+                                android:text="@string/stub_merchant_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textStyle="bold"
+                                android:textColor="@color/black"
                                 android:textSize="12sp" />
 
                             <!-- Merchant Address -->
                             <TextView
                                 android:id="@+id/address"
-                                android:text="2516 Mathews Ave, Redondo Beach, CA, 90278"
+                                android:text="@string/stub_merchant_address"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textSize="11sp"
+                                android:textColor="@color/black"
                                 android:paddingBottom="2dip" />
 
                         <!-- Merchant Info End -->
@@ -211,6 +217,7 @@
                         <!-- Merchant Button -->
                         <ImageView
                             android:src="@drawable/arrowmore"
+                            android:contentDescription="Merchant Details"
                             android:layout_weight=".09"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -223,11 +230,12 @@
                     <!-- Coupon Details -->
                     <TextView
                         android:id="@+id/details"
-                        android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.\n\nTikTok Terms and Conditions:\nwww.tiktok.com/terms"
+                        android:text="@string/stub_coupon_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autoLink="web"
                         android:textSize="14sp"
+                        android:textColor="@color/black"
                         android:paddingTop="5dip"
                         android:paddingBottom="5dip" />
 
@@ -243,24 +251,27 @@
     </LinearLayout>
 
     <FrameLayout
+        android:layout_gravity="bottom|center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
         <!-- Default -->
-        <Button
+        <ImageButton
             android:id="@+id/banner_redeem"
-            android:background="@drawable/redeembaritembutton"
+            android:src="@drawable/redeembaritembutton"
+            android:background="@drawable/blue_gradient"
+            android:scaleType="centerInside"
             android:onClick="onClickRedeem"
             android:clickable="true"
-            android:layout_margin="3dip"
             android:layout_gravity="center"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
 
         <!-- Expired -->
         <ImageView
             android:id="@+id/banner_expired"
             android:src="@drawable/dealexpiredbanner"
+            android:contentDescription="Coupon Expired Banner"
             android:adjustViewBounds="true"
             android:visibility="gone"
             android:layout_gravity="bottom|center"
@@ -271,6 +282,7 @@
         <ImageView
             android:id="@+id/banner_soldout"
             android:src="@drawable/dealsoldoutbanner"
+            android:contentDescription="Coupon SoldOut Banner"
             android:adjustViewBounds="true"
             android:visibility="gone"
             android:layout_gravity="bottom|center"
@@ -281,6 +293,7 @@
         <ImageView
             android:id="@+id/banner_info"
             android:src="@drawable/infobanner"
+            android:contentDescription="Coupon Info Banner"
             android:adjustViewBounds="true"
             android:visibility="gone"
             android:layout_gravity="bottom|center"
@@ -292,47 +305,67 @@
             android:id="@+id/banner_redeemed"
             android:visibility="gone"
             android:onClick="OnClickValidateMerchantPin"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
             <ImageView
                 android:src="@drawable/dealactivebanner"
+                android:contentDescription="Coupon Redeemed Banner"
                 android:adjustViewBounds="true"
-                android:layout_width="match_parent"
+                android:layout_gravity="bottom|center"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center"
                 android:orientation="horizontal" >
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="8" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8" />
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="8" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8" />
 
-                    <Button
-                        android:id="@+id/barcode"
-                        android:text="0123456"
-                        android:background="@drawable/dealbarcodebutton"
-                        android:textSize="18sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:shadowDx="1"
-                        android:shadowDy="1"
-                        android:shadowRadius="1"
-                        android:shadowColor="#000000"
-                        android:clickable="false"
-                        android:layout_weight="1"
-                        android:layout_gravity="right|center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8" />
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8" />
+
+                <Button
+                    android:id="@+id/barcode"
+                    android:text="@string/stub_coupon_barcode"
+                    android:background="@drawable/barcode_ninepatch"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="1"
+                    android:shadowColor="@color/black"
+                    android:clickable="false"
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+                    android:paddingLeft="13dip"
+                    android:paddingRight="13dip"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8" />
 
             </LinearLayout>
 

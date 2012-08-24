@@ -11,6 +11,8 @@ package com.tiktok.consumerapp;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -79,6 +81,9 @@ public class MerchantActivity extends SherlockActivity
 
         // can't be here without a valid coupon id
         if (id == null) finish();
+
+        // update text views with fonts
+        updateFonts();
 
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
@@ -159,6 +164,34 @@ public class MerchantActivity extends SherlockActivity
 
     //-------------------------------------------------------------------------
     // helper functions
+    //-------------------------------------------------------------------------
+
+    private void updateFonts()
+    {
+        // grab fonts
+        AssetManager manager = getAssets();
+        Typeface helvBd      = Typeface.createFromAsset(manager, "fonts/HelveticaBd.ttf");
+        Typeface helvNuBd    = Typeface.createFromAsset(manager, "fonts/HelveticaNeueBd.ttf");
+        Typeface helvNuMed   = Typeface.createFromAsset(manager, "fonts/HelveticaNeueMed.ttf");
+        Typeface helvNuLt    = Typeface.createFromAsset(manager, "fonts/HelveticaNeueLt.ttf");
+
+        // grab text views
+        TextView name = (TextView)findViewById(R.id.name);
+        TextView address = (TextView)findViewById(R.id.address);
+        TextView phone = (TextView)findViewById(R.id.phone);
+        TextView category = (TextView)findViewById(R.id.category);
+        TextView url = (TextView)findViewById(R.id.url);
+        TextView details = (TextView)findViewById(R.id.details);
+
+        // update font
+        name.setTypeface(helvNuBd);
+        address.setTypeface(helvNuMed);
+        phone.setTypeface(helvNuBd);
+        category.setTypeface(helvBd);
+        url.setTypeface(helvNuMed);
+        details.setTypeface(helvNuLt);
+    }
+
     //-------------------------------------------------------------------------
 
     public void setupMerchantDetails(final Coupon coupon)
@@ -457,6 +490,17 @@ final class ExpadableLocationAdapter extends BaseExpandableListAdapter
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         final View view = inflater.inflate(R.layout.list_header, parent, false);
+
+        // grab fonts
+        AssetManager manager = context.getAssets();
+        Typeface helv        = Typeface.createFromAsset(manager, "fonts/HelveticaMed.ttf");
+
+        // grab text views
+        TextView title = (TextView)view.findViewById(R.id.list_header_title);
+
+        // update font
+        title.setTypeface(helv);
+
         return view;
     }
 
@@ -466,6 +510,22 @@ final class ExpadableLocationAdapter extends BaseExpandableListAdapter
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         final View view = inflater.inflate(R.layout.location_list_item, parent, false);
+
+        // grab fonts
+        AssetManager manager = context.getAssets();
+        Typeface helvNuBd    = Typeface.createFromAsset(manager, "fonts/HelveticaNeueBd.ttf");
+        Typeface helvNuMed   = Typeface.createFromAsset(manager, "fonts/HelveticaNeueMed.ttf");
+
+        // grab text views
+        TextView name = (TextView)view.findViewById(R.id.name);
+        TextView address = (TextView)view.findViewById(R.id.address);
+        TextView phone = (TextView)view.findViewById(R.id.phone);
+
+        // update font
+        name.setTypeface(helvNuBd);
+        address.setTypeface(helvNuMed);
+        phone.setTypeface(helvNuBd);
+
         return view;
     }
 

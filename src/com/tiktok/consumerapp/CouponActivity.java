@@ -18,6 +18,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -150,6 +152,9 @@ public class CouponActivity extends SherlockMapActivity
 
         // can't be here without a valid coupon id
         if (id == null) finish();
+
+        // update text views with fonts
+        updateFonts();
 
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
@@ -422,6 +427,35 @@ public class CouponActivity extends SherlockMapActivity
 
     //-------------------------------------------------------------------------
     // helper functions
+    //-------------------------------------------------------------------------
+
+    private void updateFonts()
+    {
+        // grab fonts
+        AssetManager manager = getAssets();
+        Typeface helvBd      = Typeface.createFromAsset(manager, "fonts/HelveticaNeueBd.ttf");
+        Typeface helvMed     = Typeface.createFromAsset(manager, "fonts/HelveticaNeueMed.ttf");
+        Typeface helvLt      = Typeface.createFromAsset(manager, "fonts/HelveticaNeueLt.ttf");
+        Typeface neutraBd    = Typeface.createFromAsset(manager, "fonts/NeutraDisp-BoldAlt.otf");
+        Typeface unitedBd    = Typeface.createFromAsset(manager, "fonts/UnitedSansRgBd.otf");
+
+        // grab text views
+        TextView title   = (TextView)findViewById(R.id.title);
+        TextView name    = (TextView)findViewById(R.id.merchant);
+        TextView address = (TextView)findViewById(R.id.address);
+        TextView details = (TextView)findViewById(R.id.details);
+        Button barcode   = (Button)findViewById(R.id.barcode);
+        TextView expire  = (TextView)findViewById(R.id.expire);
+
+        // update font
+        title.setTypeface(helvBd);
+        name.setTypeface(helvBd);
+        address.setTypeface(helvMed);
+        details.setTypeface(helvLt);
+        barcode.setTypeface(unitedBd);
+        expire.setTypeface(neutraBd);
+    }
+
     //-------------------------------------------------------------------------
 
     private void setupCouponDetails(Coupon coupon)

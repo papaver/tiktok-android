@@ -27,11 +27,12 @@
 
                 <!-- Category -->
                 <TextView android:id="@+id/category"
-                    android:text="Resturaunt"
+                    android:text="@string/stub_merchant_category"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textSize="20sp"
+                    android:textColor="@color/black"
                     android:lines="1"
                     android:padding="3dip" />
 
@@ -74,40 +75,44 @@
                         <!-- Name -->
                         <TextView
                             android:id="@+id/name"
-                            android:text="MERCHANT NAME"
+                            android:text="@string/stub_merchant_name"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:textSize="13sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:textColor="@color/black" />
 
                         <!-- Address -->
                         <TextView android:id="@+id/address"
-                            android:text="2156 Mathews Ave,\nRedondo Beach, CA, 91605"
+                            android:text="@string/stub_merchant_address"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:textSize="12sp"
+                            android:textColor="@color/black"
                             android:autoLink="map"
                             android:lines="2"
                             android:paddingTop="1dip" />
 
                         <!-- Phone -->
                         <TextView android:id="@+id/phone"
-                            android:text="555-555-5555"
+                            android:text="@string/stub_merchant_phone"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textStyle="bold"
+                            android:textColor="@color/black"
                             android:autoLink="phone"
                             android:paddingTop="1dip" />
 
                         <!-- Url -->
                         <TextView android:id="@+id/url"
-                            android:text="www.tiktok.com"
+                            android:text="@string/stub_merchant_url"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:textSize="13sp"
                             android:textStyle="bold"
+                            android:textColor="@color/black"
                             android:autoLink="web"
                             android:paddingTop="1dip" />
 
@@ -137,11 +142,12 @@
                     <!-- Details -->
                     <TextView
                         android:id="@+id/details"
-                        android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+                        android:text="@string/stub_merchant_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:autoLink="web"
                         android:textSize="14sp"
+                        android:textColor="@color/black"
                         android:paddingTop="5dip"
                         android:paddingBottom="5dip" />
 

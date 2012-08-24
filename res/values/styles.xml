@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Theme.TikTok" parent="Theme.Sherlock.Light.DarkActionBar">
+    <item name="android:windowBackground">@drawable/background_gradient</item>
+    <item name="android:colorBackgroundCacheHint">@android:color/transparent</item>
+  </style>
+</resources>

@@ -352,7 +352,8 @@ public final class Coupon
 
     public static boolean isExpired(Date time)
     {
-        return time.before(new Date());
+        Date now = new Date();
+        return time.before(now) || time.equals(now);
     }
 
     //-------------------------------------------------------------------------

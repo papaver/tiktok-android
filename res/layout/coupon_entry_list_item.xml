@@ -3,6 +3,7 @@
 <!-- Layout for individual coupon entries in a list -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/coupon"
+        android:background="@drawable/whitish_gradient"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
@@ -28,7 +29,7 @@
                 <FrameLayout
                     android:layout_width="96dip"
                     android:layout_height="64dip"
-                    android:background="#ffffff"
+                    android:background="@color/white"
                     android:gravity="center" >
 
                     <!-- Icon shown next to the title/text -->
@@ -44,19 +45,19 @@
                 <!-- Coupon Expire Time -->
                 <TextView
                     android:id="@+id/coupon_expire"
-                    android:text="00:00:00"
+                    android:text="@string/stub_coupon_expire_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="16sp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:shadowDx=".5"
                     android:shadowDy=".5"
                     android:shadowRadius=".5"
-                    android:shadowColor="#000000"
+                    android:shadowColor="@color/black"
                     android:paddingLeft="2dip"
                     android:paddingRight="2dip"
-                    android:paddingBottom="2dip" />
+                    android:paddingTop="2dip" />
 
             </LinearLayout>
 
@@ -72,30 +73,35 @@
             <!-- Merchant Name -->
             <TextView
                 android:id="@+id/coupon_merchant"
-                android:text="MERCHANT NAME"
+                android:text="@string/stub_merchant_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 android:paddingTop="1dip" />
 
             <!-- Coupon Title -->
-            <TextView android:id="@+id/coupon_title"
-                android:text="Buy an Offer, Get Another One Free!"
+            <TextView
+                android:id="@+id/coupon_title"
+                android:text="@string/stub_coupon_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:textSize="15sp"
+                android:textColor="@color/black"
                 android:lines="3"
                 android:paddingTop="1dip" />
 
             <!-- Coupon Expires At -->
-            <TextView android:id="@+id/coupon_expires_at"
-                android:text="Offer expires at 7:00pm!"
+            <TextView
+                android:id="@+id/coupon_expires_at"
+                android:text="@string/stub_coupon_expires_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
                 android:textStyle="bold"
+                android:textColor="@color/tiktok_blue"
                 android:paddingTop="1dip" />
 
         </LinearLayout>

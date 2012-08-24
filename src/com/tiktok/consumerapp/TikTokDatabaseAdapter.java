@@ -151,14 +151,8 @@ public class TikTokDatabaseAdapter
      */
     public Cursor fetchAllCoupons()
     {
-        long oneDay            = 24 * 60 * 60 * 1000;
-        long oneDayAgo         = (new Date().getTime() - oneDay) / 1000;
-        String selection       = String.format("%s > ?", CouponTable.sKeyEndTime);
-        String[] selectionArgs = { Long.toString(oneDayAgo) };
-        String sortOrder       = String.format("%s DESC", CouponTable.sKeyEndTime);
-
         Cursor cursor = contentResolver().query(CouponTable.kContentUri,
-            CouponTable.sFullProjection, selection, selectionArgs, sortOrder);
+            CouponTable.sFullProjection, null, null, null);
         cursor.moveToFirst();
         return cursor;
     }

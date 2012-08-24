@@ -12,8 +12,10 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,12 +77,8 @@ public final class CouponAdapter extends CursorAdapter
         final boolean isRedeemable  = cursor.getInt(cursor.getColumnIndex(CouponTable.sKeyIsRedeemable)) == 1;
 
         // retrieve merchant
-        Merchant merchant = null;
-        try {
-            TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
-            merchant = adapter.fetchMerchant(merchantId);
-        } finally {
-        }
+        TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
+        Merchant merchant = adapter.fetchMerchant(merchantId);
 
         // reset alpha
         AlphaAnimation alpha = new AlphaAnimation(1.0f, 1.0f);
@@ -128,6 +126,25 @@ public final class CouponAdapter extends CursorAdapter
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         final View view = inflater.inflate(R.layout.coupon_entry_list_item, parent, false);
+
+        // grab fonts
+        AssetManager manager = context.getAssets();
+        Typeface neutraBd = Typeface.createFromAsset(manager, "fonts/NeutraDisp-BoldAlt.otf");
+        Typeface helv     = Typeface.createFromAsset(manager, "fonts/Helvetica.ttf");
+        Typeface helvBd   = Typeface.createFromAsset(manager, "fonts/HelveticaNeueBd.ttf");
+
+        // update grab the text views
+        TextView merchant    = (TextView)view.findViewById(R.id.coupon_merchant);
+        TextView title       = (TextView)view.findViewById(R.id.coupon_title);
+        TextView expiresAt   = (TextView)view.findViewById(R.id.coupon_expires_at);
+        TextView expiresTime = (TextView)view.findViewById(R.id.coupon_expire);
+
+        // update font
+        merchant.setTypeface(helvBd);
+        title.setTypeface(helv);
+        expiresAt.setTypeface(helvBd);
+        expiresTime.setTypeface(neutraBd);
+
         return view;
     }
 

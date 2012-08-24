@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Monochrome Colors -->
+    <color name="black">#020202</color>
+    <color name="white">#FEFEFE</color>
+    <color name="gray_light">#D3D3D3</color>
+    <color name="gray_silver">#C0C0C0</color>
+    <color name="gray_dark">#A9A9A9</color>
+    <color name="gray">#808080</color>
+    <color name="gray_dim">#696969</color>
+
+    <!-- Colors -->
+    <color name="orange">#FF8000</color>
+
+    <!-- TikTok Theme Colors -->
+    <color name="tiktok_red">#FFD33D3D</color>
+    <color name="tiktok_green">#FF82B34F</color>
+    <color name="tiktok_blue">#FF1C75BC</color>
+
+</resources>

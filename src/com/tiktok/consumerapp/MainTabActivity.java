@@ -59,6 +59,7 @@ public class MainTabActivity extends SherlockFragmentActivity
 
         // set the action bar defaults
         ActionBar bar = getSupportActionBar();
+        bar.setTitle("");
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // setup tabs in tab view

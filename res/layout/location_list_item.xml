@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/whitish_gradient"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_marginLeft="5dip"
     android:gravity="center|fill_vertical"
     android:orientation="vertical"
-    android:padding="1dip" >
+    android:padding="3dip" >
 
     <!-- Name -->
     <TextView
         android:id="@+id/name"
-        android:text="LOCATION NAME"
+        android:text="@string/stub_location_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="13sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/black" />
 
     <!-- Address -->
     <TextView android:id="@+id/address"
-        android:text="123 Street Address,\nCity, ST, Zipcode"
+        android:text="@string/stub_location_address"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:textSize="12sp"
+        android:textColor="@color/black"
         android:autoLink="map"
         android:lines="2"
         android:paddingTop="1dip" />
 
     <!-- Phone -->
     <TextView android:id="@+id/phone"
-        android:text="555-555-5555"
+        android:text="@string/stub_location_phone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         android:autoLink="phone"
         android:paddingTop="1dip" />
 

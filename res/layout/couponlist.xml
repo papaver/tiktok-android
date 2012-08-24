@@ -7,15 +7,15 @@
     <ListView
         android:id="@id/android:list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dip"
         android:layout_weight="1"
-        android:drawSelectorOnTop="false"/>
+        android:listSelector="@drawable/gray_list_selector"
+        android:drawSelectorOnTop="true"/>
 
      <TextView
         android:id="@id/android:empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
-        android:text=""/>
+        android:background="@android:color/transparent" />
 
 </LinearLayout>
