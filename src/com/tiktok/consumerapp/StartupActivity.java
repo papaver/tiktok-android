@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -48,6 +49,12 @@ public class StartupActivity extends SherlockFragmentActivity
         // set the action bar defaults
         ActionBar bar = getSupportActionBar();
         bar.hide();
+
+        // configure progress bar
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
+        startProgressTimer();
     }
 
     //-------------------------------------------------------------------------
@@ -59,19 +66,9 @@ public class StartupActivity extends SherlockFragmentActivity
     protected void onStart()
     {
         super.onStart();
+
+        // startup up analytics session, register checkpoint
         Analytics.startSession(this);
-    }
-
-    //-------------------------------------------------------------------------
-
-    /**
-     * The activity has become visible (it is now "resumed").
-     */
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
         Analytics.passCheckpoint("Startup");
 
         // register device with the server if no consumer id found
@@ -83,6 +80,17 @@ public class StartupActivity extends SherlockFragmentActivity
         } else {
             validateRegistration();
         }
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * The activity has become visible (it is now "resumed").
+     */
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
     }
 
     //-------------------------------------------------------------------------
@@ -169,7 +177,7 @@ public class StartupActivity extends SherlockFragmentActivity
 
         // setup the api
         final Context context = this;
-        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
                 String consumerId = (String)data;
@@ -211,7 +219,7 @@ public class StartupActivity extends SherlockFragmentActivity
 
         // setup the api
         final Utilities utilities = new Utilities(getApplicationContext());
-        TikTokApi api = new TikTokApi(this, new Handler(), new TikTokApi.CompletionHandler() {
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
 
             public void onSuccess(Object data) {
                 Boolean isRegistered = (Boolean)data;
@@ -275,5 +283,35 @@ public class StartupActivity extends SherlockFragmentActivity
         Intent dealsActivity = new Intent(getApplicationContext(), MainTabActivity.class);
         startActivity(dealsActivity);
     }
+
+    //-------------------------------------------------------------------------
+
+    private void startProgressTimer()
+    {
+        Runnable timer = new Runnable() {
+            public void run() {
+
+                // update progress bar
+                ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+                progressBar.incrementProgressBy(1);
+
+                // run timer every second unless expired
+                if (progressBar.getProgress() < progressBar.getMax()) {
+                    mHandler.postDelayed(this, 10);
+                } else {
+                    mHandler.removeCallbacks(this);
+                }
+            }
+        };
+
+        // run timer
+        mHandler.post(timer);
+    }
+
+    //-------------------------------------------------------------------------
+    // fields
+    //-------------------------------------------------------------------------
+
+    private Handler mHandler = new Handler();
 }
 

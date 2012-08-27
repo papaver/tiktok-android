@@ -42,13 +42,27 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/bar"
-            android:src="@drawable/splashprogressbar"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
+        <FrameLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dip" />
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/bar"
+                android:src="@drawable/splashprogressbar"
+                android:adjustViewBounds="true"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/Widget.TikTok.Green.ProgressBar.Horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

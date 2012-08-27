@@ -25,4 +25,8 @@
         <item name="android:background">@drawable/tt__bottom_bar</item>
     </style>
 
+    <style name="Widget.TikTok.Green.ProgressBar.Horizontal" parent="@Widget.Sherlock.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/tt__progress_horizontal_green</item>
+    </style>
+
 </resources>
