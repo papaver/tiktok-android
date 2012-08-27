@@ -8,7 +8,6 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +15,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
 
-public class StartupActivity extends Activity
+public class StartupActivity extends SherlockFragmentActivity
 {
     //-------------------------------------------------------------------------
     // statics
@@ -39,7 +41,13 @@ public class StartupActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // load content from xml
         setContentView(R.layout.startup);
+
+        // set the action bar defaults
+        ActionBar bar = getSupportActionBar();
+        bar.hide();
     }
 
     //-------------------------------------------------------------------------
