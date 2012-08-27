@@ -10,10 +10,16 @@ package com.tiktok.consumerapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+
+import com.actionbarsherlock.app.SherlockDialogFragment;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -37,16 +43,47 @@ public final class Utilities
 
     public static void displaySimpleAlert(Context context, String title, String message)
     {
-        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                // nothing to see here
-            }
-        });
-        alertDialog.show();
+        Intent intent = new Intent(context, DialogActivity.class);
+        intent.putExtra("title", title);
+        intent.putExtra("message", message);
+        context.startActivity(intent);
     }
+
+    //-------------------------------------------------------------------------
+
+    /* [moiz] example of using a alertbuilder to create an dialog fragment
+     *   this isn't themed correctly to match holo so looks like shit, using
+     *   the custom dialog activity from abs instead right now, hopefully some
+     *   bored sap will port it over and get it working.
+     *
+    public static void displaySimpleFragmentAlert(final FragmentActivity activity,
+                                                  final String title,
+                                                  final String message)
+    {
+        final class AlertDialogFragment extends SherlockDialogFragment
+        {
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState)
+            {
+                return new AlertDialog.Builder(activity)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.alert_dialog_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // nothing to see here
+                            }
+                        }
+                    ).create();
+            }
+        }
+
+        //---------------------------------------------------------------------
+
+        AlertDialogFragment fragment = new AlertDialogFragment();
+        fragment.show(activity.getSupportFragmentManager(), "dialog");
+    }
+    */
 
     //-------------------------------------------------------------------------
     // constructor

@@ -100,6 +100,13 @@
             android:name=".LocationPickerActivity"
             android:screenOrientation="portrait" />
 
+        <!-- Dialog Picker Activity -->
+        <activity
+            android:label="Dialog"
+            android:name=".DialogActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TikTok.Dialog" />
+
         <!-- only C2DM servers can send messages to the app, if permission is not set - any other app can generate it -->
         <receiver android:name=".C2DMReceiver"
                   android:permission="com.google.android.c2dm.permission.SEND" >

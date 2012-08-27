@@ -93,4 +93,8 @@
     <string name="karma_referrals">Referrals</string>
     <string name="karma_empty">-</string>
 
+    <!-- Alert Dialog -->
+    <string name="alert_dialog_ok">OK</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+
 </resources>
