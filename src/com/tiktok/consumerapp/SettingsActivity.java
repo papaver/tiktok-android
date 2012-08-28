@@ -31,6 +31,7 @@ import com.actionbarsherlock.view.MenuItem;
 // class implementation
 //-----------------------------------------------------------------------------
 
+@SuppressWarnings("deprecation")
 public class SettingsActivity extends    SherlockPreferenceActivity
                               implements OnSharedPreferenceChangeListener,
                                          OnPreferenceChangeListener
@@ -371,5 +372,5 @@ public class SettingsActivity extends    SherlockPreferenceActivity
     //-------------------------------------------------------------------------
 
     private Settings mSettings;
-}
 
+}

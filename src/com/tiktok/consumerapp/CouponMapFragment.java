@@ -139,7 +139,6 @@ public class CouponMapFragment extends SherlockFragment
         mLocalActivityManager =
             new LocalActivityManager(getSherlockActivity(), true);
         mLocalActivityManager.dispatchCreate(state);
-
     }
 
     //-------------------------------------------------------------------------
@@ -328,7 +327,7 @@ public class CouponMapFragment extends SherlockFragment
 
     private void populateMap(Cursor cursor, boolean centerMap)
     {
-        // grab the map activity
+        // forward populate request to map activity
         CouponMapActivity mapActivity =
             (CouponMapActivity)mLocalActivityManager.getActivity(kMapActivityTag);
         if (mapActivity != null) {
@@ -340,7 +339,7 @@ public class CouponMapFragment extends SherlockFragment
 
     private void centerMapToCurrentLocation()
     {
-        // grab the map activity
+        // forward center request to map activity
         CouponMapActivity mapActivity =
             (CouponMapActivity)mLocalActivityManager.getActivity(kMapActivityTag);
         if (mapActivity != null) {
