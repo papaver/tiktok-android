@@ -22,7 +22,7 @@
     </style>
 
     <!-- Holo - ButtonBar -->
-    <style name="TikTok.Holo.ButtonBar" parent="android:style/ButtonBar">
+    <style name="TikTok.Holo.ButtonBar" parent="@android:style/ButtonBar">
         <item name="android:paddingTop">0dip</item>
         <item name="android:paddingLeft">0dip</item>
         <item name="android:paddingRight">0dip</item>
@@ -33,9 +33,21 @@
         <item name="android:background">@null</item>
     </style>
 
+    <!-- Holo - EditText -->
+    <style name="Widget.TikTok.Holo.Light.EditText" parent="@android:style/Widget.EditText">
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/tt__edit_text_holo_light</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
+        <item name="android:textColor">@android:color/primary_text_light</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
     <!-- TikTok - ProgressBar -->
     <style name="Widget.TikTok.Green.ProgressBar.Horizontal" parent="Widget.Sherlock.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/tt__progress_horizontal_green</item>
     </style>
+
 
 </resources>

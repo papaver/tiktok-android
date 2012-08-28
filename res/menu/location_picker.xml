@@ -3,4 +3,7 @@
           android:title="User Location"
           android:showAsAction="ifRoom|withText"
           android:icon="@drawable/userlocation" />
+    <item android:id="@+id/save"
+          android:title="Save"
+          android:showAsAction="always|withText" />
 </menu>

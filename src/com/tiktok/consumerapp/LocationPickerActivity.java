@@ -173,10 +173,13 @@ public class LocationPickerActivity extends SherlockMapActivity
         switch (item.getItemId())
         {
             case android.R.id.home:
-                finish();
+                onCancel();
                 return true;
             case R.id.user_location:
                 centerMapToCurrentLocation();
+                return true;
+            case R.id.save:
+                onSave();
                 return true;
             default:
                 return false;
@@ -269,7 +272,7 @@ public class LocationPickerActivity extends SherlockMapActivity
     // events
     //-------------------------------------------------------------------------
 
-    public void onSave(View view)
+    public void onSave()
     {
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -301,7 +304,7 @@ public class LocationPickerActivity extends SherlockMapActivity
 
     //-------------------------------------------------------------------------
 
-    public void onCancel(View view)
+    public void onCancel()
     {
         setResult(Activity.RESULT_CANCELED);
         finish();
