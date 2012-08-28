@@ -19,10 +19,12 @@ public final class Debug
     // statics
     //-------------------------------------------------------------------------
 
-    public static final boolean kTikTokApiStaging = false;
+    public static final boolean kDebug              = false;
+
+    public static final boolean kTikTokApiStaging   = kDebug;
 
     public static final boolean kAnalytics          = true;
-    public static final boolean kAnalyticsModeDebug = false;
+    public static final boolean kAnalyticsModeDebug = kDebug;
 
     //-------------------------------------------------------------------------
     // constructor
