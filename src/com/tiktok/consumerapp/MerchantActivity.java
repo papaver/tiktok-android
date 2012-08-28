@@ -282,6 +282,9 @@ public class MerchantActivity extends SherlockActivity
         childView.measure(0, 0);
         final int childHeight = childView.getMeasuredHeight();
 
+        // calculate divider height
+        final int dividerHeight = locationListView.getDividerHeight();
+
         // resize list view to just its header
         ViewGroup.LayoutParams params = locationListView.getLayoutParams();
         params.height = groupHeight;
@@ -291,7 +294,8 @@ public class MerchantActivity extends SherlockActivity
         locationListView.setOnGroupExpandListener(new OnGroupExpandListener() {
             public void onGroupExpand(int groupPosition) {
                 ViewGroup.LayoutParams params = locationListView.getLayoutParams();
-                params.height = groupHeight + childHeight * mListAdapter.getChildrenCount(0);
+                params.height = groupHeight +
+                    (childHeight + dividerHeight) * mListAdapter.getChildrenCount(0);
                 locationListView.setLayoutParams(params);
             }
         });

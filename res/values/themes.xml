@@ -4,7 +4,7 @@
     <!-- TikTok - Main Theme Override -->
     <style name="Theme.TikTok" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="android:windowBackground">@drawable/background_gradient</item>
-        <item name="android:colorBackgroundCacheHint">@android:color/white</item>
+        <item name="android:colorBackgroundCacheHint">@android:color/transparent</item>
     </style>
 
     <!-- TikTok - Dialog Activity Theme Override -->

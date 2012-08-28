@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- TikTok - Holo Button -->
+    <!-- Holo - Button -->
     <style name="Widget.TikTok.Holo.Button" parent="@android:style/Widget.Button">
         <item name="android:background">@drawable/tt__btn_default_holo_dark</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textColor">@color/tt__primary_text_holo_dark</item>
+        <item name="android:textColor">@color/abs__primary_text_holo_dark</item>
         <item name="android:minHeight">48dip</item>
         <item name="android:minWidth">64dip</item>
     </style>
 
     <style name="Widget.TikTok.Holo.Button.Borderless">
         <item name="android:background">@drawable/tt__item_background_holo_dark</item>
-        <item name="android:textColor">@color/tt__primary_text_holo_dark</item>
+        <item name="android:textColor">@color/abs__primary_text_holo_dark</item>
         <item name="android:paddingLeft">4dip</item>
         <item name="android:paddingRight">4dip</item>
     </style>
@@ -21,11 +21,20 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Widget.TikTok.ButtonBar" parent="@android:style/ButtonBar">
-        <item name="android:background">@drawable/tt__bottom_bar</item>
+    <!-- Holo - ButtonBar -->
+    <style name="TikTok.Holo.ButtonBar" parent="android:style/ButtonBar">
+        <item name="android:paddingTop">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+        <item name="android:paddingBottom">0dip</item>
+        <item name="android:divider">@drawable/abs__list_divider_holo_dark</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:dividerPadding">0dip</item>
+        <item name="android:background">@null</item>
     </style>
 
-    <style name="Widget.TikTok.Green.ProgressBar.Horizontal" parent="@Widget.Sherlock.ProgressBar.Horizontal">
+    <!-- TikTok - ProgressBar -->
+    <style name="Widget.TikTok.Green.ProgressBar.Horizontal" parent="Widget.Sherlock.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/tt__progress_horizontal_green</item>
     </style>
 

@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.actionbarsherlock.internal.widget.IcsLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/TikTok.Holo.ButtonBar"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dip" />
+
+    <com.actionbarsherlock.internal.widget.IcsLinearLayout
+        style="@style/TikTok.Holo.ButtonBar"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:padding="20dip" >
-
-        <TextView
-            android:id="@+id/message"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:paddingBottom="3dip"
-        style="@style/Widget.TikTok.ButtonBar" >
+        android:orientation="vertical" >
 
         <Button
             android:id="@+id/ok"
@@ -31,6 +24,6 @@
             android:text="@string/alert_dialog_ok"
             android:onClick="onClickClose" />
 
-    </LinearLayout>
+    </com.actionbarsherlock.internal.widget.IcsLinearLayout>
 
-</LinearLayout>
+</com.actionbarsherlock.internal.widget.IcsLinearLayout>
