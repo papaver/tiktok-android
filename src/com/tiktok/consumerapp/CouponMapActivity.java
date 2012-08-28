@@ -60,6 +60,10 @@ public class CouponMapActivity extends MapActivity
         {
             super(defaultMarker, mapView);
 
+            // [moiz] hack to fix map crash due to google bug
+            // http://code.google.com/p/android/issues/detail?id=2035
+            populate();
+
             // iOS-like  defaults
             setShowClose(false);
             setShowDisclosure(true);
