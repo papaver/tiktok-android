@@ -48,10 +48,6 @@
             android:label="@string/tab_list"
             android:name=".CouponListActivity"
             android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="com.tiktok.consumer.app.redeemed" />
-                <action android:name="com.tiktok.consumer.app.resync" />
-            </intent-filter>
         </activity>
 
         <!-- Coupons Map Activity -->
@@ -59,9 +55,6 @@
             android:label="@string/tab_map"
             android:name=".CouponMapActivity"
             android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="com.tiktok.consumer.app.updatemap" />
-            </intent-filter>
         </activity>
 
         <!-- Karma Activity -->

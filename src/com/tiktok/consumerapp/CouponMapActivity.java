@@ -11,10 +11,7 @@ package com.tiktok.consumerapp;
 import java.util.Date;
 import java.util.List;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -91,7 +88,7 @@ public class CouponMapActivity extends MapActivity
             // open up coupon details
             Intent intent = new Intent(mContext, CouponActivity.class);
             intent.putExtra(CouponTable.sKeyId, couponItem.id());
-            startActivityForResult(intent, 0);
+            startActivity(intent);
             return true;
         }
     }
@@ -161,9 +158,6 @@ public class CouponMapActivity extends MapActivity
 
         // create a handler for the activity
         mHandler = new Handler();
-
-        // setup intent receivers
-        setupIntentFilter();
 
         // fill map with items
         populateMap(mCursor);
@@ -237,7 +231,6 @@ public class CouponMapActivity extends MapActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        cleanupIntentFilter();
     }
 
     //-------------------------------------------------------------------------
@@ -272,33 +265,6 @@ public class CouponMapActivity extends MapActivity
 
     //-------------------------------------------------------------------------
     // helper methods
-    //-------------------------------------------------------------------------
-
-    private void setupIntentFilter()
-    {
-        Log.i(kLogTag, "settings up intent filters...");
-
-        // updatemap filter - update cursor, repopluate map
-        mUpdateMapReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.i(kLogTag, "Received updatemap intent from filter...");
-                updateCursor();
-            }
-        };
-        registerReceiver(mUpdateMapReceiver,
-            new IntentFilter("com.tiktok.consumer.app.updatemap"));
-    }
-
-    //-------------------------------------------------------------------------
-
-    private void cleanupIntentFilter()
-    {
-        Log.i(kLogTag, "removing intent filters...");
-
-        unregisterReceiver(mUpdateMapReceiver);
-    }
-
     //-------------------------------------------------------------------------
 
     private void populateMap(Cursor cursor)
@@ -410,7 +376,6 @@ public class CouponMapActivity extends MapActivity
     // fields
     //-------------------------------------------------------------------------
 
-    private BroadcastReceiver     mUpdateMapReceiver;
     private CouponsOverlay        mOverlay;
     private Cursor                mCursor;
     private Handler               mHandler;

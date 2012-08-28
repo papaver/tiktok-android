@@ -8,13 +8,15 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Date;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -35,12 +37,12 @@ public class MainTabActivity extends SherlockFragmentActivity
     // statics
     //-------------------------------------------------------------------------
 
-    private static final String kLogTag = "MainTabActivity";
+    //private static final String kLogTag = "MainTabActivity";
 
     private static final String kTagCouponList = "list";
     private static final String kTagCouponMap  = "map";
     private static final String kTagKarma      = "karma";
-    private static final String kTagSettings   = "settings";
+    //private static final String kTagSettings   = "settings";
     private static final String kTagCities     = "cities";
 
     //-------------------------------------------------------------------------
@@ -160,12 +162,9 @@ public class MainTabActivity extends SherlockFragmentActivity
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        Log.i(kLogTag, "New intent...");
 
-        // broadcast intent
-        Intent newIntent = new Intent();
-        newIntent.setAction("com.tiktok.consumer.app.resync");
-        sendBroadcast(newIntent);
+        // notification intent to sync coupons
+        syncCoupons();
     }
 
     //-------------------------------------------------------------------------
@@ -243,6 +242,23 @@ public class MainTabActivity extends SherlockFragmentActivity
 
         // select tab
         bar.setSelectedNavigationItem(0);
+    }
+
+    //-------------------------------------------------------------------------
+    // methods
+    //-------------------------------------------------------------------------
+
+    private void syncCoupons()
+    {
+        final Context context   = this;
+        final Settings settings = new Settings(context);
+        TikTokApi api = new TikTokApi(context, new Handler(), new TikTokApi.CompletionHandler() {
+            public void onSuccess(Object data) { settings.setLastUpdate(new Date()); }
+            public void onError(Throwable error) {}
+        });
+
+        // query server
+        api.syncActiveCoupons(settings.lastUpdate());
     }
 
     //-------------------------------------------------------------------------

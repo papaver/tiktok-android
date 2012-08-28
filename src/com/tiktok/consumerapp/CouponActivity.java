@@ -68,9 +68,6 @@ public class CouponActivity extends SherlockMapActivity
     private static final int kIntentSMS   = 100;
     private static final int kIntentEmail = 101;
 
-    public static final int kResultDefault  = 1;
-    public static final int kResultRedeemed = 2;
-
     //-------------------------------------------------------------------------
     // enum
     //-------------------------------------------------------------------------
@@ -167,9 +164,6 @@ public class CouponActivity extends SherlockMapActivity
         } else {
             expireCoupon(mCoupon, 0);
         }
-
-        // set default result
-        setResult(kResultDefault);
     }
 
     //-------------------------------------------------------------------------
@@ -292,7 +286,7 @@ public class CouponActivity extends SherlockMapActivity
     {
         Intent intent = new Intent(this, MerchantActivity.class);
         intent.putExtra(CouponTable.sKeyId, mCoupon.id());
-        startActivityForResult(intent, 0);
+        startActivity(intent);
     }
 
     //-------------------------------------------------------------------------
