@@ -38,12 +38,11 @@ public class DialogActivity extends SherlockActivity
         String title   = extras != null ? extras.getString("title") : "";
         String message = extras != null ? extras.getString("message") : "";
 
-        // grab views
-        TextView titleView   = (TextView)findViewById(R.id.title);
-        TextView messageView = (TextView)findViewById(R.id.message);
-
-        // update content
+        // update title
         setTitle(title);
+
+        // update message
+        TextView messageView = (TextView)findViewById(R.id.message);
         messageView.setText(message);
     }
 
