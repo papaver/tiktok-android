@@ -15,8 +15,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -39,12 +37,11 @@ import com.tiktok.consumerapp.utilities.TextUtilities;
 
 public class CouponMapActivity extends MapActivity
 {
-
     //-------------------------------------------------------------------------
     // statics
     //-------------------------------------------------------------------------
 
-    private static final String kLogTag = "CouponMapActivity";
+    //private static final String kLogTag = "CouponMapActivity";
 
     //-------------------------------------------------------------------------
     // CouponsOverlay
@@ -128,18 +125,18 @@ public class CouponMapActivity extends MapActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.couponmap);
 
+        // checkpoint marker
         Analytics.passCheckpoint("Deal Map");
+
+        // load layout containing map
+        setContentView(R.layout.map);
 
         // grab the map view
         mMapView = (TapControlledMapView)findViewById(R.id.map_view);
 
         // add the map's zoom view to the zoom layout
         mMapView.setBuiltInZoomControls(true);
-
-        // setup overlays
-        mOverlay = new CouponsOverlay(mMapView);
 
         // dismiss balloon upon single tap of mapview (iOS behavior)
         mMapView.setOnSingleTapListener(new OnSingleTapListener() {
@@ -149,18 +146,8 @@ public class CouponMapActivity extends MapActivity
             }
         });
 
-        // open up database connection
-        mDatabaseAdapter = new TikTokDatabaseAdapter(this);
-
-        // fill the map with data
-        mCursor = mDatabaseAdapter.fetchAllCoupons();
-        startManagingCursor(mCursor);
-
-        // create a handler for the activity
-        mHandler = new Handler();
-
-        // fill map with items
-        populateMap(mCursor);
+        // setup overlays
+        mOverlay = new CouponsOverlay(mMapView);
     }
 
     //-------------------------------------------------------------------------
@@ -185,14 +172,10 @@ public class CouponMapActivity extends MapActivity
         super.onResume();
 
         // [moiz] super fucking ugly hackery to get maps working with multiple
-        //   views, only one is allowed per proceses...
-        if (mPaused) {
-            mPaused = false;
-            MapController controller = mMapView.getController();
-            controller.setCenter(mMapCenter);
-            controller.setZoom(mMapZoomLevel + 1);
-            controller.zoomOut();
-        }
+        //   views, only one is allowed per proceses so we need to keep track
+        //   of what was being looked at last...
+        mMapView.onRestoreInstanceState(mMapState);
+        mMapView.requestLayout();
     }
 
     //-------------------------------------------------------------------------
@@ -206,9 +189,7 @@ public class CouponMapActivity extends MapActivity
         super.onPause();
 
         // keep track of map data to reset map on resume
-        mPaused           = true;
-        mMapCenter        = mMapView.getMapCenter();
-        mMapZoomLevel     = mMapView.getZoomLevel();
+        mMapView.onSaveInstanceState(mMapState);
     }
 
     //-------------------------------------------------------------------------
@@ -264,10 +245,10 @@ public class CouponMapActivity extends MapActivity
     }
 
     //-------------------------------------------------------------------------
-    // helper methods
+    // methods
     //-------------------------------------------------------------------------
 
-    private void populateMap(Cursor cursor)
+    public void populateMap(Cursor cursor, boolean centerMap)
     {
         List<Overlay> mapOverlays = mMapView.getOverlays();
 
@@ -282,7 +263,15 @@ public class CouponMapActivity extends MapActivity
         double maxLongitude = -180.0;
 
         // nothing to do if cursor is empty
-        if (!cursor.moveToFirst()) return;
+        if (!cursor.moveToFirst()) {
+            mMapView.invalidate();
+            mMapView.requestLayout();
+            return;
+        }
+
+        // setup adapter
+        TikTokDatabaseAdapter databaseAdapter
+            = new TikTokDatabaseAdapter(CouponMapActivity.this);
 
         // add overlays
         for ( ; !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -296,8 +285,8 @@ public class CouponMapActivity extends MapActivity
             if (Coupon.isExpired(endTime)) continue;
 
             // query merchant from cursor
-            final Merchant merchant        = mDatabaseAdapter.fetchMerchant(merchantId);
-            final List<Location> locations = mDatabaseAdapter.fetchLocations(locationIds);
+            Merchant merchant        = databaseAdapter.fetchMerchant(merchantId);
+            List<Location> locations = databaseAdapter.fetchLocations(locationIds);
 
             // loop through all of the locations
             for (Location location : locations) {
@@ -321,70 +310,61 @@ public class CouponMapActivity extends MapActivity
             }
         }
 
-        // calculate center and region
-        double latitude      = ((minLatitude + maxLatitude)   * 0.5);
-        double longitude     = ((minLongitude + maxLongitude) * 0.5);
-        double latitudeSpan  = (maxLatitude - minLatitude) * 1.05;
-        double longitudeSpan = (maxLongitude - minLongitude) * 1.05;
-
         // add overlays to map
         mapOverlays.add(mOverlay);
 
-        // center map
-        GeoPoint center          = new GeoPoint((int)(latitude * 1E6), (int)(longitude * 1E6));
-        MapController controller = mMapView.getController();
-        controller.setCenter(center);
-        controller.zoomToSpan((int)(latitudeSpan * 1E6), (int)(longitudeSpan * 1E6));
+        // calculate center and region
+        if (centerMap) {
+            double latitude      = ((minLatitude + maxLatitude)   * 0.5);
+            double longitude     = ((minLongitude + maxLongitude) * 0.5);
+            double latitudeSpan  = (maxLatitude - minLatitude) * 1.05;
+            double longitudeSpan = (maxLongitude - minLongitude) * 1.05;
+
+            // center map
+            GeoPoint center          = new GeoPoint((int)(latitude * 1E6), (int)(longitude * 1E6));
+            MapController controller = mMapView.getController();
+            controller.setCenter(center);
+            controller.zoomToSpan((int)(latitudeSpan * 1E6), (int)(longitudeSpan * 1E6));
+        }
 
         // update map
         mMapView.invalidate();
+        mMapView.requestLayout();
     }
 
     //-------------------------------------------------------------------------
 
-    private void updateCursor()
+    public void centerMapToCurrentLocation()
     {
-        // fetch the cursor on a background thread
-        final MapActivity activity = this;
-        new Thread(new Runnable() {
-            public void run() {
-                Log.i(kLogTag, "Updating cursor...");
-                final Cursor cursor = mDatabaseAdapter.fetchAllCoupons();
+        LocationTrackerManager manager = LocationTrackerManager.getInstance(this);
+        android.location.Location currentLocation = manager.currentLocation();
+        if (currentLocation != null) {
+            double latitude  = currentLocation.getLatitude();
+            double longitude = currentLocation.getLongitude();
+            centerMap(latitude, longitude);
+        }
+    }
 
-                // swap to the new cursor on the main thread
-                mHandler.post(new Runnable() {
-                    public void run() {
+    //-------------------------------------------------------------------------
+    // helper methods
+    //-------------------------------------------------------------------------
 
-                        // clean up the previous cursor
-                        if (mCursor != null) {
-                            activity.stopManagingCursor(mCursor);
-                        }
-
-                        // repopulate map
-                        populateMap(cursor);
-
-                        // start managing the new cursor
-                        mCursor = cursor;
-                        activity.startManagingCursor(mCursor);
-                    }
-                });
-            }
-        }).start();
+    private void centerMap(double latitude, double longitude)
+    {
+        if ((latitude != 0.0) && (longitude != 0.0)) {
+            MapController controller = mMapView.getController();
+            controller.setCenter(new GeoPoint((int)(latitude * 1E6), (int)(longitude * 1E6)));
+            controller.setZoom(15);
+        }
     }
 
     //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
-    private CouponsOverlay        mOverlay;
-    private Cursor                mCursor;
-    private Handler               mHandler;
     private TapControlledMapView  mMapView;
-    private TikTokDatabaseAdapter mDatabaseAdapter;
-
-    private boolean               mPaused = false;
-    private GeoPoint              mMapCenter;
-    private int                   mMapZoomLevel;
+    private CouponsOverlay        mOverlay;
+    private Bundle                mMapState = new Bundle();
 
 }
 

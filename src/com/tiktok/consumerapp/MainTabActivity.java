@@ -207,7 +207,7 @@ public class MainTabActivity extends SherlockFragmentActivity
                  .setTag(kTagCouponMap)
                  .setText("Map")
                  //.setIcon(R.drawable.icon_tab_couponmap)
-                 .setTabListener(new TabListener</* CouponMapActivity */ FragmentTabStub>(this, kTagCouponMap, FragmentTabStub.class));
+                 .setTabListener(new TabListener<CouponMapFragment>(this, kTagCouponMap, CouponMapFragment.class));
         bar.addTab(tab);
 
         // setup karma tab
