@@ -259,8 +259,10 @@ public class CouponActivity extends SherlockMapActivity
             TikTokApi api = new TikTokApi(this, new Handler(), null);
             api.updateCoupon(mCoupon.id(), TikTokApi.CouponAttribute.kSMS);
         } else if (resultCode == Activity.RESULT_OK) {
-            FacebookManager manager = FacebookManager.getInstance(this);
-            manager.facebook().authorizeCallback(requestCode, resultCode, data);
+            if (requestCode == FacebookManager.kIntentFacebook) {
+                FacebookManager manager = FacebookManager.getInstance(this);
+                manager.facebook().authorizeCallback(requestCode, resultCode, data);
+            }
         }
     }
 

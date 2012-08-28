@@ -248,7 +248,7 @@ public class SettingsActivity extends    SherlockPreferenceActivity
                 saveHomeLocation(data);
             } else if (requestCode == kIntentWorkLocation) {
                 saveWorkLocation(data);
-            } else {
+            } else if (requestCode == FacebookManager.kIntentFacebook) {
                 FacebookManager manager = FacebookManager.getInstance(this);
                 manager.facebook().authorizeCallback(requestCode, resultCode, data);
             }

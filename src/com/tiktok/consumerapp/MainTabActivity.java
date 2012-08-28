@@ -8,6 +8,7 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -170,19 +171,16 @@ public class MainTabActivity extends SherlockFragmentActivity
     //-------------------------------------------------------------------------
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        super.onActivityResult(requestCode, resultCode, intent);
+        super.onActivityResult(requestCode, resultCode, data);
 
-        /* [moiz] fix facebook callback authorization stuff...
-        // [moiz] stupid facebook request code is fucking private... wtf
-        //   should be ok for now since we don't need the activity result
-        //   for anything else right now
         if (resultCode == Activity.RESULT_OK) {
-            FacebookManager manager = FacebookManager.getInstance(this);
-            manager.facebook().authorizeCallback(requestCode, resultCode, intent);
+            if (requestCode == FacebookManager.kIntentFacebook) {
+                FacebookManager manager = FacebookManager.getInstance(this);
+                manager.facebook().authorizeCallback(requestCode, resultCode, data);
+            }
         }
-        */
     }
 
     //-------------------------------------------------------------------------

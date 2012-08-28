@@ -46,6 +46,8 @@ public final class FacebookManager
     // statics
     //-------------------------------------------------------------------------
 
+    public static final int kIntentFacebook = 32665;
+
     private static final String kLogTag = "FacebookManager";
 
     //-------------------------------------------------------------------------
@@ -95,7 +97,7 @@ public final class FacebookManager
         };
 
         // attempt to log into facebook
-        mFacebook.authorize(activity, permissions, 1, new DialogListener() {
+        mFacebook.authorize(activity, permissions, kIntentFacebook, new DialogListener() {
 
             public void onComplete(Bundle values) {
                 saveFacebookData();
