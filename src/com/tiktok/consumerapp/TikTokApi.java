@@ -741,23 +741,11 @@ public final class TikTokApi
         // process the coupons
         if (response.isOkay()) {
 
-            // open up a database connection
-            TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(mContext);
-
             // repack the data for easier processing
             Map<CouponKey, Object> data = repackCouponData(response);
 
-            // process new coupons
-            Coupon[] coupons = (Coupon[])data.get(TikTokApi.CouponKey.kCoupons);
-            processCoupons(coupons, adapter);
-
-            // kill coupons
-            Long[] killed = (Long[])data.get(TikTokApi.CouponKey.kKilled);
-            processKilled(killed, adapter);
-
-            // update sold out coupons
-            Long[] soldOut = (Long[])data.get(TikTokApi.CouponKey.kSoldOut);
-            processSoldOut(soldOut, adapter);
+            // process coupons in sync to prevent threading issues on db
+            TikTokApi.procesCouponDataSynchronized(mContext, data);
         }
 
         // run handler
@@ -766,10 +754,29 @@ public final class TikTokApi
 
     //-------------------------------------------------------------------------
 
-    private void processCoupons(Coupon[] coupons, TikTokDatabaseAdapter adapter)
+    private static synchronized void procesCouponDataSynchronized(
+        Context context, Map<CouponKey, Object> data)
     {
-        if (Thread.currentThread().isInterrupted()) return;
+        // open up a database connection
+        TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(context);
 
+        // process new coupons
+        Coupon[] coupons = (Coupon[])data.get(TikTokApi.CouponKey.kCoupons);
+        processCoupons(coupons, adapter);
+
+        // kill coupons
+        Long[] killed = (Long[])data.get(TikTokApi.CouponKey.kKilled);
+        processKilled(killed, adapter);
+
+        // update sold out coupons
+        Long[] soldOut = (Long[])data.get(TikTokApi.CouponKey.kSoldOut);
+        processSoldOut(soldOut, adapter);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private static void processCoupons(Coupon[] coupons, TikTokDatabaseAdapter adapter)
+    {
         // add only new coupons to the database
         List<Long> couponIds        = adapter.fetchAllCouponIds();
         Map<Long, Date> merchantIds = adapter.fetchAllMerchantIds();
@@ -825,10 +832,8 @@ public final class TikTokApi
 
     //-------------------------------------------------------------------------
 
-    private void processKilled(Long[] killed, TikTokDatabaseAdapter adapter)
+    private static void processKilled(Long[] killed, TikTokDatabaseAdapter adapter)
     {
-        if (Thread.currentThread().isInterrupted()) return;
-
         List<Long> couponIds = adapter.fetchAllCouponIds();
         for (final Long id : killed) {
             if (couponIds.contains(id)) {
@@ -840,10 +845,8 @@ public final class TikTokApi
 
     //-------------------------------------------------------------------------
 
-    private void processSoldOut(Long[] soldOut, TikTokDatabaseAdapter adapter)
+    private static void processSoldOut(Long[] soldOut, TikTokDatabaseAdapter adapter)
     {
-        if (Thread.currentThread().isInterrupted()) return;
-
         List<Long> couponIds = adapter.fetchAllCouponIds();
         for (final Long id : soldOut) {
             if (couponIds.contains(id)) {
@@ -877,4 +880,5 @@ public final class TikTokApi
     private Thread     mThread;
     private Downloader mDownloader;
     private Utilities  mUtilities;
+
 }
