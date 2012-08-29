@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -37,7 +38,7 @@ public class MainTabActivity extends SherlockFragmentActivity
     // statics
     //-------------------------------------------------------------------------
 
-    //private static final String kLogTag = "MainTabActivity";
+    private static final String kLogTag = "MainTabActivity";
 
     private static final String kTagCouponList = "list";
     private static final String kTagCouponMap  = "map";
@@ -71,6 +72,9 @@ public class MainTabActivity extends SherlockFragmentActivity
         // create appirater instance
         mAppirater = new Appirater(this, new Handler());
         mAppirater.appLaunched(true);
+
+        // run intial sync
+        syncCoupons();
     }
 
     //-------------------------------------------------------------------------
@@ -83,6 +87,7 @@ public class MainTabActivity extends SherlockFragmentActivity
     {
         super.onStart();
         Analytics.startSession(this);
+        autoSync(new Date());
     }
 
     //-------------------------------------------------------------------------
@@ -162,6 +167,7 @@ public class MainTabActivity extends SherlockFragmentActivity
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
+        Log.w(kLogTag, "NewIntent: Syncing coupons...");
 
         // notification intent to sync coupons
         syncCoupons();
@@ -262,10 +268,24 @@ public class MainTabActivity extends SherlockFragmentActivity
     }
 
     //-------------------------------------------------------------------------
+
+    private void autoSync(Date now)
+    {
+        long fiveMinutes = 5 * 60;
+        long secondsAgo  = (now.getTime() - mLastSync.getTime()) / 1000;
+        if (secondsAgo > fiveMinutes) {
+            mLastSync = now;
+            syncCoupons();
+            Log.i(kLogTag, "AutoSyncing coupons...");
+        }
+    }
+
+    //-------------------------------------------------------------------------
     // fields
     //-------------------------------------------------------------------------
 
     Appirater mAppirater;
+    Date      mLastSync = new Date();
 }
 
 //-----------------------------------------------------------------------------
