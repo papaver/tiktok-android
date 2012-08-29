@@ -397,6 +397,7 @@ public class CouponActivity extends SherlockMapActivity
 
         // create dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Merchant Pin");
         builder.setView(alertView);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("Validate", new DialogInterface.OnClickListener() {

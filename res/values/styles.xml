@@ -34,20 +34,62 @@
     </style>
 
     <!-- Holo - EditText -->
-    <style name="Widget.TikTok.Holo.Light.EditText" parent="@android:style/Widget.EditText">
+    <style name="Widget.TikTok.Holo.EditText" parent="@android:style/Widget.EditText">
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>
         <item name="android:clickable">true</item>
-        <item name="android:background">@drawable/tt__edit_text_holo_light</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
-        <item name="android:textColor">@android:color/primary_text_light</item>
+        <item name="android:background">@drawable/tt__edit_text_holo_dark</item>
+        <item name="android:textAppearance">@style/TextAppearance.TikTok.Holo.Medium.Inverse</item>
+        <item name="android:textColor">@color/abs__primary_text_holo_dark</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="Widget.TikTok.Holo.Light.EditText" parent="Widget.TikTok.Holo.EditText">
+        <item name="android:background">@drawable/tt__edit_text_holo_light</item>
+        <item name="android:textAppearance">@style/TextAppearance.TikTok.Holo.Light.Medium.Inverse</item>
+        <item name="android:textColor">@color/abs__primary_text_holo_light</item>
+    </style>
+
+    <!-- Holo - Partial - AlertDialog -->
+    <style name="Widget.TikTok.Holo.AlertDialog" parent="Widget">
+        <item name="android:fullDark">@drawable/tt__dialog_full_holo_dark</item>
+        <item name="android:topDark">@drawable/tt__dialog_top_holo_dark</item>
+        <item name="android:centerDark">@drawable/tt__dialog_middle_holo_dark</item>
+        <item name="android:bottomDark">@drawable/tt__dialog_bottom_holo_dark</item>
+        <item name="android:fullBright">@drawable/tt__dialog_full_holo_dark</item>
+        <item name="android:topBright">@drawable/tt__dialog_top_holo_dark</item>
+        <item name="android:centerBright">@drawable/tt__dialog_middle_holo_dark</item>
+        <item name="android:bottomBright">@drawable/tt__dialog_bottom_holo_dark</item>
+        <item name="android:bottomMedium">@drawable/tt__dialog_bottom_holo_dark</item>
+        <item name="android:centerMedium">@drawable/tt__dialog_middle_holo_dark</item>
+    </style>
+
+    <!-- Holo - TextAppearance -->
+    <style name="TextAppearance.TikTok" parent="Widget">>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.TikTok.Holo.Medium" parent="TextAppearance.TikTok">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.TikTok.Holo.Medium.Inverse" >
+        <item name="android:textColor">@color/abs__primary_text_holo_light</item>
+        <item name="android:textColorHint">@color/tt__hint_foreground_holo_light</item>
+        <item name="android:textColorHighlight">@color/tt__highlighted_text_holo_light</item>
+        <item name="android:textColorLink">@color/tt__holo_blue_light</item>
+    </style>
+
+    <style name="TextAppearance.TikTok.Holo.Light.Medium.Inverse" parent="TextAppearance.TikTok.Holo.Medium">
+        <item name="android:textColor">@color/abs__primary_text_holo_dark</item>
+        <item name="android:textColorHint">@color/tt__hint_foreground_holo_dark</item>
+        <item name="android:textColorHighlight">@color/tt__highlighted_text_holo_dark</item>
+        <item name="android:textColorLink">@color/tt__holo_blue_light</item>
     </style>
 
     <!-- TikTok - ProgressBar -->
     <style name="Widget.TikTok.Green.ProgressBar.Horizontal" parent="Widget.Sherlock.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/tt__progress_horizontal_green</item>
     </style>
-
 
 </resources>

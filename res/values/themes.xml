@@ -5,7 +5,8 @@
     <style name="Theme.TikTok" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="android:windowBackground">@drawable/background_gradient</item>
         <item name="android:colorBackgroundCacheHint">@android:color/transparent</item>
-        <item name="android:editTextStyle">@style/Widget.TikTok.Holo.Light.EditText</item>
+        <item name="android:editTextStyle">@style/Widget.TikTok.Holo.EditText</item>
+        <item name="android:alertDialogStyle">@style/Widget.TikTok.Holo.AlertDialog</item>
     </style>
 
     <!-- TikTok - Dialog Activity Theme Override -->

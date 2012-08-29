@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.location.Location;
 import android.view.KeyEvent;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 

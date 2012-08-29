@@ -438,6 +438,7 @@ public class CouponListFragment extends SherlockListFragment
 
         // create dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Promo Code");
         builder.setView(view);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("Redeem", new DialogInterface.OnClickListener() {

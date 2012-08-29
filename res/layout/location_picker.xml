@@ -6,6 +6,7 @@
 
     <EditText
         android:id="@+id/input"
+        style="@style/Widget.TikTok.Holo.Light.EditText"
         android:textSize="17sp"
         android:hint="Search"
         android:inputType="textEmailAddress|textEmailSubject"
