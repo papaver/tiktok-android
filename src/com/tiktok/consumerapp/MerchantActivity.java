@@ -82,13 +82,26 @@ public class MerchantActivity extends SherlockActivity
         // can't be here without a valid coupon id
         if (id == null) finish();
 
-        // update text views with fonts
-        updateFonts();
-
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
         mCoupon = adapter.fetchCoupon(id);
-        setupMerchantDetails(mCoupon);
+
+        // can only continue with a valid coupon
+        if (mCoupon != null) {
+
+            // update text views with fonts
+            updateFonts();
+
+            // update view with merchant details
+            setupMerchantDetails(mCoupon);
+
+        // alert user of booboo
+        } else {
+            String title   = getString(R.string.tiktok_fail_title);
+            String message = getString(R.string.tiktok_fail_message);
+            Utilities.displaySimpleAlert(this, title, message);
+            finish();
+       }
     }
 
     //-------------------------------------------------------------------------

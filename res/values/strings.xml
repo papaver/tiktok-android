@@ -3,6 +3,10 @@
 
     <string name="app_name">TikTok</string>
 
+    <!-- TikTok Sspport -->
+    <string name="tiktok_fail_title">Ooops.</string>
+    <string name="tiktok_fail_message">Something went horribly wrong.  Please contact TikTok support for further assistance.  Thanks.</string>
+
     <!-- Device Sspport -->
     <string name="google_maps_api_key">0xwxb_DAfECWYdmrqOYRwjKmfyvkvhvs7pIiL0g</string>
 

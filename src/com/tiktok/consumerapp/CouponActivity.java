@@ -156,13 +156,26 @@ public class CouponActivity extends SherlockMapActivity
         // retrieve the coupon from the database
         TikTokDatabaseAdapter adapter = new TikTokDatabaseAdapter(this);
         mCoupon = adapter.fetchCoupon(id);
-        setupCouponDetails(mCoupon);
 
-        // setup coupon depending on status
-        if (!Coupon.isExpired(mCoupon.endTime())) {
-            startTimer(mCoupon);
+        // can only continue with a valid coupon
+        if (mCoupon != null) {
+
+            // update view with coupon details
+            setupCouponDetails(mCoupon);
+
+            // setup coupon depending on status
+            if (!Coupon.isExpired(mCoupon.endTime())) {
+                startTimer(mCoupon);
+            } else {
+                expireCoupon(mCoupon, 0);
+            }
+
+        // alert user of booboo
         } else {
-            expireCoupon(mCoupon, 0);
+            String title   = getString(R.string.tiktok_fail_title);
+            String message = getString(R.string.tiktok_fail_message);
+            Utilities.displaySimpleAlert(this, title, message);
+            finish();
         }
     }
 
