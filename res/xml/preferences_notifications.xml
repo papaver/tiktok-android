@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Notifications">
+
+    <!-- Notifications -->
+    <CheckBoxPreference
+        android:title="Notifications"
+        android:key="TTS_notifications"
+        android:defaultValue="true"
+        android:summary="Configure notifications."/>
+
+    <!-- Sound -->
+    <CheckBoxPreference
+        android:title="Sound"
+        android:key="TTS_notifications_sound"
+        android:defaultValue="true"
+        android:summary="Configure notification sound."/>
+
+    <!-- Vibration -->
+    <CheckBoxPreference
+        android:title="Vibration"
+        android:key="TTS_notifications_vibrate"
+        android:defaultValue="true"
+        android:summary="Configure notification vibration."/>
+
+</PreferenceScreen>
+

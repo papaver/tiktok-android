@@ -90,28 +90,11 @@
         <!-- Notifications -->
         <PreferenceScreen
             android:title="Notifications">
-
-            <!-- Notifications -->
-            <CheckBoxPreference
-                android:title="Notifications"
-                android:key="TTS_notifications"
-                android:defaultValue="true"
-                android:summary="Configure notifications."/>
-
-            <!-- Sound -->
-            <CheckBoxPreference
-                android:title="Sound"
-                android:key="TTS_notifications_sound"
-                android:defaultValue="true"
-                android:summary="Configure notification sound."/>
-
-            <!-- Vibration -->
-            <CheckBoxPreference
-                android:title="Vibration"
-                android:key="TTS_notifications_vibrate"
-                android:defaultValue="true"
-                android:summary="Configure notification vibration."/>
-
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.tiktok.consumerapp"
+                android:targetClass="com.tiktok.consumerapp.SettingsActivity"
+                android:data="preferences://notifications" />
         </PreferenceScreen>
     </PreferenceCategory>
 

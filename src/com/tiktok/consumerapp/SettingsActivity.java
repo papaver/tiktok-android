@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -58,18 +59,31 @@ public class SettingsActivity extends    SherlockPreferenceActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
 
-        final Context context = this;
+        // [moiz] hack to get multiple screens with the proper themes, another
+        //   bug in android that causes the second pref screens to lose their
+        //   themes... thanks goog... wtf can't you just port over prefs and
+        //   holo to the support lib????
+        Uri intentData = getIntent().getData();
+        boolean isNotificationScreen = (intentData != null) &&
+            intentData.toString().equals("preferences://notifications");
+
+        // load the correct screen
+        addPreferencesFromResource(isNotificationScreen ?
+            R.xml.preferences_notifications : R.xml.preferences);
 
         // setup action bar
         ActionBar bar = getSupportActionBar();
-        bar.setTitle("Settings");
         bar.setHomeButtonEnabled(true);
         bar.setDisplayHomeAsUpEnabled(true);
 
-        // update the summaries
+        // update the settings
         mSettings = new Settings(this, true);
+
+        // bail out early if we are on the notification screen
+        if (isNotificationScreen) return;
+
+        final Context context = this;
 
         // name
         if (!mSettings.name().equals("")) {
