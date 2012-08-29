@@ -22,8 +22,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
+
+import com.tiktok.consumerapp.R;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -62,11 +65,17 @@ public class DatePreference extends DialogPreference
     @Override
     protected View onCreateDialogView()
     {
-        this.datePicker   = new DatePicker(getContext());
+        // inflate layout
+        LayoutInflater inflator =
+            (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflator.inflate(R.layout.date_picker_dialog, null);
+
+        // configure date picker
+        this.datePicker = (DatePicker)view.findViewById(R.id.datePicker);
         Calendar calendar = getDate();
         datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH), this);
-        return datePicker;
+        return view;
     }
 
     //-------------------------------------------------------------------------
@@ -277,7 +286,7 @@ public class DatePreference extends DialogPreference
         datePicker.clearFocus();
         onDateChanged(datePicker, datePicker.getYear(), datePicker.getMonth(),
             datePicker.getDayOfMonth());
-        onDialogClosed(which == DialogInterface.BUTTON1);
+        onDialogClosed(which == DialogInterface.BUTTON_POSITIVE);
     }
 
     //-------------------------------------------------------------------------
