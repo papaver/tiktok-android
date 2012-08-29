@@ -396,6 +396,9 @@ public final class TikTokApi
      */
     public void updateHomeLocation(Location location)
     {
+        // nothing to update if no location...
+        if (location == null) return;
+
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
         String longitude = String.format("%f", location.getLongitude());
@@ -417,6 +420,9 @@ public final class TikTokApi
      */
     public void updateWorkLocation(Location location)
     {
+        // nothing to update if no location...
+        if (location == null) return;
+
         // convert location into string
         String latitude  = String.format("%f", location.getLatitude());
         String longitude = String.format("%f", location.getLongitude());
