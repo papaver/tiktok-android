@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import android.app.ActivityManager;
@@ -120,10 +121,19 @@ public class C2DMReceiver extends BroadcastReceiver
             context, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // setup notification
-        Notification notification = new Notification(icon, ticker, time);
-        notification.setLatestEventInfo(context, title, text, contentIntent);
-        notification.defaults = settings(context).notificationDefaults();
-        notification.flags   |= Notification.FLAG_AUTO_CANCEL;
+        Notification notification = new NotificationCompat.Builder(context)
+            .setSmallIcon(icon)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setTicker(ticker)
+            .setWhen(time)
+            .setDefaults(settings(context).notificationDefaults())
+            .setContentIntent(contentIntent)
+            .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
+            .build();
+
+        // push out notification
         notificationManager.notify(0, notification);
     }
 
