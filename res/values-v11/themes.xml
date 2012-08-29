@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- TikTok - Main Theme Override -->
+    <style name="Theme.TikTok" parent="Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:windowBackground">@drawable/background_gradient</item>
+        <item name="android:colorBackgroundCacheHint">@android:color/transparent</item>
+        <item name="android:editTextStyle">@android:style/Widget.Holo.EditText</item>
+        <item name="android:editTextColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:alertDialogTheme">@style/Theme.TikTok.Holo.AlertDialog</item>
+    </style>
+
+    <!-- TikTok - Dialog Activity Theme Override -->
+    <style name="Theme.TikTok.Dialog" parent="Theme.Sherlock.Dialog">
+        <item name="android:buttonStyle">@android:style/Widget.Holo.Button.Borderless</item>
+        <item name="android:buttonStyleSmall">@android:style/Widget.Holo.Button.Borderless.Small</item>
+    </style>
+
+</resources>
