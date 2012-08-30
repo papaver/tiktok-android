@@ -39,6 +39,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockMapActivity;
+import com.actionbarsherlock.internal.widget.IcsProgressBar;
 import com.actionbarsherlock.view.MenuItem;
 
 import com.google.android.maps.GeoPoint;
@@ -51,7 +52,6 @@ import com.google.android.maps.OverlayItem;
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
 import com.tiktok.consumerapp.map.ItemizedOverlay;
 import com.tiktok.consumerapp.utilities.ShareUtilities;
-import com.tiktok.consumerapp.utilities.UIUtilities;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -519,8 +519,9 @@ public class CouponActivity extends SherlockMapActivity
 
     private void setupIcon(final Coupon coupon)
     {
-        final ImageView iconView            = (ImageView)findViewById(R.id.icon);
-        final IconManager.IconData iconData = coupon.iconData();
+        final ImageView iconView              = (ImageView)findViewById(R.id.icon);
+        final IcsProgressBar iconProgressView = (IcsProgressBar)findViewById(R.id.icon_progress);
+        final IconManager.IconData iconData   = coupon.iconData();
 
         // setup the icon manager
         if (mIconManager == null) {
@@ -530,14 +531,20 @@ public class CouponActivity extends SherlockMapActivity
         // use cached icon if available
         BitmapDrawable icon = mIconManager.getImage(iconData);
         if (icon != null) {
+
+            // hide activity indicator
+            iconView.setVisibility(View.VISIBLE);
+            iconProgressView.setVisibility(View.GONE);
+
+            // update icon
             iconView.setImageBitmap(icon.getBitmap());
 
         // use activity indicator and load image from server
         } else {
 
-            // set activity indicator
-            iconView.setImageResource(R.drawable.activity_indicator);
-            iconView.startAnimation(UIUtilities.getActivityIndicatorAnimation());
+            // show activity indicator
+            iconView.setVisibility(View.INVISIBLE);
+            iconProgressView.setVisibility(View.VISIBLE);
 
             // download icon from server
             mIconManager.requestImage(iconData, new IconManager.CompletionHandler() {
@@ -547,7 +554,8 @@ public class CouponActivity extends SherlockMapActivity
                     iconView.post(new Runnable() {
                         public void run() {
                             iconView.setImageBitmap(drawable.getBitmap());
-                            iconView.clearAnimation();
+                            iconView.setVisibility(View.VISIBLE);
+                            iconProgressView.setVisibility(View.GONE);
                         }
                     });
                 }

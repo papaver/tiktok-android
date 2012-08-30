@@ -5,11 +5,11 @@
         android:id="@+id/coupon"
         android:background="@drawable/whitish_gradient"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent" >
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal" >
 
         <FrameLayout
@@ -18,7 +18,7 @@
             android:padding="5dip" >
 
             <LinearLayout
-                android:id="@+id/coupon_gradient"
+                android:id="@+id/gradient"
                 android:layout_width="96dip"
                 android:layout_height="96dip"
                 android:background="@drawable/coupon_icon"
@@ -32,9 +32,16 @@
                     android:background="@color/white"
                     android:gravity="center" >
 
+                    <com.actionbarsherlock.internal.widget.IcsProgressBar
+                        android:id="@+id/icon_progress"
+                        style="@style/Widget.Sherlock.Light.ProgressBar"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
                     <!-- Icon shown next to the title/text -->
                     <ImageView
-                        android:id="@+id/coupon_icon"
+                        android:id="@+id/icon"
                         android:src="@drawable/icon03"
                         android:layout_gravity="center"
                         android:layout_width="64dip"
@@ -44,10 +51,11 @@
 
                 <!-- Coupon Expire Time -->
                 <TextView
-                    android:id="@+id/coupon_expire"
+                    android:id="@+id/expire"
                     android:text="@string/stub_coupon_expire_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@color/white"
@@ -72,7 +80,7 @@
 
             <!-- Merchant Name -->
             <TextView
-                android:id="@+id/coupon_merchant"
+                android:id="@+id/merchant"
                 android:text="@string/stub_merchant_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +91,7 @@
 
             <!-- Coupon Title -->
             <TextView
-                android:id="@+id/coupon_title"
+                android:id="@+id/title"
                 android:text="@string/stub_coupon_title"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -95,7 +103,7 @@
 
             <!-- Coupon Expires At -->
             <TextView
-                android:id="@+id/coupon_expires_at"
+                android:id="@+id/expires_at"
                 android:text="@string/stub_coupon_expires_at"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -110,7 +118,7 @@
 
     <!-- Sash -->
     <ImageView
-        android:id="@+id/coupon_sash"
+        android:id="@+id/sash"
         android:src="@drawable/redeemedsash"
         android:layout_width="65dip"
         android:layout_height="65dip"

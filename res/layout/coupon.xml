@@ -60,6 +60,13 @@
                             android:background="@color/white"
                             android:gravity="center" >
 
+                            <com.actionbarsherlock.internal.widget.IcsProgressBar
+                                android:id="@+id/icon_progress"
+                                style="@style/Widget.Sherlock.Light.ProgressBar"
+                                android:layout_gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
                             <!-- Icon -->
                             <ImageView
                                 android:id="@+id/icon"

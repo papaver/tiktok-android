@@ -26,11 +26,12 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.internal.widget.IcsProgressBar;
 import com.actionbarsherlock.view.MenuItem;
 
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
@@ -246,8 +247,8 @@ public class MerchantActivity extends SherlockActivity
         details.setText(merchant.details());
 
         // gradient
-        LinearLayout linearLayout   = (LinearLayout)findViewById(R.id.gradient);
-        GradientDrawable background = (GradientDrawable)linearLayout.getBackground();
+        FrameLayout frameLayout     = (FrameLayout)findViewById(R.id.gradient);
+        GradientDrawable background = (GradientDrawable)frameLayout.getBackground();
         background.setColor(ColorUtilities.kTik);
 
         // icon
@@ -339,8 +340,9 @@ public class MerchantActivity extends SherlockActivity
 
     private void setupIcon(final Merchant merchant)
     {
-        final ImageView iconView            = (ImageView)findViewById(R.id.icon);
-        final IconManager.IconData iconData = merchant.iconData();
+        final ImageView iconView              = (ImageView)findViewById(R.id.icon);
+        final IcsProgressBar iconProgressView = (IcsProgressBar)findViewById(R.id.icon_progress);
+        final IconManager.IconData iconData   = merchant.iconData();
 
         // setup the icon manager
         if (mIconManager == null) {
@@ -350,14 +352,20 @@ public class MerchantActivity extends SherlockActivity
         // use cached icon if available
         BitmapDrawable icon = mIconManager.getImage(iconData);
         if (icon != null) {
+
+            // hide activity indicator
+            iconView.setVisibility(View.VISIBLE);
+            iconProgressView.setVisibility(View.GONE);
+
+            // update icon
             iconView.setImageBitmap(icon.getBitmap());
 
         // use activity indicator and load image from server
         } else {
 
-            // set activity indicator
-            iconView.setImageResource(R.drawable.activity_indicator);
-            iconView.startAnimation(UIUtilities.getActivityIndicatorAnimation());
+            // show activity indicator
+            iconView.setVisibility(View.INVISIBLE);
+            iconProgressView.setVisibility(View.VISIBLE);
 
             // download icon from server
             mIconManager.requestImage(iconData, new IconManager.CompletionHandler() {
@@ -367,7 +375,8 @@ public class MerchantActivity extends SherlockActivity
                     iconView.post(new Runnable() {
                         public void run() {
                             iconView.setImageBitmap(drawable.getBitmap());
-                            iconView.clearAnimation();
+                            iconView.setVisibility(View.VISIBLE);
+                            iconProgressView.setVisibility(View.GONE);
                         }
                     });
                 }

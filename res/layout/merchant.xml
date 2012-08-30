@@ -44,24 +44,31 @@
                     android:padding="5dip" >
 
                     <!-- Icon Container -->
-                    <LinearLayout
+                    <FrameLayout
                         android:id="@+id/gradient"
                         android:layout_width="96dip"
                         android:layout_height="96dip"
                         android:background="@drawable/coupon_icon"
                         android:gravity="center"
-                        android:orientation="vertical"
                         android:padding="5dip" >
+
+                        <com.actionbarsherlock.internal.widget.IcsProgressBar
+                            android:id="@+id/icon_progress"
+                            style="@style/Widget.Sherlock.Light.ProgressBar"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
 
                         <!-- Icon -->
                         <ImageView
                             android:id="@+id/icon"
                             android:src="@drawable/icon03"
+                            android:layout_gravity="center"
                             android:layout_width="74dip"
                             android:layout_height="74dip" />
 
                     <!-- Icon Container End -->
-                    </LinearLayout>
+                    </FrameLayout>
 
                     <!-- Info Container -->
                     <LinearLayout

@@ -28,8 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 
+import com.actionbarsherlock.internal.widget.IcsProgressBar;
+
 import com.tiktok.consumerapp.drawable.BitmapDrawable;
-import com.tiktok.consumerapp.utilities.UIUtilities;
 
 //-----------------------------------------------------------------------------
 // class implementation
@@ -125,7 +126,7 @@ public final class CouponAdapter extends CursorAdapter
     public View newView(Context context, Cursor cursor, ViewGroup parent)
     {
         LayoutInflater inflater = LayoutInflater.from(context);
-        final View view = inflater.inflate(R.layout.coupon_entry_list_item, parent, false);
+        final View view = inflater.inflate(R.layout.coupon_list_item, parent, false);
 
         // grab fonts
         AssetManager manager = context.getAssets();
@@ -134,10 +135,10 @@ public final class CouponAdapter extends CursorAdapter
         Typeface helvBd   = Typeface.createFromAsset(manager, "fonts/HelveticaNeueBd.ttf");
 
         // update grab the text views
-        TextView merchant    = (TextView)view.findViewById(R.id.coupon_merchant);
-        TextView title       = (TextView)view.findViewById(R.id.coupon_title);
-        TextView expiresAt   = (TextView)view.findViewById(R.id.coupon_expires_at);
-        TextView expiresTime = (TextView)view.findViewById(R.id.coupon_expire);
+        TextView merchant    = (TextView)view.findViewById(R.id.merchant);
+        TextView title       = (TextView)view.findViewById(R.id.title);
+        TextView expiresAt   = (TextView)view.findViewById(R.id.expires_at);
+        TextView expiresTime = (TextView)view.findViewById(R.id.expire);
 
         // update font
         merchant.setTypeface(helvBd);
@@ -148,6 +149,8 @@ public final class CouponAdapter extends CursorAdapter
         return view;
     }
 
+    //-------------------------------------------------------------------------
+    // helper methods
     //-------------------------------------------------------------------------
 
     private void setupTimer(final ViewHolder viewHolder,
@@ -210,14 +213,23 @@ public final class CouponAdapter extends CursorAdapter
         // set image if available
         BitmapDrawable icon = mIconManager.getImage(iconData);
         if (icon != null) {
+
+            // hide activity indicator
+            viewHolder.icon.setVisibility(View.VISIBLE);
+            viewHolder.iconProgress.setVisibility(View.GONE);
+
+            // set tag to track view
+            viewHolder.icon.setTag(null);
+
+            // update icon
             viewHolder.icon.setImageBitmap(icon.getBitmap());
 
         // use activity indicator and load image from server
         } else {
 
-            // set activity indicator
-            viewHolder.icon.setImageResource(R.drawable.activity_indicator);
-            viewHolder.icon.startAnimation(UIUtilities.getActivityIndicatorAnimation());
+            // show activity indicator
+            viewHolder.icon.setVisibility(View.INVISIBLE);
+            viewHolder.iconProgress.setVisibility(View.VISIBLE);
 
             // set tag to track view
             viewHolder.icon.setTag(iconUrl);
@@ -230,9 +242,11 @@ public final class CouponAdapter extends CursorAdapter
                     viewHolder.icon.post(new Runnable() {
                         public void run() {
                             String tag = (String)viewHolder.icon.getTag();
-                            if (viewHolder.icon.isShown() && iconUrl.equals(tag)) {
+                            if (iconUrl.equals(tag)) {
+                                Log.i(kLogTag, String.format("Updating icon: %s", iconUrl));
                                 viewHolder.icon.setImageBitmap(drawable.getBitmap());
-                                viewHolder.icon.clearAnimation();
+                                viewHolder.icon.setVisibility(View.VISIBLE);
+                                viewHolder.iconProgress.setVisibility(View.GONE);
                             }
                         }
                     });
@@ -241,7 +255,7 @@ public final class CouponAdapter extends CursorAdapter
                 public void onFailure() {
                     Log.e(kLogTag, String.format("Failed to download icon: %s", iconUrl));
                     String tag = (String)viewHolder.icon.getTag();
-                    if (viewHolder.icon.isShown() && iconUrl.equals(tag)) {
+                    if (iconUrl.equals(tag)) {
                         setupIcon(viewHolder, iconId, iconUrl);
                     }
                 }
@@ -259,15 +273,16 @@ public final class CouponAdapter extends CursorAdapter
      */
     private static class ViewHolder
     {
-        public FrameLayout  main;
-        public TextView     merchant;
-        public TextView     title;
-        public TextView     expiresAt;
-        public TextView     expiresTime;
-        public LinearLayout linearLayout;
-        public ImageView    icon;
-        public Runnable     timer;
-        public ImageView    sash;
+        public FrameLayout    main;
+        public TextView       merchant;
+        public TextView       title;
+        public TextView       expiresAt;
+        public TextView       expiresTime;
+        public LinearLayout   linearLayout;
+        public ImageView      icon;
+        public IcsProgressBar iconProgress;
+        public Runnable       timer;
+        public ImageView      sash;
     }
 
     //-------------------------------------------------------------------------
@@ -279,13 +294,14 @@ public final class CouponAdapter extends CursorAdapter
         if ((tag == null) || !(tag instanceof ViewHolder)) {
             ViewHolder holder   = new ViewHolder();
             holder.main         = (FrameLayout)view.findViewById(R.id.coupon);
-            holder.merchant     = (TextView)view.findViewById(R.id.coupon_merchant);
-            holder.title        = (TextView)view.findViewById(R.id.coupon_title);
-            holder.expiresAt    = (TextView)view.findViewById(R.id.coupon_expires_at);
-            holder.expiresTime  = (TextView)view.findViewById(R.id.coupon_expire);
-            holder.linearLayout = (LinearLayout)view.findViewById(R.id.coupon_gradient);
-            holder.icon         = (ImageView)view.findViewById(R.id.coupon_icon);
-            holder.sash         = (ImageView)view.findViewById(R.id.coupon_sash);
+            holder.merchant     = (TextView)view.findViewById(R.id.merchant);
+            holder.title        = (TextView)view.findViewById(R.id.title);
+            holder.expiresAt    = (TextView)view.findViewById(R.id.expires_at);
+            holder.expiresTime  = (TextView)view.findViewById(R.id.expire);
+            holder.linearLayout = (LinearLayout)view.findViewById(R.id.gradient);
+            holder.icon         = (ImageView)view.findViewById(R.id.icon);
+            holder.iconProgress = (IcsProgressBar)view.findViewById(R.id.icon_progress);
+            holder.sash         = (ImageView)view.findViewById(R.id.sash);
             view.setTag(holder);
         }
 
