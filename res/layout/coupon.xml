@@ -352,7 +352,7 @@
                 <Button
                     android:id="@+id/barcode"
                     android:text="@string/stub_coupon_barcode"
-                    android:background="@drawable/barcode_ninepatch"
+                    android:background="@drawable/barcode"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/white"

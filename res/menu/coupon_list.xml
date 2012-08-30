@@ -8,7 +8,7 @@
           android:showAsAction="always|withText"
           android:icon="@drawable/icon_gift" />
     <item android:id="@+id/share"
-          android:title="Share"
+          android:title="Share App"
           android:showAsAction="always|withText"
           android:icon="@drawable/icon_share" >
         <menu>
