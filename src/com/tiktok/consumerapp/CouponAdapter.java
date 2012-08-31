@@ -254,10 +254,14 @@ public final class CouponAdapter extends CursorAdapter
 
                 public void onFailure() {
                     Log.e(kLogTag, String.format("Failed to download icon: %s", iconUrl));
+
+                    /* [moiz] don't resync, hard to tell when to retry and when to give up
+                     *   possibly add a retry number to the tag to track retry attempts?
                     String tag = (String)viewHolder.icon.getTag();
                     if (iconUrl.equals(tag)) {
                         setupIcon(viewHolder, iconId, iconUrl);
                     }
+                    */
                 }
             });
         }
