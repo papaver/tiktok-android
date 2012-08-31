@@ -23,7 +23,7 @@
                 android:padding="1dip"
                 android:scaleType="fitCenter"
                 android:contentDescription="Facebook Icon"
-                android:src="@drawable/icon_facebook" />
+                android:src="@drawable/ic_action_facebook" />
 
             <TextView
                 android:id="@+id/fb_title"
@@ -54,7 +54,7 @@
                 android:padding="1dip"
                 android:scaleType="fitCenter"
                 android:contentDescription="Twitter Icon"
-                android:src="@drawable/icon_twitterbird" />
+                android:src="@drawable/ic_action_twitter" />
 
             <TextView
                 android:id="@+id/tw_title"
@@ -85,7 +85,7 @@
                 android:padding="1dip"
                 android:scaleType="fitCenter"
                 android:contentDescription="Email Icon"
-                android:src="@drawable/icon_envelope" />
+                android:src="@drawable/ic_action_mail" />
 
             <TextView
                 android:id="@+id/email_title"
@@ -116,7 +116,7 @@
                 android:padding="1dip"
                 android:scaleType="fitCenter"
                 android:contentDescription="SMS Icon"
-                android:src="@drawable/icon_speechbubble" />
+                android:src="@drawable/ic_action_dialog" />
 
             <TextView
                 android:id="@+id/sms_title"
@@ -147,7 +147,7 @@
                 android:padding="1dip"
                 android:scaleType="fitCenter"
                 android:contentDescription="Referral Icon"
-                android:src="@drawable/icon_badge" />
+                android:src="@drawable/ic_action_users" />
 
             <TextView
                 android:id="@+id/referral_title"
