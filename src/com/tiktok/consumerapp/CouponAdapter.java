@@ -161,7 +161,7 @@ public final class CouponAdapter extends CursorAdapter
 
         // no need to set timer if coupon is already expired
         if (Coupon.isExpired(endTime)) {
-            expireCoupon(viewHolder, 0);
+            expireCoupon(viewHolder, 0, endTime);
             return;
         }
 
@@ -178,7 +178,7 @@ public final class CouponAdapter extends CursorAdapter
 
                 // fade out coupon if expired
                 if (Coupon.isExpired(endTime)) {
-                    expireCoupon(viewHolder, 200);
+                    expireCoupon(viewHolder, 200, endTime);
                 } else {
                     mHandler.postDelayed(this, 1000);
                 }
@@ -191,7 +191,7 @@ public final class CouponAdapter extends CursorAdapter
 
     //-------------------------------------------------------------------------
 
-    public void expireCoupon(ViewHolder viewHolder, long milliseconds)
+    public void expireCoupon(ViewHolder viewHolder, long milliseconds, Date endTime)
     {
         // fade out coupon
         AlphaAnimation alpha = new AlphaAnimation(1.0f, 0.6f);
@@ -200,7 +200,9 @@ public final class CouponAdapter extends CursorAdapter
         viewHolder.main.startAnimation(alpha);
 
         // update expire time
-        viewHolder.expiresAt.setText("Offer is no longer available.");
+        final String formattedText = String.format("Offer expired at %s",
+            DateFormat.getTimeInstance(DateFormat.SHORT).format(endTime));
+        viewHolder.expiresAt.setText(formattedText);
     }
 
     //-------------------------------------------------------------------------
