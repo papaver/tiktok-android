@@ -10,6 +10,8 @@ package com.tiktok.consumerapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -200,6 +202,63 @@ public final class GoogleMapsApi
                     postError(error);
                 }
             })).start();
+    }
+
+    //-------------------------------------------------------------------------
+
+    public static String parseLocality(JsonNode node)
+    {
+        final String[] keys = {
+            "subpremise", "premise", "neighborhood",
+            "sublocality", "locality", "colloquial_area",
+            "administrative_area_level_3"
+        };
+
+        // make sure data exists
+        if (node == null) return "Unknown";
+
+        // make sure search results exist
+        String status = node.get("status") != null ? node.get("status").getTextValue() : null;
+        if ((status == null) || status.equals("ZERO_RESULTS")) {
+            return "Unknown";
+        }
+
+        // grab the results from the json data
+        JsonNode results = node.get("results");
+
+        // loop through all of the results and get as many fits as possbile
+        Map<String, String> localities = new HashMap<String, String>();
+        for (JsonNode address : results) {
+            JsonNode components = address.get("address_components");
+            for (JsonNode component : components) {
+                for (String key : keys) {
+
+                    // skip if the key was already found
+                    if (localities.containsKey(key)) continue;
+
+                    // add key if it matches the type
+                    JsonNode types = component.get("types");
+                    for (JsonNode type : types) {
+                        if (type.getTextValue().equals(key)) {
+                            String name = component.get("short_name").getTextValue();
+                            localities.put(key, name);
+                        }
+                    }
+                }
+            }
+        }
+
+        // go through the list and find the smallest locality
+        String locality = "Unknown";
+        for (String key : keys) {
+            String value = localities.get(key);
+            if (value != null) {
+                locality = value;
+                break;
+            }
+        }
+
+        return locality;
     }
 
     //-------------------------------------------------------------------------

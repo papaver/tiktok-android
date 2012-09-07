@@ -8,6 +8,8 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
+import java.util.Map;
+
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -159,6 +161,9 @@ public class StartupActivity extends SherlockFragmentActivity
         // add location tracking operation
         setupLocationTracking();
 
+        // sync settings
+        syncSettings();
+
         // sync coupons
         syncCoupons();
     }
@@ -270,6 +275,38 @@ public class StartupActivity extends SherlockFragmentActivity
         Log.i(kLogTag, "setting up location tracking...");
         startService(new Intent(this, LocationTracker.class));
         LocationTrackerManager.getInstance(this);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void syncSettings()
+    {
+        // only run sync once ever with the server
+        final Settings settings = new Settings(getApplicationContext());
+        if (settings.syncedSettings()) return;
+
+        Log.i(kLogTag, "syncing settings with the server...");
+
+        // setup the api
+        TikTokApi api = new TikTokApi(this, mHandler, new TikTokApi.CompletionHandler() {
+
+            public void onSuccess(Object data) {
+
+                // update settings from the server
+                @SuppressWarnings("unchecked")
+                Map<String, ?> serverSettings = (Map<String, ?>)data;
+                if (settings != null) {
+                    settings.syncToServerSettings(serverSettings);
+                    settings.setSyncedSettings(true);
+                }
+            }
+
+            public void onError(Throwable error) {
+            }
+        });
+
+        // run the query
+        api.syncSettings();
     }
 
     //-------------------------------------------------------------------------

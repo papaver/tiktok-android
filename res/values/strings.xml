@@ -101,4 +101,8 @@
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
 
+    <!-- Gender -->
+    <string name="gender_female">Female</string>
+    <string name="gender_male">Male</string>
+
 </resources>

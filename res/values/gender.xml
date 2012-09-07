@@ -1,10 +1,10 @@
 <resources>
-  <string-array name="gender_entries">
-    <item>Female</item>
-    <item>Male</item>
-  </string-array>
-  <string-array name="gender_values">
-    <item>"Female"</item>
-    <item>"Male"</item>
-  </string-array>
+    <string-array name="gender_entries">
+        <item>Female</item>
+        <item>Male</item>
+    </string-array>
+    <string-array name="gender_values">
+        <item>@string/gender_female</item>
+        <item>@string/gender_male</item>
+    </string-array>
 </resources>

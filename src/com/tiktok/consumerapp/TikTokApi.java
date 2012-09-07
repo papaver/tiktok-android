@@ -494,7 +494,7 @@ public final class TikTokApi
 
                     // parse out the karma points
                     Map<String, Integer> karma = null;
-                    TikTokApiResponse response   = (TikTokApiResponse)data;
+                    TikTokApiResponse response = (TikTokApiResponse)data;
                     if (response.isOkay()) {
                         ObjectMapper mapper = new ObjectMapper();
                         karma = mapper.convertValue(
@@ -548,7 +548,7 @@ public final class TikTokApi
      */
     public void syncCities()
     {
-        // construct route to retrieve karma points
+        // construct route to retrieve city data
         String url = String.format("%s/cities", getApiUrl());
 
         // query the server
@@ -621,6 +621,45 @@ public final class TikTokApi
                     TikTokApiMultiResponse response = (TikTokApiMultiResponse)data;
                     postSuccess(response.getResponse("merchant_redeem"));
                 }
+                public void onError(Throwable error) {
+                    postError(error);
+                }
+            });
+
+        runOnThread(downloader);
+    }
+
+    //-------------------------------------------------------------------------
+
+    /**
+     * @return Syncs the settings from the server.
+     */
+    public void syncSettings()
+    {
+        // construct route to retrieve karma points
+        String url = String.format("%s/consumers/%s/settings",
+            getApiUrl(), utilities().getConsumerId());
+
+        // query the server
+        HttpGet request = new HttpGet(url);
+        Downloader downloader = new Downloader(request, TikTokApiResponse.class,
+            new DownloadHandler() {
+                public void onSuccess(final Object data) {
+
+                    // parse out data if response is valid
+                    Map<String, ?> settings = null;
+                    TikTokApiResponse response   = (TikTokApiResponse)data;
+                    if (response.isOkay()) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        settings = mapper.convertValue(
+                            response.getResults(),
+                            new TypeReference<Map<String, ?>>() {});
+                    }
+
+                    // run handler
+                    postSuccess(settings);
+                }
+
                 public void onError(Throwable error) {
                     postError(error);
                 }

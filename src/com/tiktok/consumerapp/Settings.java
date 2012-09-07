@@ -8,7 +8,6 @@ package com.tiktok.consumerapp;
 // imports
 //-----------------------------------------------------------------------------
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -26,6 +25,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.codehaus.jackson.JsonNode;
+
 //-----------------------------------------------------------------------------
 // class implementation
 //-----------------------------------------------------------------------------
@@ -35,7 +36,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     /**
      * [moiz] use apply instead of commit where possible, this runs the save
-     *   process asychronously instead of commit which runs it synchronously,
+     *   process asynchronously instead of commit which runs it synchronously,
      *   can't use for remove
      */
 
@@ -58,6 +59,16 @@ public final class Settings implements OnSharedPreferenceChangeListener
     public static final String kTagNotifications       = "TTS_notifications";
     public static final String kTagNotificationSound   = "TTS_notifications_sound";
     public static final String kTagNotificationVibrate = "TTS_notifications_vibrate";
+    public static final String kTagSyncedSettings      = "TTS_synced_settings";
+
+    public static final String kApiName                = "name";
+    public static final String kApiEmail               = "email";
+    public static final String kApiTwitterHandle       = "twh";
+    public static final String kApiPhone               = "phone";
+    public static final String kApiGender              = "sex";
+    public static final String kApiBirthday            = "birthday";
+    public static final String kApiHome                = "home";
+    public static final String kApiWork                = "work";
 
     //-------------------------------------------------------------------------
     // constructor
@@ -119,7 +130,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("name", name);
+        settings.put(kApiName, name);
         api.updateSettings(settings);
     }
 
@@ -147,7 +158,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("email", email);
+        settings.put(kApiEmail, email);
         api.updateSettings(settings);
     }
 
@@ -175,7 +186,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("twh", handle);
+        settings.put(kApiTwitterHandle, handle);
         api.updateSettings(settings);
     }
 
@@ -203,7 +214,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("phone", phone);
+        settings.put(kApiPhone, phone);
         api.updateSettings(settings);
     }
 
@@ -232,7 +243,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
         // push update to server
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("sex", gender.toLowerCase().substring(0, 1));
+        settings.put(kApiGender, gender.toLowerCase().substring(0, 1));
         api.updateSettings(settings);
 
         // update analytics
@@ -266,7 +277,8 @@ public final class Settings implements OnSharedPreferenceChangeListener
 
     public void setBirthday(Date birthday)
     {
-        mEditor.putString(kTagBirthday, DateFormat.getDateInstance().format(birthday));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.US);
+        mEditor.putString(kTagBirthday, dateFormat.format(birthday));
         mEditor.commit();
     }
 
@@ -280,7 +292,7 @@ public final class Settings implements OnSharedPreferenceChangeListener
         // push update to server
         TikTokApi api = new TikTokApi(mContext, new Handler(), null);
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("birthday", birthday);
+        settings.put(kApiBirthday, birthday);
         api.updateSettings(settings);
 
         // update analytics
@@ -381,6 +393,84 @@ public final class Settings implements OnSharedPreferenceChangeListener
     // methods
     //-------------------------------------------------------------------------
 
+    public void syncToServerSettings(Map<String, ?> settings)
+    {
+        // name
+        String name = (String)settings.get(kApiName);
+        if (name().equals("") && !name.equals("")) setName(name);
+
+        // email
+        String email = (String)settings.get(kApiEmail);
+        if (email().equals("") && !email.equals("")) setEmail(email);
+
+        // twitter handle
+        String twh = (String)settings.get(kApiTwitterHandle);
+        if (twitterHandle().equals("") && !twh.equals("")) setTwitterHandle(twh);
+
+        // phone
+        String phone  = (String)settings.get(kApiPhone);
+        if (phone().equals("") && !phone.equals("")) setPhone(phone);
+
+        // gender
+        String gender = ((String)settings.get(kApiGender)).toLowerCase();
+        if (gender().equals("")) {
+            if (gender.equals("f")) {
+                setGender(mContext.getString(R.string.gender_female));
+            } else if (gender.equals("m")) {
+                setGender(mContext.getString(R.string.gender_male));
+            }
+        }
+
+        // birthday
+        String birthday = (String)settings.get(kApiBirthday);
+        if ((birthday() == null) && !birthday.equals("")) {
+            try {
+                Date date =
+                    new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(birthday);
+                setBirthday(date);
+            } catch (ParseException e) {
+            }
+        }
+
+        // home
+        syncToServerLocation(settings, kApiHome, kTagHome, kTagHomeLocality);
+
+        // work
+        syncToServerLocation(settings, kApiWork, kTagWork, kTagWorkLocality);
+    }
+
+    //-------------------------------------------------------------------------
+
+    private void syncToServerLocation(
+        Map<String, ?> settings, String apiKey, String tagKey, final String localityKey)
+    {
+        Double latitude  = (Double)settings.get(apiKey + "_latitude");
+        Double longitude = (Double)settings.get(apiKey + "_longitude");
+        if ((getLocation(tagKey) == null) && (latitude != 0.0) && (longitude != 0.0)) {
+
+            // update location setting
+            Location location = new Location("");
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+            setLocation(tagKey, location);
+
+            // update locality setting
+            final Handler handler = new Handler();
+            GoogleMapsApi api = new GoogleMapsApi(mContext, handler, new GoogleMapsApi.CompletionHandler() {
+                public void onSuccess(final JsonNode node) {
+                    String locality = GoogleMapsApi.parseLocality(node);
+                    mEditor.putString(localityKey, locality);
+                    mEditor.commit();
+                }
+                public void onError(Throwable error) {
+                }
+            });
+            api.getReverseGeocodingForAddress(location);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
     public void clearAllSettings()
     {
         mEditor.clear();
@@ -447,6 +537,22 @@ public final class Settings implements OnSharedPreferenceChangeListener
         } else {
             return 0;
         }
+    }
+
+    //-------------------------------------------------------------------------
+
+    public boolean syncedSettings()
+    {
+        return mPreferences.getBoolean(kTagSyncedSettings, false);
+    }
+
+    //-------------------------------------------------------------------------
+
+    public void setSyncedSettings(boolean syncedSettings)
+    {
+        // update preferences
+        mEditor.putBoolean(kTagSyncedSettings, syncedSettings);
+        mEditor.commit();
     }
 
     //-------------------------------------------------------------------------
