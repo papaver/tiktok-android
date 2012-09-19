@@ -192,6 +192,7 @@ public class KarmaFragment extends SherlockFragment
         if (item.getItemId() == R.id.refresh) {
             ProgressDialog progressDialog = new ProgressDialog(getSherlockActivity());
             progressDialog.setMessage("Syncing Points...");
+            progressDialog.setCancelable(false);
             syncPoints(progressDialog);
         }
         return true;

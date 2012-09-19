@@ -285,6 +285,7 @@ public class CouponListFragment extends SherlockListFragment
             withDialog ? new ProgressDialog(context) : null;
         if (progressDialog != null) {
             progressDialog.setMessage("Syncing Deals...");
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
 
@@ -462,6 +463,7 @@ public class CouponListFragment extends SherlockListFragment
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Redeeming...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         // redeem the coupon with the server

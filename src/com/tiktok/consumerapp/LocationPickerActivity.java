@@ -191,6 +191,7 @@ public class LocationPickerActivity extends SherlockMapActivity
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Searching...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         final Handler handler = new Handler();
@@ -273,6 +274,7 @@ public class LocationPickerActivity extends SherlockMapActivity
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Saving...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         final Handler handler = new Handler();

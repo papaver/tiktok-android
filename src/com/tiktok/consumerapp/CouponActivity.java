@@ -345,6 +345,7 @@ public class CouponActivity extends SherlockMapActivity
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Redeeming...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         // redeem the coupon with the server
@@ -706,6 +707,7 @@ public class CouponActivity extends SherlockMapActivity
         // setup progress dialog
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Validating...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         // redeem the coupon with the server
